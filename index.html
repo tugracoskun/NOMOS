@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NOMOS - Grand Strategy Web Engine</title>
+    <!-- Ikonlar -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <!-- Stil -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- Üst Menü (Navbar) -->
+    <nav class="top-nav">
+        <div class="nav-brand">
+            <i class="fa-solid fa-earth-europe"></i> NOMOS
+        </div>
+        <div class="nav-links">
+            <a href="#" class="active" data-page="home"><i class="fa-solid fa-house"></i> Ana Sayfa</a>
+            <a href="#" data-page="profile"><i class="fa-regular fa-id-card"></i> Profil</a>
+            <a href="#" data-page="map"><i class="fa-solid fa-map-location-dot"></i> Haritalar</a>
+            <a href="#" data-page="parliament"><i class="fa-solid fa-landmark"></i> Meclis</a>
+            <a href="#" data-page="trade"><i class="fa-solid fa-arrow-trend-up"></i> Ticaret</a>
+            <a href="#" data-page="wars"><i class="fa-solid fa-jet-fighter"></i> Savaşlar</a>
+        </div>
+        <div class="nav-right">
+            <button class="social-btn"><i class="fa-brands fa-twitter"></i> Sosyal Medya</button>
+            <div class="user-mini">
+                <img src="https://via.placeholder.com/30" class="avatar-mini" alt="User">
+            </div>
+        </div>
+    </nav>
+
+    <!-- Ana Sahne -->
+    <main id="app-container">
+        <!-- İçerik dinamik olarak buraya gelecek -->
+        <div class="loading-screen">
+            <h2>NOMOS</h2>
+            <p>Sistem yükleniyor...</p>
+        </div>
+    </main>
+
+    <!-- JS -->
+    <script src="app.js"></script>
+</body>
+</html>
