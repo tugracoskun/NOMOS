@@ -1,7 +1,7 @@
 // Router Modülü
 import { initMap, destroyMap } from './map.js';
 import { setupChat, initFakeChat } from './chat.js';
-import { renderPartiesPage } from './parties.js';
+import { renderPartiesPage } from './parties/main.js';
 
 const appContainer = document.getElementById('app-container');
 
