@@ -174,3 +174,110 @@
     .parties-toolbar { flex-direction: column; align-items: stretch; }
     .create-btn { margin-left: 0; }
 }
+
+/* --- PARTİ KURMA EKRANI --- */
+.create-party-wrapper {
+    padding: 20px;
+    max-width: 900px;
+    margin: 0 auto;
+    height: 100%;
+    overflow-y: auto;
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+/* Üst Başlık */
+.cp-header {
+    display: flex; align-items: center; gap: 15px;
+    margin-bottom: 30px; border-bottom: 1px solid var(--border); padding-bottom: 15px;
+}
+.back-btn {
+    background: transparent; border: 1px solid var(--border); color: var(--text-dim);
+    width: 40px; height: 40px; border-radius: 50%; cursor: pointer; transition: 0.2s;
+    display: flex; align-items: center; justify-content: center;
+}
+.back-btn:hover { background: var(--bg-card); color: white; }
+.cp-title h2 { font-size: 1.8rem; color: var(--text-light); }
+.cp-title p { color: var(--text-dim); font-size: 0.9rem; }
+
+/* Form Izgarası */
+.cp-grid {
+    display: grid;
+    grid-template-columns: 250px 1fr; /* Sol: Logo, Sağ: Bilgiler */
+    gap: 30px;
+}
+
+/* Sol Taraf: Logo Yükleme */
+.logo-upload-section {
+    display: flex; flex-direction: column; gap: 10px;
+}
+.logo-preview-box {
+    width: 100%; aspect-ratio: 1;
+    background-color: var(--bg-card);
+    border: 2px dashed var(--border);
+    border-radius: 12px;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    cursor: pointer; overflow: hidden; position: relative;
+    transition: all 0.2s;
+    padding: 20px; /* Logoya nefes payı */
+}
+.logo-preview-box:hover { border-color: var(--primary); background-color: rgba(59,130,246,0.05); }
+.logo-preview-box img { width: 100%; height: 100%; object-fit: contain; border-radius: 8px; }
+.upload-placeholder { text-align: center; color: var(--text-dim); pointer-events: none; }
+.upload-placeholder i { font-size: 3rem; margin-bottom: 10px; opacity: 0.5; }
+
+/* Sağ Taraf: Form Alanları */
+.form-fields { display: flex; flex-direction: column; gap: 20px; }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+.form-group { display: flex; flex-direction: column; gap: 8px; }
+.form-group label { font-size: 0.85rem; font-weight: 600; color: var(--text-dim); }
+
+.cp-input, .cp-select, .cp-textarea {
+    background-color: var(--bg-main); border: 1px solid var(--border);
+    color: white; padding: 10px 15px; border-radius: 6px; outline: none;
+    font-size: 0.95rem; transition: border-color 0.2s;
+}
+.cp-input:focus, .cp-select:focus, .cp-textarea:focus { border-color: var(--primary); }
+.cp-textarea { resize: vertical; min-height: 100px; line-height: 1.5; }
+
+/* Renk Seçici Özel Stil */
+.color-picker-wrapper {
+    display: flex; align-items: center; gap: 10px;
+    background: var(--bg-main); border: 1px solid var(--border);
+    padding: 5px 10px; border-radius: 6px;
+}
+input[type="color"] {
+    background: none; border: none; width: 30px; height: 30px; cursor: pointer;
+}
+
+/* Alt Bar: Maliyet ve Onay */
+.cp-footer {
+    margin-top: 30px; padding-top: 20px; border-top: 1px solid var(--border);
+    display: flex; justify-content: space-between; align-items: center;
+}
+.cost-display { font-size: 1.1rem; color: #eab308; font-weight: 700; display: flex; align-items: center; gap: 8px; }
+.publish-btn {
+    background-color: var(--primary); color: white; border: none;
+    padding: 12px 30px; border-radius: 6px; font-weight: 700; font-size: 1rem;
+    cursor: pointer; display: flex; align-items: center; gap: 10px;
+    box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4); transition: 0.2s;
+}
+.publish-btn:hover { background-color: #2563eb; transform: translateY(-2px); }
+
+/* --- CROPPER (KIRPMA) MODAL --- */
+.cropper-modal {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,0.9); z-index: 200;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+}
+.cropper-container {
+    width: 80%; height: 60%; background: #000;
+    margin-bottom: 20px;
+}
+.cropper-controls { display: flex; gap: 15px; }
+.crop-btn { padding: 10px 25px; border-radius: 6px; border:none; font-weight: 600; cursor: pointer; }
+.btn-cancel { background: #334155; color: white; }
+.btn-save { background: var(--accent); color: #000; }
+
+@media (max-width: 768px) { .cp-grid { grid-template-columns: 1fr; } .form-row { grid-template-columns: 1fr; } }
