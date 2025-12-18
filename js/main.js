@@ -1,30 +1,30 @@
 // Main Modülü
-// Giriş noktası. Event listener'ları tanımlar.
+// Uygulamanın giriş noktası ve global olay dinleyicisi
 
-import { loadPage } from './router.js';
+import { navigateTo, handleInitialLoad } from './router.js';
 
 document.addEventListener('DOMContentLoaded', () => {
-    console.log("NOMOS System Initialized (Modular).");
+    console.log("NOMOS System Initialized.");
 
-    // Navigasyon Linklerini Seç
-    const navLinks = document.querySelectorAll('.header-bottom a');
+    // --- GLOBAL EVENT DELEGATION ---
+    // Sayfadaki herhangi bir tıklamayı dinler
+    document.body.addEventListener('click', (e) => {
+        // Tıklanan elementin kendisi veya üst ebeveyni bir "data-page" içeriyor mu?
+        // (Örn: Butonun içindeki ikona tıklansa bile butonu bulur)
+        const target = e.target.closest('[data-page]');
+        
+        if (target) {
+            e.preventDefault(); // Sayfanın yenilenmesini engelle
+            
+            const page = target.getAttribute('data-page');
+            const view = target.getAttribute('data-view') || null; // Alt sayfa (create, detail)
+            const id = target.getAttribute('data-id') || null;     // ID (1, 2, 5)
 
-    // Tıklama Olayları
-    navLinks.forEach(link => {
-        link.addEventListener('click', (e) => {
-            e.preventDefault();
-
-            // Aktif sınıfını güncelle
-            navLinks.forEach(l => l.classList.remove('active'));
-            link.classList.add('active');
-
-            // Sayfayı yükle
-            const pageName = link.getAttribute('data-page');
-            loadPage(pageName);
-        });
+            // Router üzerinden git (Geçmişe kaydeder)
+            navigateTo(page, view, id);
+        }
     });
 
-    // Varsayılan olarak Ana Sayfayı aç
-    // (İstersen 'map' yaparak doğrudan haritayla açılmasını sağlayabilirsin)
-    loadPage('home');
+    // Sayfa ilk açıldığında veya F5 atıldığında URL'e göre doğru yeri aç
+    handleInitialLoad();
 });
