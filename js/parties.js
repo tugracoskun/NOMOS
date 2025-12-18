@@ -1,7 +1,55 @@
 // PARTİLER MODÜLÜ
-// Veri, Listeleme, Arama ve Detay Penceresi (Modal)
+// Veri, Listeleme, Arama ve Detay Penceresi
 
-// Örnek Veritabanı (Rival Regions + Wiki Hibrit)
+// --- GENİŞLETİLMİŞ İDEOLOJİ LİSTESİ (40+ Adet) ---
+const availableIdeologies = [
+    "Agraryanizm (Köylü Hareketi)",
+    "Anarşizm",
+    "Anarko-Kapitalizm",
+    "Anarko-Komünizm",
+    "Bölgeselcilik",
+    "Çevrecilik (Yeşil Siyaset)",
+    "Demokratik Sosyalizm",
+    "Devletçilik",
+    "Eko-Faşizm",
+    "Faşizm",
+    "Feminizm",
+    "Gelenekselcilik",
+    "Hristiyan Demokrasi",
+    "İslamcılık",
+    "İslami Demokrasi",
+    "Kemalizm",
+    "Komünizm",
+    "Korporatizm",
+    "Liberalizm",
+    "Liberteryanizm",
+    "Marksizm-Leninizm",
+    "Merkezcilik",
+    "Militarizm",
+    "Milliyetçilik",
+    "Monarşizm",
+    "Muhafazakarlık",
+    "Mutlakiyet",
+    "Nasyonal Sosyalizm",
+    "Neo-Liberalizm",
+    "Otoriteryanizm",
+    "Pan-Türkizm (Turanizm)",
+    "Parlamentarizm",
+    "Pasifizm",
+    "Piratizm (Korsan Parti)",
+    "Popülizm",
+    "Progresivizm (İlerlemecilik)",
+    "Sosyal Demokrasi",
+    "Sosyalizm",
+    "Teknokratizm",
+    "Teokrasi",
+    "Totalitarizm",
+    "Transhümanizm",
+    "Troçkizm",
+    "Ulusalcılık"
+];
+
+// Örnek Veritabanı (Test için çeşitlendirildi)
 const partiesData = [
     {
         id: 1,
@@ -11,8 +59,8 @@ const partiesData = [
         founded: "12 Kasım 2024",
         members: 1420,
         ideology: "Milliyetçilik",
-        color: "#94a3b8", // Koyu Gri/Metal
-        logo: "fa-wolf-pack-battalion", // FontAwesome ikonu (Resim de olabilir)
+        color: "#94a3b8", 
+        logo: "fa-wolf-pack-battalion", 
         slogan: "Her şey vatan için!",
         description: "Milli İrade Partisi, devletin bekasını ve ulusun bölünmez bütünlüğünü savunan, geleneklerine bağlı vatandaşların partisidir.",
         policies: ["Sınır güvenliği artırılacak", "Yerli üretim desteklenecek", "Askeri bütçe %20 artırılacak"],
@@ -26,11 +74,11 @@ const partiesData = [
         founded: "5 Ocak 2025",
         members: 850,
         ideology: "Liberalizm",
-        color: "#3b82f6", // Mavi
+        color: "#3b82f6", 
         logo: "fa-dove",
         slogan: "Bırakınız yapsınlar, bırakınız geçsinler.",
-        description: "Bireysel özgürlükleri ve serbest piyasa ekonomisini savunan, devletin ekonomiye müdahalesini en aza indirmeyi hedefleyen oluşum.",
-        policies: ["Vergiler %10 düşürülecek", "Gümrük duvarları kaldırılacak", "İfade özgürlüğü yasası"],
+        description: "Bireysel özgürlükleri ve serbest piyasa ekonomisini savunan oluşum.",
+        policies: ["Vergiler düşürülecek", "Gümrük duvarları kaldırılacak", "İfade özgürlüğü"],
         wage: "250 G"
     },
     {
@@ -41,11 +89,11 @@ const partiesData = [
         founded: "1 Mayıs 2024",
         members: 2300,
         ideology: "Komünizm",
-        color: "#ef4444", // Kırmızı
+        color: "#ef4444", 
         logo: "fa-hammer",
         slogan: "Zincirlerinden başka kaybedecek neyin var?",
-        description: "İşçi sınıfının haklarını savunan, üretim araçlarının kamulaştırılmasını hedefleyen devrimci parti.",
-        policies: ["Özel mülkiyet sınırlandırılacak", "Herkese ücretsiz konut", "Fabrikalar işçilere devredilecek"],
+        description: "İşçi sınıfının haklarını savunan devrimci parti.",
+        policies: ["Kamulaştırma", "Ücretsiz konut", "İşçi konseyleri"],
         wage: "100 G"
     },
     {
@@ -55,17 +103,52 @@ const partiesData = [
         leader: "Deniz G.",
         founded: "22 Mart 2025",
         members: 120,
-        ideology: "Ekolojizm",
-        color: "#10b981", // Yeşil
+        ideology: "Çevrecilik (Yeşil Siyaset)",
+        color: "#10b981", 
         logo: "fa-leaf",
         slogan: "Doğa yoksa, gelecek yok.",
-        description: "Sürdürülebilir kalkınma ve çevre koruma odaklı, sanayileşmenin doğaya verdiği zararı durdurmayı amaçlayan parti.",
-        policies: ["Fosil yakıtlar yasaklanacak", "Yenilenebilir enerji teşviği", "Orman alanları koruma kanunu"],
+        description: "Sürdürülebilir kalkınma odaklı parti.",
+        policies: ["Fosil yakıt yasağı", "Yenilenebilir enerji", "Orman koruma"],
         wage: "0 G"
+    },
+    {
+        id: 5,
+        name: "Gelecek Bilim Hareketi",
+        shortName: "GBH",
+        leader: "Dr. Selim A.",
+        founded: "10 Nisan 2025",
+        members: 450,
+        ideology: "Teknokratizm",
+        color: "#a855f7", 
+        logo: "fa-microchip",
+        slogan: "Veri, Bilim, Yönetim.",
+        description: "Devletin siyasetçiler değil, yapay zeka ve uzman kurullar tarafından yönetilmesini savunan hareket.",
+        policies: ["Yapay zeka hükümeti", "Ar-Ge bütçesi %10", "Dijital vatandaşlık"],
+        wage: "300 G"
+    },
+    {
+        id: 6,
+        name: "Büyük Turan Birliği",
+        shortName: "BTB",
+        leader: "Alparslan T.",
+        founded: "19 Mayıs 2023",
+        members: 3100,
+        ideology: "Pan-Türkizm (Turanizm)",
+        color: "#06b6d4", 
+        logo: "fa-horse-head",
+        slogan: "Adriyatik'ten Çin Seddi'ne!",
+        description: "Tüm Türk devletlerinin tek çatı altında birleşmesini hedefleyen birlik.",
+        policies: ["Ortak ordu", "Ortak para birimi", "Vizesiz seyahat"],
+        wage: "600 G"
     }
 ];
 
 export function renderPartiesPage(container) {
+    // İdeoloji Seçeneklerini Oluştur (Alfabetik Sıraya Göre)
+    const ideologyOptions = availableIdeologies.sort().map(ideology => 
+        `<option value="${ideology}">${ideology}</option>`
+    ).join('');
+
     container.innerHTML = `
         <div class="parties-wrapper">
             <!-- ÜST KONTROL PANELİ -->
@@ -78,10 +161,7 @@ export function renderPartiesPage(container) {
                 <div class="filter-box">
                     <select id="ideology-filter">
                         <option value="all">Tüm İdeolojiler</option>
-                        <option value="Milliyetçilik">Milliyetçilik</option>
-                        <option value="Liberalizm">Liberalizm</option>
-                        <option value="Komünizm">Komünizm</option>
-                        <option value="Ekolojizm">Ekolojizm</option>
+                        ${ideologyOptions} <!-- LİSTE BURAYA OTOMATİK GELİYOR -->
                     </select>
                 </div>
 
@@ -94,38 +174,32 @@ export function renderPartiesPage(container) {
             </div>
         </div>
 
-        <!-- DETAY MODAL (Pop-up) - Başlangıçta gizli -->
+        <!-- DETAY MODAL -->
         <div id="party-modal" class="modal-overlay" style="display:none;">
             <div class="modal-content">
                 <button class="close-modal"><i class="fa-solid fa-xmark"></i></button>
-                <div id="modal-body">
-                    <!-- İçerik dinamik gelecek -->
-                </div>
+                <div id="modal-body"></div>
             </div>
         </div>
     `;
 
-    // İlk listeleme
     filterAndRenderParties();
 
-    // Event Listeners (Arama ve Filtreleme)
     document.getElementById('party-search').addEventListener('input', filterAndRenderParties);
     document.getElementById('ideology-filter').addEventListener('change', filterAndRenderParties);
     
-    // Modal Kapatma
     document.querySelector('.close-modal').addEventListener('click', closeModal);
     document.getElementById('party-modal').addEventListener('click', (e) => {
         if (e.target.id === 'party-modal') closeModal();
     });
 }
 
-// Filtreleme ve Ekrana Basma Fonksiyonu
 function filterAndRenderParties() {
     const searchText = document.getElementById('party-search').value.toLowerCase();
     const ideologyFilter = document.getElementById('ideology-filter').value;
     const grid = document.getElementById('party-list-grid');
 
-    grid.innerHTML = ""; // Temizle
+    grid.innerHTML = "";
 
     const filtered = partiesData.filter(p => {
         const matchesSearch = p.name.toLowerCase().includes(searchText) || p.shortName.toLowerCase().includes(searchText);
@@ -134,7 +208,7 @@ function filterAndRenderParties() {
     });
 
     if (filtered.length === 0) {
-        grid.innerHTML = `<div class="no-result">Aradığınız kriterlere uygun parti bulunamadı.</div>`;
+        grid.innerHTML = `<div style="text-align:center; padding:20px; color:#94a3b8; width:100%;">Aradığınız kriterlere uygun parti bulunamadı.</div>`;
         return;
     }
 
@@ -152,25 +226,22 @@ function filterAndRenderParties() {
             <button class="details-btn">İncele</button>
         `;
         
-        // Tıklayınca Modalı Aç
-        card.querySelector('.details-btn').addEventListener('click', () => openPartyModal(party));
-        card.addEventListener('click', (e) => {
-             // Butona değil karta basınca da açılsın (opsiyonel)
-             if(e.target.tagName !== 'BUTTON') openPartyModal(party);
+        card.querySelector('.details-btn').addEventListener('click', (e) => {
+            e.stopPropagation();
+            openPartyModal(party);
         });
+        card.addEventListener('click', () => openPartyModal(party));
 
         grid.appendChild(card);
     });
 }
 
-// Detay Penceresini Açma (Rival Regions / Wiki Style)
 function openPartyModal(party) {
     const modal = document.getElementById('party-modal');
     const body = document.getElementById('modal-body');
 
-    // Wiki/RR Tarzı İçerik Oluşturma
     body.innerHTML = `
-        <div class="party-profile-header" style="background: linear-gradient(to right, rgba(0,0,0,0.8), rgba(0,0,0,0.8)), linear-gradient(to right, ${party.color}, transparent);">
+        <div class="party-profile-header" style="background: linear-gradient(to right, rgba(15, 23, 42, 0.9), rgba(15, 23, 42, 0.4)), linear-gradient(to right, ${party.color}, transparent);">
             <div class="big-logo" style="color:${party.color}"><i class="fa-solid ${party.logo}"></i></div>
             <div class="header-texts">
                 <h1>${party.name}</h1>
@@ -179,7 +250,6 @@ function openPartyModal(party) {
         </div>
 
         <div class="party-profile-grid">
-            <!-- Sol: Wiki Infobox -->
             <div class="wiki-infobox">
                 <div class="wiki-title">Parti Künyesi</div>
                 <div class="wiki-row"><span>Kısaltma</span> <strong>${party.shortName}</strong></div>
@@ -190,7 +260,6 @@ function openPartyModal(party) {
                 <div class="wiki-row"><span>Parti Maaşı</span> <strong style="color:#eab308">${party.wage}</strong></div>
             </div>
 
-            <!-- Sağ: İçerik -->
             <div class="party-main-content">
                 <h3>Hakkında</h3>
                 <p>${party.description}</p>
