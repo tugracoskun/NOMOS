@@ -310,3 +310,81 @@ body {
 @media (max-width: 768px) {
     .home-layout { grid-template-columns: 1fr; grid-template-rows: 1fr 300px; }
 }
+
+/* --- PARTİLER VE İDEOLOJİLER SAYFASI --- */
+.parties-layout {
+    padding: 30px;
+    max-width: 1200px;
+    margin: 0 auto;
+    overflow-y: auto;
+    height: 100%;
+}
+
+.page-header {
+    margin-bottom: 25px;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 15px;
+}
+
+.page-title { font-size: 1.8rem; color: var(--text-light); font-weight: 300; }
+.page-subtitle { color: var(--text-dim); font-size: 0.9rem; margin-top: 5px; }
+
+/* İdeoloji Grid Yapısı */
+.ideology-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 20px;
+}
+
+.ideology-card {
+    background-color: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 20px;
+    transition: transform 0.2s, border-color 0.2s;
+    position: relative;
+    overflow: hidden;
+}
+
+.ideology-card:hover {
+    transform: translateY(-5px);
+    border-color: var(--primary);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+}
+
+/* Kartın solundaki renkli şerit */
+.ideology-card::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 4px;
+    background-color: var(--tag-color, #94a3b8); /* Varsayılan gri */
+}
+
+.card-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.ideology-icon {
+    font-size: 1.5rem;
+    color: var(--tag-color, #fff);
+    background: rgba(255,255,255,0.05);
+    width: 40px; height: 40px;
+    display: flex; align-items: center; justify-content: center;
+    border-radius: 6px;
+}
+
+.ideology-name { font-size: 1.1rem; font-weight: 600; color: var(--text-light); }
+.ideology-desc { font-size: 0.85rem; color: var(--text-dim); line-height: 1.5; }
+
+/* Renk Tanımlamaları (Inline style ile de verebiliriz ama class daha temiz) */
+.color-red { --tag-color: #ef4444; }      /* Komünizm/Sosyalizm */
+.color-blue { --tag-color: #3b82f6; }     /* Liberalizm */
+.color-dark { --tag-color: #1e293b; }     /* Faşizm/Absolutizm */
+.color-green { --tag-color: #10b981; }    /* Çevrecilik */
+.color-yellow { --tag-color: #eab308; }   /* Anarşizm */
+.color-purple { --tag-color: #a855f7; }   /* Feminizm */
+.color-gray { --tag-color: #64748b; }     /* Muhafazakarlık */
