@@ -1,57 +1,176 @@
-.parties-layout {
-    padding: 30px; max-width: 1400px; margin: 0 auto;
-    overflow-y: auto; height: 100%;
+/* --- PARTİLER ANA SAYFA --- */
+.parties-wrapper {
+    padding: 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+    height: 100%;
+    overflow-y: auto;
 }
-.page-header { margin-bottom: 30px; border-bottom: 1px solid var(--border); padding-bottom: 20px; }
-.page-title { font-size: 2rem; color: var(--text-light); font-weight: 700; letter-spacing: -0.5px; }
-.page-subtitle { color: var(--text-dim); font-size: 1rem; margin-top: 8px; }
 
-.ideology-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 25px; }
-
-.ideology-card {
-    background-color: var(--bg-card); border: 1px solid var(--border);
-    border-radius: 12px; display: flex; flex-direction: column; overflow: hidden;
-    transition: transform 0.2s, box-shadow 0.2s; position: relative;
+/* Araç Çubuğu (Search & Filter) */
+.parties-toolbar {
+    display: flex;
+    gap: 15px;
+    background-color: var(--bg-card);
+    padding: 15px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    margin-bottom: 20px;
+    align-items: center;
+    flex-wrap: wrap;
 }
-.ideology-card:hover { transform: translateY(-5px); box-shadow: 0 15px 30px rgba(0,0,0,0.4); border-color: var(--tag-color); }
 
-/* Renk Sınıfları */
-.color-red { --tag-color: var(--color-red); }
-.color-blue { --tag-color: var(--color-blue); }
-.color-dark { --tag-color: var(--color-dark); }
-.color-green { --tag-color: var(--color-green); }
-.color-yellow { --tag-color: var(--color-yellow); }
-.color-purple { --tag-color: var(--color-purple); }
-.color-orange { --tag-color: var(--color-orange); }
-
-.card-header-bg {
-    background: linear-gradient(135deg, var(--bg-panel) 0%, rgba(0,0,0,0.4) 100%);
-    padding: 20px; border-bottom: 1px solid var(--border); position: relative;
+.search-box {
+    flex: 2;
+    background-color: var(--bg-main);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 8px 12px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
 }
-.card-header-bg::before {
-    content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 6px;
-    background-color: var(--tag-color);
+.search-box input {
+    background: transparent; border: none; outline: none; color: white; width: 100%;
 }
-.header-content { display: flex; justify-content: space-between; align-items: center; }
-.ideology-icon-large { font-size: 2rem; color: var(--tag-color); opacity: 0.9; }
-.ideology-title-group { text-align: right; }
-.ideology-name { font-size: 1.4rem; font-weight: 700; color: var(--text-light); display: block; }
-.ideology-type { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; color: var(--tag-color); font-weight: 600; }
+.search-box i { color: var(--text-dim); }
 
-.card-body { padding: 20px; display: flex; flex-direction: column; gap: 20px; flex: 1; }
-.ideology-desc { font-size: 0.9rem; color: #cbd5e1; line-height: 1.6; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 15px; }
+.filter-box select {
+    background-color: var(--bg-main); color: white; border: 1px solid var(--border);
+    padding: 8px 15px; border-radius: 6px; outline: none; cursor: pointer;
+}
 
-/* Stats */
-.stats-container { display: flex; flex-direction: column; gap: 10px; }
-.stat-row { display: flex; align-items: center; justify-content: space-between; font-size: 0.8rem; color: var(--text-dim); }
-.stat-label { width: 100px; }
-.stat-bar-bg { flex: 1; height: 8px; background-color: rgba(255,255,255,0.1); border-radius: 4px; margin-left: 10px; overflow: hidden; }
-.stat-bar-fill { height: 100%; background-color: var(--tag-color); border-radius: 4px; }
+.create-btn {
+    background-color: var(--accent); color: #000; border: none; padding: 10px 20px;
+    border-radius: 6px; font-weight: 600; cursor: pointer; margin-left: auto;
+}
 
-/* Modifiers */
-.modifiers-box { background-color: rgba(0,0,0,0.2); border-radius: 8px; padding: 10px; }
-.modifier-title { font-size: 0.75rem; font-weight: 700; color: var(--text-dim); margin-bottom: 8px; text-transform: uppercase; }
-.mod-list { list-style: none; font-size: 0.85rem; }
-.mod-item { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; }
-.mod-plus { color: #4ade80; }
-.mod-minus { color: #f87171; }
+/* Liste Izgarası (Grid) */
+.party-list-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.party-list-card {
+    background-color: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 15px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.party-list-card:hover {
+    background-color: rgba(255,255,255,0.03);
+}
+
+.list-logo { font-size: 1.5rem; width: 40px; text-align: center; }
+.list-info { flex: 1; }
+.list-name { font-size: 1.1rem; font-weight: 600; color: var(--text-light); }
+.list-short { font-size: 0.9rem; color: var(--text-dim); font-weight: 400; }
+.list-sub { font-size: 0.8rem; color: var(--text-dim); margin-top: 4px; }
+.list-tag { background: rgba(255,255,255,0.1); padding: 4px 8px; border-radius: 4px; font-size: 0.75rem; color: var(--text-dim); }
+
+.details-btn {
+    background: transparent; border: 1px solid var(--border); color: var(--text-dim);
+    padding: 6px 12px; border-radius: 4px; cursor: pointer;
+}
+
+/* --- DETAY MODAL (POP-UP) --- */
+.modal-overlay {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background-color: rgba(0,0,0,0.85); /* Karartılmış arka plan */
+    z-index: 100;
+    display: flex; align-items: center; justify-content: center;
+    backdrop-filter: blur(5px);
+}
+
+.modal-content {
+    background-color: var(--bg-panel);
+    width: 90%; max-width: 900px;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    position: relative;
+    overflow: hidden;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.8);
+}
+
+.close-modal {
+    position: absolute; top: 15px; right: 15px;
+    background: rgba(0,0,0,0.5); border: none; color: white;
+    width: 30px; height: 30px; border-radius: 50%;
+    cursor: pointer; z-index: 10; font-size: 1.2rem;
+}
+
+/* Modal İçerik Tasarımı */
+.party-profile-header {
+    padding: 40px;
+    display: flex; align-items: center; gap: 20px;
+    border-bottom: 1px solid var(--border);
+}
+.big-logo { font-size: 4rem; }
+.header-texts h1 { font-size: 2.5rem; margin-bottom: 5px; text-shadow: 0 2px 4px rgba(0,0,0,0.5); }
+.slogan { font-style: italic; color: rgba(255,255,255,0.8); font-size: 1.1rem; }
+
+.party-profile-grid {
+    display: grid;
+    grid-template-columns: 300px 1fr; /* Sol (Wiki) - Sağ (İçerik) */
+    gap: 0;
+}
+
+/* Sol Taraf: Wiki Infobox */
+.wiki-infobox {
+    background-color: rgba(0,0,0,0.2);
+    padding: 20px;
+    border-right: 1px solid var(--border);
+    display: flex; flex-direction: column; gap: 10px;
+}
+
+.wiki-title {
+    text-align: center; font-weight: 700; border-bottom: 1px solid var(--border);
+    padding-bottom: 10px; margin-bottom: 10px; font-size: 1.1rem;
+}
+
+.wiki-row {
+    display: flex; justify-content: space-between;
+    font-size: 0.9rem; border-bottom: 1px solid rgba(255,255,255,0.05);
+    padding: 8px 0;
+}
+.wiki-row span { color: var(--text-dim); }
+
+/* Sağ Taraf: İçerik */
+.party-main-content { padding: 30px; }
+.party-main-content h3 { border-bottom: 1px solid var(--border); padding-bottom: 10px; margin-bottom: 15px; margin-top: 20px; color: var(--text-light); }
+.party-main-content h3:first-child { margin-top: 0; }
+.party-main-content p { color: #cbd5e1; line-height: 1.6; }
+
+.policy-list { list-style: none; margin-top: 15px; }
+.policy-list li { margin-bottom: 10px; color: #cbd5e1; }
+.policy-list i { margin-right: 10px; }
+
+.action-buttons {
+    margin-top: 30px; display: flex; gap: 15px;
+}
+.join-party-btn {
+    flex: 2; padding: 12px; border: none; border-radius: 6px;
+    color: white; font-weight: 700; cursor: pointer; font-size: 1rem;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+}
+.donate-btn {
+    flex: 1; background: transparent; border: 1px solid var(--border); color: var(--text-light);
+    border-radius: 6px; cursor: pointer;
+}
+
+/* Mobil */
+@media (max-width: 768px) {
+    .party-profile-grid { grid-template-columns: 1fr; }
+    .wiki-infobox { border-right: none; border-bottom: 1px solid var(--border); }
+    .parties-toolbar { flex-direction: column; align-items: stretch; }
+    .create-btn { margin-left: 0; }
+}
