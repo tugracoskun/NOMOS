@@ -14,13 +14,10 @@
 </head>
 <body>
 
-    <!-- YENİ ÜST PANEL (Çizimine Göre) -->
+    <!-- ÜST PANEL -->
     <header class="game-header">
-        
-        <!-- Üst Satır: Profil ve Statüler -->
         <div class="header-top">
-            
-            <!-- Sol: Profil Resmi, İsim, Level -->
+            <!-- Profil -->
             <div class="user-section">
                 <div class="avatar-frame">
                     <img src="https://i.pravatar.cc/150?img=11" alt="Avatar" id="user-avatar">
@@ -32,7 +29,7 @@
                 </div>
             </div>
 
-            <!-- Sağ: Enerji ve Ayarlar -->
+            <!-- Enerji ve Ayarlar -->
             <div class="status-section">
                 <div class="resource-group">
                     <i class="fa-solid fa-bolt text-yellow"></i>
@@ -46,7 +43,7 @@
             </div>
         </div>
 
-        <!-- Alt Satır: Navigasyon Linkleri -->
+        <!-- Navigasyon -->
         <nav class="header-bottom">
             <a href="#" data-page="home" class="active"><i class="fa-solid fa-house"></i> Ana Sayfa</a>
             <a href="#" data-page="profile"><i class="fa-solid fa-user"></i> Profil</a>
@@ -62,11 +59,13 @@
 
     <!-- Ana Sahne -->
     <main id="app-container">
-        <!-- İçerik buraya gelecek -->
+        <!-- İçerik dinamik gelecek -->
     </main>
 
-    <!-- Leaflet JS -->
+    <!-- Leaflet JS (Global Kütüphane) -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
-    <script src="app.js"></script>
+    
+    <!-- MODÜLER JS BAŞLANGICI -->
+    <script type="module" src="js/main.js"></script>
 </body>
 </html>

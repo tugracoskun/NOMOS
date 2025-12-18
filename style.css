@@ -178,8 +178,14 @@ body {
 #game-map {
     width: 100%;
     height: 100%;
-    background-color: #050a14; /* Harita yüklenmeden önceki renk */
+    /* Arka plan artık harita yüklenirken görünen renk değil, DENİZİN kendisi */
+    background-color: #0f172a; 
     z-index: 1;
+}
+
+/* Leaflet varsayılan gri arka planını ezmek için */
+.leaflet-container {
+    background: #0f172a !important;
 }
 
 /* Leaflet Özelleştirmeleri */
