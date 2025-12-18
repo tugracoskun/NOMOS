@@ -29,9 +29,9 @@ export async function initMap(containerId) {
     
     try {
         // GÜNCELLENEN GÜVENİLİR URL (Cloudfront CDN)
-        const response = await fetch('https://d2ad6b4ur7yvpq.cloudfront.net/naturalearth-3.3.0/ne_50m_admin_0_countries.geojson');
+        const response = await fetch('./assets/world.json');
         
-        if (!response.ok) throw new Error(`HTTP Hata: ${response.status}`);
+        if (!response.ok) throw new Error(`Dosya Bulunamadı: ${response.status}`);
         
         const data = await response.json();
 
