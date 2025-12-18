@@ -1,25 +1,21 @@
 // NOMOS Client Side Logic
 
-// Global değişkenler
 let mapInstance = null; 
 
 document.addEventListener('DOMContentLoaded', () => {
     console.log("NOMOS System Initialized.");
 
-    // Navigasyon Mantığı
-    const navLinks = document.querySelectorAll('.nav-links a');
+    // Navigasyon Seçicileri güncellendi (.header-bottom içindekiler)
+    const navLinks = document.querySelectorAll('.header-bottom a');
     
-    // Varsayılan olarak Ana Sayfa yükle
+    // Varsayılan sayfa
     loadPage('home');
 
     navLinks.forEach(link => {
         link.addEventListener('click', (e) => {
             e.preventDefault();
-            
-            // Aktif sınıfını değiştir
             navLinks.forEach(l => l.classList.remove('active'));
             link.classList.add('active');
-
             const page = link.getAttribute('data-page');
             loadPage(page);
         });
@@ -28,58 +24,75 @@ document.addEventListener('DOMContentLoaded', () => {
 
 function loadPage(pageName) {
     const container = document.getElementById('app-container');
-    console.log(`Sayfa yükleniyor: ${pageName}`);
     
-    // Harita varsa ve başka sayfaya geçiyorsak haritayı temizle (bellek yönetimi)
+    // Harita temizliği
     if (mapInstance && pageName !== 'map') {
         mapInstance.remove();
         mapInstance = null;
     }
 
     if (pageName === 'map') {
-        // Harita Konteynerini Oluştur
         container.innerHTML = `<div id="game-map"></div>`;
         initMap();
     } else if (pageName === 'home') {
         container.innerHTML = `
-            <div style="display:flex; justify-content:center; align-items:center; height:100%; flex-direction:column;">
-                <h1 style="color:var(--text-dim); font-size: 3rem; opacity: 0.2;">NOMOS</h1>
-                <p style="color:var(--text-dim);">Devlet Yönetim Paneline Hoşgeldiniz.</p>
+            <div style="display:flex; justify-content:center; align-items:center; height:100%; flex-direction:column; gap:10px;">
+                <h1 style="color:var(--text-dim); font-size: 2rem;">ANA SAYFA</h1>
+                <p style="color:var(--text-dim);">Son Makaleler ve Gündem burada olacak.</p>
             </div>
         `;
     } else {
-        // Diğer sayfalar için placeholder
         container.innerHTML = `
             <div style="display:flex; justify-content:center; align-items:center; height:100%; flex-direction:column;">
-                <h1 style="color:var(--text-dim); font-size: 3rem; opacity: 0.2;">${pageName.toUpperCase()}</h1>
-                <p style="color:var(--text-dim);">Bu modül yapım aşamasında.</p>
+                <h1 style="color:var(--text-dim); font-size: 2rem; opacity: 0.3;">${pageName.toUpperCase()}</h1>
+                <p style="color:var(--text-dim);">Yapım aşamasında.</p>
             </div>
         `;
     }
 }
 
 function initMap() {
-    // Haritayı başlat (Türkiye odaklı)
-    // Koordinatlar: [Enlem, Boylam], Zoom Seviyesi: 6
-    mapInstance = L.map('game-map', {
-        zoomControl: false, // Zoom butonlarını elle ekleyeceğiz veya kapalı tutacağız
-        attributionControl: false 
-    }).setView([39.0, 35.0], 6);
-
-    // Zoom butonunu sağ alta ekleyelim (Tasarım tercihi)
-    L.control.zoom({
-        position: 'bottomright'
-    }).addTo(mapInstance);
-
-    // KARANLIK TEMA HARİTA KATMANI (CartoDB Dark Matter)
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-        maxZoom: 19,
-        subdomains: 'abcd'
-    }).addTo(mapInstance);
-
-    // Örnek bir işaretçi (Ankara)
-    const marker = L.marker([39.9334, 32.8597]).addTo(mapInstance);
-    marker.bindPopup("<b>Başkent Ankara</b><br>Yönetim Merkezi").openPopup();
+    // "Sağlam" harita için temel:
+    // Fazla detaylı "uydu" veya "sokak" haritası yerine,
+    // üzerine veri işleyebileceğimiz sade bir zemin (Canvas) kullanacağız.
     
-    console.log("Harita başarıyla yüklendi.");
+    mapInstance = L.map('game-map', {
+        zoomControl: false,
+        attributionControl: false,
+        minZoom: 3,
+        maxZoom: 6, // Çok içeri girmeyi engelliyoruz, strateji haritası bu.
+        // Dünyanın tekrar etmesini engelle (opsiyonel, strateji oyunlarında iyidir)
+        maxBoundsViscosity: 1.0 
+    }).setView([39.0, 35.0], 5);
+
+    L.control.zoom({ position: 'bottomright' }).addTo(mapInstance);
+
+    // BASEMAP SEÇİMİ:
+    // Burası çok önemli. "CartoDB Dark Matter No Labels" kullanıyoruz.
+    // Yani sadece kara parçalarının şekli var, üstünde yazı/yol yok.
+    // Şehirleri ve sınırları biz kodla ekleyeceğiz.
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}{r}.png', {
+        subdomains: 'abcd',
+        maxZoom: 19
+    }).addTo(mapInstance);
+
+    // Şimdilik test için bir başkent ikonu koyalım
+    // İleride buraya tüm şehirleri veritabanından çekeceğiz.
+    const capitals = [
+        { name: "Ankara", coords: [39.9334, 32.8597] },
+        { name: "Londra", coords: [51.5074, -0.1278] },
+        { name: "Moskova", coords: [55.7558, 37.6173] },
+        { name: "Berlin", coords: [52.5200, 13.4050] }
+    ];
+
+    capitals.forEach(city => {
+        L.circleMarker(city.coords, {
+            color: '#3b82f6', // Mavi çerçeve
+            fillColor: '#0f172a', // Koyu dolgu
+            fillOpacity: 1,
+            radius: 6
+        }).addTo(mapInstance).bindPopup(`<b>${city.name}</b>`);
+    });
+
+    console.log("Harita motoru başlatıldı (Basitleştirilmiş Mod).");
 }

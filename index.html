@@ -3,52 +3,70 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NOMOS - Grand Strategy Web Engine</title>
-    <!-- Ikonlar -->
+    <title>NOMOS</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Font -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
-    <!-- Stil -->
-    <link rel="stylesheet" href="style.css">
+    
     <!-- Leaflet CSS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+    
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-    <!-- Üst Menü (Navbar) -->
-    <nav class="top-nav">
-        <div class="nav-brand">
-            <i class="fa-solid fa-earth-europe"></i> NOMOS
-        </div>
-        <div class="nav-links">
-            <a href="#" class="active" data-page="home"><i class="fa-solid fa-house"></i> Ana Sayfa</a>
-            <a href="#" data-page="profile"><i class="fa-regular fa-id-card"></i> Profil</a>
-            <a href="#" data-page="map"><i class="fa-solid fa-map-location-dot"></i> Haritalar</a>
-            <a href="#" data-page="parliament"><i class="fa-solid fa-landmark"></i> Meclis</a>
-            <a href="#" data-page="trade"><i class="fa-solid fa-arrow-trend-up"></i> Ticaret</a>
-            <a href="#" data-page="wars"><i class="fa-solid fa-jet-fighter"></i> Savaşlar</a>
-        </div>
-        <div class="nav-right">
-            <button class="social-btn"><i class="fa-brands fa-twitter"></i> Sosyal Medya</button>
-            <div class="user-mini">
-                <img src="https://via.placeholder.com/30" class="avatar-mini" alt="User">
+    <!-- YENİ ÜST PANEL (Çizimine Göre) -->
+    <header class="game-header">
+        
+        <!-- Üst Satır: Profil ve Statüler -->
+        <div class="header-top">
+            
+            <!-- Sol: Profil Resmi, İsim, Level -->
+            <div class="user-section">
+                <div class="avatar-frame">
+                    <img src="https://i.pravatar.cc/150?img=11" alt="Avatar" id="user-avatar">
+                    <span class="level-badge">LVL 12</span>
+                </div>
+                <div class="user-details">
+                    <span class="username">Başkan [TR]</span>
+                    <span class="user-title">Parti Lideri</span>
+                </div>
+            </div>
+
+            <!-- Sağ: Enerji ve Ayarlar -->
+            <div class="status-section">
+                <div class="resource-group">
+                    <i class="fa-solid fa-bolt text-yellow"></i>
+                    <div class="bar-container">
+                        <div class="bar-fill" style="width: 85%;"></div>
+                        <span class="bar-text">85 / 100</span>
+                    </div>
+                    <span class="label">Enerji</span>
+                </div>
+                <button class="settings-btn"><i class="fa-solid fa-gear"></i> Ayarlar</button>
             </div>
         </div>
-    </nav>
+
+        <!-- Alt Satır: Navigasyon Linkleri -->
+        <nav class="header-bottom">
+            <a href="#" data-page="home" class="active"><i class="fa-solid fa-house"></i> Ana Sayfa</a>
+            <a href="#" data-page="profile"><i class="fa-solid fa-user"></i> Profil</a>
+            <a href="#" data-page="map"><i class="fa-solid fa-map"></i> Harita</a>
+            <a href="#" data-page="parties"><i class="fa-solid fa-flag"></i> Partiler</a>
+            <a href="#" data-page="parliament"><i class="fa-solid fa-landmark"></i> Meclis</a>
+            <a href="#" data-page="trade"><i class="fa-solid fa-chart-line"></i> Ticaret</a>
+            <a href="#" data-page="hangar"><i class="fa-solid fa-jet-fighter"></i> Hangar</a>
+            <a href="#" data-page="messages"><i class="fa-solid fa-envelope"></i> Mesajlar</a>
+            <a href="#" data-page="social"><i class="fa-brands fa-twitter"></i> Sosyal Medya</a>
+        </nav>
+    </header>
 
     <!-- Ana Sahne -->
     <main id="app-container">
-        <!-- İçerik dinamik olarak buraya gelecek -->
-        <div class="loading-screen">
-            <h2>NOMOS</h2>
-            <p>Sistem yükleniyor...</p>
-        </div>
+        <!-- İçerik buraya gelecek -->
     </main>
 
     <!-- Leaflet JS -->
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script> 
-
-    <!-- JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
     <script src="app.js"></script>
 </body>
 </html>
