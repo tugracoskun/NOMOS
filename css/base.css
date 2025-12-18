@@ -1,0 +1,43 @@
+:root {
+    --bg-main: #050a14;
+    --bg-panel: #0f172a;
+    --bg-card: #1e293b;
+    --primary: #3b82f6;
+    --accent: #10b981;
+    --energy: #eab308;
+    --text-light: #f8fafc;
+    --text-dim: #94a3b8;
+    --border: #334155;
+    
+    /* İdeoloji Renkleri */
+    --color-red: #ef4444;
+    --color-blue: #3b82f6;
+    --color-dark: #475569;
+    --color-green: #10b981;
+    --color-yellow: #eab308;
+    --color-purple: #a855f7;
+    --color-orange: #f97316;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+
+body {
+    background-color: var(--bg-main);
+    color: var(--text-light);
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+#app-container {
+    flex: 1;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Scrollbar Tasarımı */
+::-webkit-scrollbar { width: 8px; }
+::-webkit-scrollbar-track { background: var(--bg-main); }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: var(--text-dim); }

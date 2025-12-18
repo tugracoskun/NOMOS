@@ -1,0 +1,57 @@
+.parties-layout {
+    padding: 30px; max-width: 1400px; margin: 0 auto;
+    overflow-y: auto; height: 100%;
+}
+.page-header { margin-bottom: 30px; border-bottom: 1px solid var(--border); padding-bottom: 20px; }
+.page-title { font-size: 2rem; color: var(--text-light); font-weight: 700; letter-spacing: -0.5px; }
+.page-subtitle { color: var(--text-dim); font-size: 1rem; margin-top: 8px; }
+
+.ideology-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 25px; }
+
+.ideology-card {
+    background-color: var(--bg-card); border: 1px solid var(--border);
+    border-radius: 12px; display: flex; flex-direction: column; overflow: hidden;
+    transition: transform 0.2s, box-shadow 0.2s; position: relative;
+}
+.ideology-card:hover { transform: translateY(-5px); box-shadow: 0 15px 30px rgba(0,0,0,0.4); border-color: var(--tag-color); }
+
+/* Renk Sınıfları */
+.color-red { --tag-color: var(--color-red); }
+.color-blue { --tag-color: var(--color-blue); }
+.color-dark { --tag-color: var(--color-dark); }
+.color-green { --tag-color: var(--color-green); }
+.color-yellow { --tag-color: var(--color-yellow); }
+.color-purple { --tag-color: var(--color-purple); }
+.color-orange { --tag-color: var(--color-orange); }
+
+.card-header-bg {
+    background: linear-gradient(135deg, var(--bg-panel) 0%, rgba(0,0,0,0.4) 100%);
+    padding: 20px; border-bottom: 1px solid var(--border); position: relative;
+}
+.card-header-bg::before {
+    content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 6px;
+    background-color: var(--tag-color);
+}
+.header-content { display: flex; justify-content: space-between; align-items: center; }
+.ideology-icon-large { font-size: 2rem; color: var(--tag-color); opacity: 0.9; }
+.ideology-title-group { text-align: right; }
+.ideology-name { font-size: 1.4rem; font-weight: 700; color: var(--text-light); display: block; }
+.ideology-type { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; color: var(--tag-color); font-weight: 600; }
+
+.card-body { padding: 20px; display: flex; flex-direction: column; gap: 20px; flex: 1; }
+.ideology-desc { font-size: 0.9rem; color: #cbd5e1; line-height: 1.6; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 15px; }
+
+/* Stats */
+.stats-container { display: flex; flex-direction: column; gap: 10px; }
+.stat-row { display: flex; align-items: center; justify-content: space-between; font-size: 0.8rem; color: var(--text-dim); }
+.stat-label { width: 100px; }
+.stat-bar-bg { flex: 1; height: 8px; background-color: rgba(255,255,255,0.1); border-radius: 4px; margin-left: 10px; overflow: hidden; }
+.stat-bar-fill { height: 100%; background-color: var(--tag-color); border-radius: 4px; }
+
+/* Modifiers */
+.modifiers-box { background-color: rgba(0,0,0,0.2); border-radius: 8px; padding: 10px; }
+.modifier-title { font-size: 0.75rem; font-weight: 700; color: var(--text-dim); margin-bottom: 8px; text-transform: uppercase; }
+.mod-list { list-style: none; font-size: 0.85rem; }
+.mod-item { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; }
+.mod-plus { color: #4ade80; }
+.mod-minus { color: #f87171; }

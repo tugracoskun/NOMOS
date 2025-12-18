@@ -1,0 +1,77 @@
+.game-header {
+    background-color: var(--bg-panel);
+    border-bottom: 1px solid var(--border);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+    z-index: 50;
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+}
+
+.header-top {
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 20px;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+
+/* Profil Alanı */
+.user-section { display: flex; align-items: center; gap: 12px; }
+.avatar-frame { position: relative; width: 42px; height: 42px; }
+#user-avatar { width: 100%; height: 100%; border-radius: 8px; border: 2px solid var(--border); }
+.level-badge {
+    position: absolute; bottom: -5px; right: -5px;
+    background-color: var(--primary); color: white;
+    font-size: 0.6rem; font-weight: 800; padding: 2px 4px;
+    border-radius: 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.5);
+}
+.user-details { display: flex; flex-direction: column; line-height: 1.2; }
+.username { font-weight: 600; font-size: 0.95rem; color: var(--text-light); }
+.user-title { font-size: 0.75rem; color: var(--text-dim); }
+
+/* Sağ Taraf: Enerji ve Ayarlar */
+.status-section { display: flex; align-items: center; gap: 20px; }
+.resource-group {
+    display: flex; align-items: center; gap: 8px;
+    background-color: rgba(0,0,0,0.2); padding: 5px 10px;
+    border-radius: 6px; border: 1px solid var(--border);
+}
+.text-yellow { color: var(--energy); }
+.bar-container {
+    width: 100px; height: 12px; background-color: #333;
+    border-radius: 6px; position: relative; overflow: hidden;
+}
+.bar-fill { height: 100%; background: linear-gradient(90deg, #ca8a04, #eab308); border-radius: 6px; }
+.bar-text {
+    position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.55rem; font-weight: bold; color: white; text-shadow: 0 1px 2px black;
+}
+.label { font-size: 0.75rem; color: var(--text-dim); font-weight: 500; }
+.settings-btn {
+    background: transparent; border: 1px solid var(--border);
+    color: var(--text-dim); padding: 6px 12px; border-radius: 4px;
+    cursor: pointer; transition: 0.2s; font-size: 0.8rem;
+    display: flex; align-items: center; gap: 6px;
+}
+.settings-btn:hover { background-color: var(--bg-card); color: var(--text-light); }
+
+/* Navigasyon Linkleri */
+.header-bottom {
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center; /* Ortalanmış */
+    padding: 0 20px;
+    gap: 5px;
+    overflow-x: auto;
+}
+.header-bottom a {
+    color: var(--text-dim); text-decoration: none; font-size: 0.8rem;
+    padding: 6px 10px; border-radius: 4px; display: flex; align-items: center; gap: 6px;
+    transition: all 0.2s; white-space: nowrap;
+}
+.header-bottom a:hover { background-color: rgba(255,255,255,0.05); color: var(--text-light); }
+.header-bottom a.active { color: var(--primary); background-color: rgba(59, 130, 246, 0.1); font-weight: 600; }
