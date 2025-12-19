@@ -1,4 +1,4 @@
-// PARTİLER: DASHBOARD (YENİ DÜZEN)
+// PARTİLER: DASHBOARD
 import { partiesData, availableIdeologies, invitations, playerProfile } from './data.js';
 import { setupModal } from './modal.js';
 
@@ -10,8 +10,9 @@ export function renderDashboard(container) {
     container.innerHTML = `
         <div class="parties-dashboard-layout">
             
-            <!-- SOL SÜTUN: ANA LİSTE VE FİLTRELER -->
+            <!-- SOL SÜTUN: ANA LİSTE -->
             <div class="parties-main-col">
+                <!-- Toolbar -->
                 <div class="parties-toolbar">
                     <div class="toolbar-top">
                         <div class="search-box">
@@ -29,35 +30,34 @@ export function renderDashboard(container) {
                 </div>
 
                 <div class="list-header-label">TÜM PARTİLER (${partiesData.length})</div>
-                <div id="party-list-grid" class="party-list-grid"></div>
+                
+                <!-- Liste Wrapper (Scroll ve Fade Efekti İçin) -->
+                <div class="party-list-wrapper">
+                    <div id="party-list-grid" class="party-list-grid"></div>
+                </div>
             </div>
 
-            <!-- SAĞ SÜTUN: WIDGETLAR (DAVET & ÖNERİ) -->
+            <!-- SAĞ SÜTUN: WIDGETLAR -->
             <div class="parties-side-col">
                 
-                <!-- Widget: Davetler -->
+                <!-- 1. Davetiyeler -->
                 ${invitations.length > 0 ? `
                 <div class="side-widget">
                     <div class="widget-header"><i class="fa-solid fa-envelope"></i> Davetiyeler <span class="badge">${invitations.length}</span></div>
-                    <div class="widget-content">
-                        ${renderInvitations()}
-                    </div>
+                    <div class="widget-content">${renderInvitations()}</div>
                 </div>` : ''}
 
-                <!-- Widget: Önerilenler -->
+                <!-- 2. Önerilenler -->
                 <div class="side-widget">
                     <div class="widget-header"><i class="fa-solid fa-star"></i> Sizin İçin (${playerProfile.ideology})</div>
-                    <div class="widget-content">
-                        ${renderRecommended()}
-                    </div>
+                    <div class="widget-content">${renderRecommended()}</div>
                 </div>
 
-                <!-- Widget: Bilgi -->
+                <!-- 3. Bilgi -->
                 <div class="info-box">
                     <i class="fa-solid fa-circle-info"></i>
                     <p>Parti kurmak için 1000 Altın ve en az 10. seviye gereklidir.</p>
                 </div>
-
             </div>
         </div>
     `;
@@ -65,6 +65,7 @@ export function renderDashboard(container) {
     setupModal(container);
     applyFilters();
 
+    // Event Listeners
     document.getElementById('party-search').addEventListener('input', applyFilters);
     document.getElementById('country-filter').addEventListener('change', applyFilters);
     document.getElementById('ideology-filter').addEventListener('change', applyFilters);
@@ -79,24 +80,21 @@ function renderInvitations() {
         return `
             <div class="mini-invite-card" style="border-left-color:${p.color}">
                 <div class="mini-invite-top">
-                    <img src="https://flagcdn.com/20x15/${p.countryCode}.png" title="${p.country}">
-                    <span class="sender">${inv.inviter}</span>
+                    <span style="color:var(--text-dim); font-size:0.8rem">${inv.inviter}</span>
+                    <img src="https://flagcdn.com/20x15/${p.countryCode}.png">
                 </div>
                 <div class="mini-invite-body">
                     <strong>${p.name}</strong>
                     <p>"${inv.message}"</p>
                 </div>
-                <div class="mini-invite-actions">
-                    <button class="btn-accept">Kabul</button>
-                    <button class="btn-reject"><i class="fa-solid fa-xmark"></i></button>
-                </div>
+                <button class="btn-accept">Kabul</button>
             </div>`;
     }).join('');
 }
 
 function renderRecommended() {
     const recs = partiesData.filter(p => p.ideology === playerProfile.ideology);
-    if(recs.length === 0) return '<div class="empty-widget">Öneri yok.</div>';
+    if(recs.length === 0) return '<div style="color:#64748b; font-size:0.85rem; text-align:center;">Öneri bulunamadı.</div>';
     
     return recs.map(p => `
         <div class="mini-rec-row" data-page="parties" data-view="detail" data-id="${p.id}">
@@ -105,7 +103,7 @@ function renderRecommended() {
             </div>
             <div class="mini-info">
                 <div class="mini-name">${p.name}</div>
-                <div class="mini-meta">${p.members} Üye • ${p.city}</div>
+                <span class="mini-meta">${p.members} Üye • ${p.city}</span>
             </div>
             <i class="fa-solid fa-chevron-right arrow"></i>
         </div>
@@ -127,41 +125,45 @@ function applyFilters() {
     grid.innerHTML = "";
     
     if(filtered.length === 0) { 
-        grid.innerHTML = `<div class="empty-state">Sonuç yok.</div>`; 
+        grid.innerHTML = `<div class="empty-state">Kriterlere uygun parti bulunamadı.</div>`; 
         return; 
     }
 
     filtered.forEach(p => {
         const logo = p.logo ? `<img src="${p.logo}">` : `<i class="fa-solid ${p.icon || 'fa-flag'}"></i>`;
+        
         const div = document.createElement('div');
-        div.className = 'party-compact-card';
-        div.style.borderLeft = `3px solid ${p.color}`;
+        div.className = 'party-row-card';
+        div.style.setProperty('--party-color', p.color);
         
         div.innerHTML = `
-            <div class="compact-logo" style="color:${p.color}">${logo}</div>
-            <div class="compact-info">
-                <div class="compact-header">
-                    <span class="compact-name">${p.name}</span>
-                    <span class="compact-short">${p.shortName}</span>
+            <div class="row-border-strip" style="background-color:${p.color}"></div>
+            <div class="row-logo" style="color:${p.color}">${logo}</div>
+            
+            <div class="row-main">
+                <div class="row-name">
+                    ${p.name} 
+                    <img src="https://flagcdn.com/16x12/${p.countryCode}.png" title="${p.country}">
+                    <span style="color:#64748b; font-weight:400; font-size:0.9rem; margin-left:5px;">${p.shortName}</span>
                 </div>
-                <div class="compact-meta">
-                    <img src="https://flagcdn.com/16x12/${p.countryCode}.png"> 
-                    <span>${p.leader}</span>
-                    <span class="dot">•</span>
-                    <span>${p.ideology}</span>
+                <div class="row-leader">
+                    <span style="color:${p.color}">${p.ideology}</span> • ${p.leader}
                 </div>
             </div>
-            <div class="compact-stats">
+
+            <div class="row-stats">
                 <i class="fa-solid fa-users"></i> ${p.members}
             </div>
-            <button class="compact-btn" data-page="parties" data-view="detail" data-id="${p.id}">
+
+            <button class="row-btn" data-page="parties" data-view="detail" data-id="${p.id}">
                 <i class="fa-solid fa-eye"></i>
             </button>
         `;
-        // Global Click
+        
         div.setAttribute('data-page', 'parties');
         div.setAttribute('data-view', 'detail');
         div.setAttribute('data-id', p.id);
+        
         grid.appendChild(div);
     });
 }
