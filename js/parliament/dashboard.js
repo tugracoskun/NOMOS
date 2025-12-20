@@ -81,7 +81,7 @@ export function renderParliament(container) {
     }, 50);
 }
 
-// --- GRAFİK MATEMATİĞİ (GÜNCELLENDİ) ---
+// --- GRAFİK MATEMATİĞİ (TAŞMA DÜZELTİLDİ) ---
 function generateHemicycle() {
     const wrapper = document.getElementById('hemicycle-wrapper');
     const legend = document.getElementById('seat-legend');
@@ -89,33 +89,28 @@ function generateHemicycle() {
 
     let allSeats = [];
     
-    // SCALE FACTOR: Her 3 koltuk için 1 nokta çizelim (Görsel sadeleştirme)
+    // SCALE FACTOR: Görsel sadeleştirme (3 koltuk = 1 nokta)
     const visualScale = 3; 
 
     parliamentSeats.forEach(group => {
-        // Matematiksel yuvarlama ile nokta sayısını azaltıyoruz
         const visualCount = Math.ceil(group.count / visualScale);
-        
         for(let i=0; i<visualCount; i++) {
             allSeats.push({ color: group.color, party: group.party });
         }
-        
-        // Legend kısmında gerçek sayıları göstermeye devam ediyoruz
         legend.innerHTML += `<div class="legend-item"><span class="dot" style="background:${group.color}"></span> ${group.short} (${group.count})</div>`;
     });
 
-    // Nokta sayısı azaldığı için sıra sayısını da azalttık (12 -> 8)
+    // --- AYARLAR (Küçültüldü ve Hizalandı) ---
     const rows = 8; 
-    const baseRadius = 70; // Biraz daha geniş başlasın
-    const rowSpacing = 24; // Araları açılsın
+    const baseRadius = 60; // Yarıçapı kıstık (70 -> 60)
+    const rowSpacing = 22; // Aralıkları kıstık (24 -> 22)
+    const liftUp = 25;     // TABANDAN YUKARI KALDIRMA PAYI (Pikseller yukarı!)
     
     let seatIndex = 0;
 
     for (let r = 1; r <= rows; r++) {
         const radius = baseRadius + (r * rowSpacing);
         const arcLength = Math.PI * radius; 
-        
-        // Noktalar arası boşluk faktörünü ayarladık
         const seatsInRow = Math.floor(arcLength / 18); 
         
         for (let s = 0; s < seatsInRow; s++) {
@@ -123,7 +118,6 @@ function generateHemicycle() {
             
             const seatData = allSeats[seatIndex];
             
-            // Açıyı hesapla
             const angleStep = 180 / (seatsInRow - 1 || 1);
             const angle = 180 - (s * angleStep);
             const radians = (angle * Math.PI) / 180;
@@ -134,10 +128,15 @@ function generateHemicycle() {
             const dot = document.createElement('div');
             dot.className = 'seat-dot';
             dot.style.backgroundColor = seatData.color;
-            dot.style.left = `calc(50% + ${x}px)`;
-            dot.style.bottom = `${y}px`;
-            dot.title = seatData.party;
             
+            // X ekseni (Yatay): Merkezden hizala
+            dot.style.left = `calc(50% + ${x}px)`;
+            
+            // Y ekseni (Dikey): Hesaplanan Y değeri + Kaldırma Payı
+            // Bu sayede alttaki yazıların üzerine binmez.
+            dot.style.bottom = `${y + liftUp}px`;
+            
+            dot.title = seatData.party;
             wrapper.appendChild(dot);
             seatIndex++;
         }
