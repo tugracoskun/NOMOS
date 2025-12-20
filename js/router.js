@@ -1,4 +1,5 @@
 // Router Modülü
+import { renderParliamentPage } from './parliament/main.js';
 import { initMap, destroyMap } from './map.js';
 import { setupChat, initFakeChat } from './chat.js';
 import { renderPartiesPage } from './parties/main.js';
@@ -28,6 +29,9 @@ export function loadPage(pageName, subView = null, id = null) {
             break;
         default:
             renderPlaceholder(pageName);
+        case 'parliament':
+            renderParliamentPage(appContainer);
+            break;    
     }
 }
 

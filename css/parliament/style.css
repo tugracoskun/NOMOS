@@ -1,0 +1,146 @@
+/* MECLİS SAYFASI STİLLERİ */
+
+.parliament-layout {
+    padding: 20px;
+    max-width: 1400px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+    height: 100%;
+    overflow-y: auto;
+    animation: fadeIn 0.4s ease;
+}
+
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+/* Üst Başlık */
+.state-header {
+    display: flex; justify-content: space-between; align-items: center;
+    background: linear-gradient(90deg, var(--bg-card) 0%, rgba(20,30,45,0) 100%);
+    padding: 20px; border-radius: 12px; border-left: 5px solid var(--primary);
+}
+.state-info { display: flex; align-items: center; gap: 20px; }
+.state-flag { height: 50px; border-radius: 4px; box-shadow: 0 0 10px rgba(0,0,0,0.5); }
+.state-info h1 { font-size: 1.8rem; color: var(--text-light); margin-bottom: 5px; }
+.regime-tag { background: rgba(255,255,255,0.1); padding: 4px 10px; border-radius: 4px; font-size: 0.8rem; color: var(--text-dim); }
+
+.actions { display: flex; gap: 10px; }
+.action-btn {
+    padding: 10px 20px; border: none; border-radius: 6px; cursor: pointer;
+    font-weight: 600; color: white; display: flex; align-items: center; gap: 8px;
+    transition: 0.2s;
+}
+.action-btn:hover { filter: brightness(1.1); transform: translateY(-2px); }
+.action-btn.red { background: #ef4444; }
+.action-btn.blue { background: #3b82f6; }
+
+/* Meclis Sahnesi (Grid) */
+.parliament-stage {
+    display: grid;
+    grid-template-columns: 2fr 1fr; /* Koltuklar geniş, istatistik dar */
+    gap: 30px;
+    min-height: 400px;
+}
+
+/* --- HEMICYCLE (YARIM DAİRE) --- */
+.hemicycle-container {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-end; /* Koltuklar alta yaslansın */
+    padding-bottom: 20px;
+    overflow: hidden;
+}
+
+.hemicycle-wrapper {
+    width: 100%;
+    height: 350px; /* Yarım daire yüksekliği */
+    position: relative;
+    display: flex; justify-content: center;
+}
+
+.seat-dot {
+    position: absolute;
+    width: 12px; height: 12px;
+    border-radius: 50%;
+    box-shadow: 0 0 5px rgba(0,0,0,0.5);
+    transition: transform 0.2s;
+    cursor: pointer;
+}
+.seat-dot:hover { transform: scale(1.5); box-shadow: 0 0 10px white; z-index: 10; }
+
+.seat-legend {
+    display: flex; gap: 15px; flex-wrap: wrap; justify-content: center;
+    margin-top: 10px; padding: 10px;
+    border-top: 1px solid var(--border);
+    width: 100%;
+}
+.legend-item { display: flex; align-items: center; gap: 6px; font-size: 0.8rem; color: var(--text-dim); }
+.dot { width: 10px; height: 10px; border-radius: 50%; }
+
+/* İstatistik Paneli */
+.stats-panel { display: flex; flex-direction: column; gap: 20px; }
+.panel-box {
+    background: var(--bg-card); border: 1px solid var(--border);
+    border-radius: 12px; padding: 15px;
+}
+.panel-box h3 { margin-bottom: 15px; font-size: 1rem; color: var(--text-light); border-bottom: 1px solid var(--border); padding-bottom: 8px; }
+
+/* Anketler */
+.polls-list { display: flex; flex-direction: column; gap: 10px; }
+.poll-row { display: flex; align-items: center; gap: 10px; font-size: 0.85rem; }
+.poll-info { width: 100px; display: flex; flex-direction: column; }
+.text-green { color: #4ade80; font-size: 0.7rem; }
+.text-red { color: #f87171; font-size: 0.7rem; }
+.poll-bar-bg { flex: 1; height: 6px; background: rgba(255,255,255,0.1); border-radius: 3px; }
+.poll-bar-fill { height: 100%; background: var(--primary); border-radius: 3px; }
+.poll-rate { font-weight: 700; width: 35px; text-align: right; }
+
+/* Son Yasalar */
+.logs-list { list-style: none; font-size: 0.9rem; }
+.log-item { padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.05); color: var(--text-dim); }
+.log-item i { margin-right: 8px; }
+.log-item.passed i { color: #4ade80; }
+.log-item.failed i { color: #f87171; }
+
+/* --- YASA TASARILARI --- */
+.bills-grid {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 20px;
+}
+.bill-card {
+    background: var(--bg-card); border: 1px solid var(--border);
+    border-radius: 12px; padding: 20px;
+    display: flex; flex-direction: column; gap: 15px;
+}
+.bill-header { display: flex; justify-content: space-between; font-size: 0.8rem; color: var(--text-dim); }
+.bill-content h4 { font-size: 1.1rem; color: var(--text-light); margin-bottom: 5px; }
+.bill-content p { font-size: 0.9rem; color: #cbd5e1; }
+
+.vote-bar { display: flex; height: 8px; border-radius: 4px; overflow: hidden; background: #333; }
+.bar-segment.yes { background: #4ade80; }
+.bar-segment.no { background: #f87171; }
+.bar-segment.abs { background: #cbd5e1; }
+
+.vote-actions { display: flex; gap: 10px; }
+.vote-btn { flex: 1; border: none; padding: 8px; border-radius: 4px; font-weight: 700; cursor: pointer; font-size: 0.8rem; }
+.btn-yes { background: rgba(74, 222, 128, 0.1); color: #4ade80; border: 1px solid #4ade80; }
+.btn-no { background: rgba(248, 113, 113, 0.1); color: #f87171; border: 1px solid #f87171; }
+.btn-abs { background: rgba(203, 213, 225, 0.1); color: #cbd5e1; border: 1px solid #cbd5e1; }
+.vote-btn:hover { opacity: 0.8; }
+
+/* Modal */
+.const-body { padding: 30px; }
+.const-body h2 { margin-bottom: 20px; border-bottom: 1px solid var(--border); padding-bottom: 10px; }
+.const-list li { margin-bottom: 10px; padding: 10px; background: rgba(255,255,255,0.05); border-radius: 6px; }
+
+/* Mobil */
+@media (max-width: 900px) {
+    .parliament-stage { grid-template-columns: 1fr; }
+    .hemicycle-wrapper { height: 250px; } /* Mobilde küçült */
+    .seat-dot { width: 8px; height: 8px; }
+}
