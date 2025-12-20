@@ -1,15 +1,11 @@
-// MECLİS DASHBOARD VE KOLTUK SİSTEMİ
-import { parliamentSeats, activeBills, electionPolls, constitutionArticles } from './data.js';
+// MECLİS DASHBOARD
+import { parliamentSeats, outsideParties, activeBills, electionPolls, constitutionArticles } from './data.js';
 
 export function renderParliament(container) {
-    // ... (renderParliament fonksiyonunun HTML kısmı AYNI KALSIN) ...
-    // Sadece kolaylık olsun diye HTML kısmını tekrar yazmıyorum,
-    // mevcut HTML kodunu koru. Sadece aşağıdaki generateHemicycle fonksiyonunu değiştir.
-    
     container.innerHTML = `
         <div class="parliament-layout">
             
-            <!-- ÜST BİLGİ PANELI -->
+            <!-- HEADER -->
             <div class="state-header">
                 <div class="state-info">
                     <img src="https://flagcdn.com/80x60/tr.png" class="state-flag">
@@ -24,181 +20,158 @@ export function renderParliament(container) {
                 </div>
             </div>
 
-            <!-- ORTA: MECLİS KOLTUKLARI VE GRAFİKLER -->
-            <div class="parliament-stage">
+            <!-- GRID ALANI -->
+            <div class="parliament-grid-system">
                 
-                <!-- Sol: Koltuk Düzeni (Hemicycle) -->
-                <div class="hemicycle-container">
-                    <div class="hemicycle-wrapper" id="hemicycle-wrapper">
-                        <!-- JS ile Noktalar Buraya Gelecek -->
-                    </div>
+                <!-- 1. HEMICYCLE (SOL ÜST) -->
+                <div class="grid-area-hemicycle">
+                    <div class="hemicycle-wrapper" id="hemicycle-wrapper"></div>
                     <div class="seat-legend" id="seat-legend"></div>
                 </div>
 
-                <!-- Sağ: Özet ve Anketler -->
-                <div class="stats-panel">
-                    <div class="panel-box">
-                        <h3><i class="fa-solid fa-chart-pie"></i> Seçim Anketleri</h3>
-                        <div class="polls-list" id="polls-list"></div>
-                    </div>
-                    <div class="panel-box">
-                        <h3><i class="fa-solid fa-gavel"></i> Son Geçen Yasalar</h3>
+                <!-- 2. SAĞ PANEL (ÜST: SON YASALAR + ALT: ANKETLER) -->
+                <div class="grid-area-right-panel">
+                    
+                    <!-- Kısım A: Son Yasalar -->
+                    <div class="sub-panel">
+                        <div class="panel-header"><h3><i class="fa-solid fa-gavel"></i> Son Yasalar</h3></div>
                         <ul class="logs-list">
-                            <li class="log-item passed"><i class="fa-solid fa-check"></i> Vergi Reformu (Dün)</li>
-                            <li class="log-item failed"><i class="fa-solid fa-xmark"></i> Savaş İlanı (2 gün önce)</li>
+                            <li class="log-item passed"><i class="fa-solid fa-circle-check"></i> <div><strong>Vergi Reformu</strong><small>Dün kabul edildi</small></div></li>
+                            <li class="log-item failed"><i class="fa-solid fa-circle-xmark"></i> <div><strong>Savaş İlanı</strong><small>2 gün önce reddedildi</small></div></li>
                         </ul>
                     </div>
-                </div>
-            </div>
 
-            <!-- ALT: YASA TASARILARI (Active Bills) -->
-            <div class="bills-section">
-                <h3><i class="fa-solid fa-file-signature"></i> Gündemdeki Yasa Tasarıları</h3>
-                <div class="bills-grid" id="bills-grid"></div>
+                    <!-- Kısım B: Seçim Anketleri (Buraya taşındı) -->
+                    <div class="sub-panel">
+                        <div class="panel-header"><h3><i class="fa-solid fa-chart-pie"></i> Seçim Anketleri</h3></div>
+                        <div class="polls-list" id="polls-list"></div>
+                    </div>
+
+                </div>
+
+                <!-- 3. AKTİF TASARILAR (SOL ALT) -->
+                <div class="grid-area-bills">
+                    <div class="panel-header"><h3><i class="fa-solid fa-file-signature"></i> Gündemdeki Tasarılar</h3></div>
+                    <div class="bills-container" id="bills-grid"></div>
+                </div>
+
+                <!-- 4. PARTİ DAĞILIMI LİSTESİ (SAĞ ALT - YENİ) -->
+                <div class="grid-area-parties">
+                    <div class="panel-header"><h3><i class="fa-solid fa-users-rectangle"></i> Parti Durumları</h3></div>
+                    <div class="parliament-parties-list">
+                        <!-- Meclistekiler -->
+                        <div class="list-group-title">MECLİSTEKİ PARTİLER</div>
+                        ${renderParliamentPartiesList()}
+                        
+                        <!-- Dışarıdakiler -->
+                        <div class="list-group-title">BARAJ ALTI</div>
+                        ${renderOutsidePartiesList()}
+                    </div>
+                </div>
+
             </div>
         </div>
 
-        <!-- ANAYASA MODALI -->
+        <!-- MODAL -->
         <div id="constitution-modal" class="modal-overlay" style="display:none;">
             <div class="modal-content">
                 <button class="close-modal"><i class="fa-solid fa-xmark"></i></button>
                 <div class="const-body">
                     <h2><i class="fa-solid fa-scale-balanced"></i> Devlet Anayasası</h2>
-                    <ul class="const-list">
-                        ${constitutionArticles.map(a => `<li>${a}</li>`).join('')}
-                    </ul>
+                    <ul class="const-list">${constitutionArticles.map(a => `<li>${a}</li>`).join('')}</ul>
                 </div>
             </div>
         </div>
     `;
 
-    generateHemicycle();
-    renderBills();
-    renderPolls();
-    setupEvents();
+    setTimeout(() => {
+        generateHemicycle();
+        renderBills();
+        renderPolls();
+        setupEvents();
+    }, 50);
 }
 
-// --- 1. HEMICYCLE (YARIM DAİRE) - GÜNCELLENMİŞ VERSİYON ---
-function generateHemicycle() {
-    const wrapper = document.getElementById('hemicycle-wrapper');
-    const legend = document.getElementById('seat-legend');
-    
-    // Temizle (Tekrar çizimlerde üst üste binmesin)
-    wrapper.innerHTML = '';
-    legend.innerHTML = '';
+// --- YARDIMCI HTML GENERATORS ---
 
-    // Partileri tek bir düz listede topla
-    let allSeats = [];
-    parliamentSeats.forEach(group => {
-        for(let i=0; i<group.count; i++) {
-            allSeats.push({ color: group.color, party: group.party });
-        }
-        legend.innerHTML += `<div class="legend-item"><span class="dot" style="background:${group.color}"></span> ${group.short} (${group.count})</div>`;
-    });
-
-    const totalSeats = allSeats.length;
-    
-    // AYARLAR (Burayı küçülttük)
-    const rows = 12; // Sıra sayısını artırıp sıkıştıralım
-    const baseRadius = 60; // En içteki çemberin yarıçapı (Eskiden 100'dü)
-    const rowSpacing = 20; // Sıralar arası mesafe (Eskiden 25'ti)
-    
-    let seatIndex = 0;
-
-    for (let r = 1; r <= rows; r++) {
-        const radius = baseRadius + (r * rowSpacing);
-        // Arkadaki sıralar daha geniş olduğu için daha fazla koltuk alır
-        const arcLength = Math.PI * radius; 
-        const seatWidth = 10; // Koltuk genişliği + boşluk
-        const seatsInRow = Math.floor(arcLength / (seatWidth * 1.3)); // 1.3 boşluk faktörü
-        
-        for (let s = 0; s < seatsInRow; s++) {
-            if (seatIndex >= totalSeats) break;
-
-            const seatData = allSeats[seatIndex];
-            
-            // Açıyı hesapla (180 dereceye yay)
-            // Kenarlardan biraz boşluk bırakmak için 10 derece ve 170 derece arası çalışalım
-            const startAngle = 180;
-            const endAngle = 0;
-            const totalAngle = startAngle - endAngle;
-            
-            const angleStep = totalAngle / (seatsInRow - 1 || 1); // 0'a bölme hatasını önle
-            const angle = startAngle - (s * angleStep);
-            
-            const radians = (angle * Math.PI) / 180;
-
-            // Koordinatlar
-            const x = radius * Math.cos(radians);
-            const y = radius * Math.sin(radians);
-
-            const dot = document.createElement('div');
-            dot.className = 'seat-dot';
-            dot.style.backgroundColor = seatData.color;
-            
-            // Pozisyonlama
-            dot.style.left = `calc(50% + ${x}px)`; // X ekseninde merkeze göre
-            dot.style.bottom = `${y}px`; // Y ekseninde aşağıdan yukarı
-            
-            dot.title = seatData.party;
-            wrapper.appendChild(dot);
-            seatIndex++;
-        }
-    }
+function renderParliamentPartiesList() {
+    return parliamentSeats.map(p => `
+        <div class="pp-row">
+            <div class="pp-color" style="background:${p.color}"></div>
+            <div class="pp-name">${p.party}</div>
+            <div class="pp-seats">${p.count} <small>Koltuk</small></div>
+        </div>
+    `).join('');
 }
 
-// ... (renderBills, renderPolls, setupEvents fonksiyonları AYNI kalacak) ...
-function renderBills() {
-    const grid = document.getElementById('bills-grid');
-    grid.innerHTML = activeBills.map(bill => `
-        <div class="bill-card">
-            <div class="bill-header">
-                <span class="proposer">Öneren: ${bill.proposer}</span>
-                <span class="deadline"><i class="fa-regular fa-clock"></i> ${bill.deadline}</span>
-            </div>
-            <div class="bill-content">
-                <h4>${bill.title}</h4>
-                <p>${bill.desc}</p>
-            </div>
-            <div class="vote-bar">
-                <div class="bar-segment yes" style="width:${(bill.votes.yes/600)*100}%"></div>
-                <div class="bar-segment no" style="width:${(bill.votes.no/600)*100}%"></div>
-                <div class="bar-segment abs" style="width:${(bill.votes.abstain/600)*100}%"></div>
-            </div>
-            <div class="vote-actions">
-                <button class="vote-btn btn-yes">KABUL</button>
-                <button class="vote-btn btn-abs">ÇEKİMSER</button>
-                <button class="vote-btn btn-no">RED</button>
-            </div>
+function renderOutsidePartiesList() {
+    return outsideParties.map(p => `
+        <div class="pp-row out">
+            <div class="pp-color" style="background:${p.color}"></div>
+            <div class="pp-name">${p.party}</div>
+            <div class="pp-seats">${p.rate} <small>Oy</small></div>
         </div>
     `).join('');
 }
 
 function renderPolls() {
-    const list = document.getElementById('polls-list');
-    list.innerHTML = electionPolls.map(poll => `
+    document.getElementById('polls-list').innerHTML = electionPolls.map(poll => `
         <div class="poll-row">
-            <div class="poll-info">
-                <span>${poll.party}</span>
-                <span class="${poll.change.includes('+') ? 'text-green' : 'text-red'}">${poll.change}%</span>
+            <div class="poll-name">${poll.party}</div>
+            <div class="poll-track"><div class="poll-fill" style="width:${poll.rate}%"></div></div>
+            <div class="poll-val">
+                <span>%${poll.rate}</span>
+                <small class="${poll.change.includes('+')?'green':'red'}">${poll.change}</small>
             </div>
-            <div class="poll-bar-bg">
-                <div class="poll-bar-fill" style="width:${poll.rate}%"></div>
-            </div>
-            <span class="poll-rate">%${poll.rate}</span>
         </div>
     `).join('');
 }
 
+function renderBills() {
+    document.getElementById('bills-grid').innerHTML = activeBills.map(bill => `
+        <div class="bill-card">
+            <div class="bill-header"><span style="color:#3b82f6">${bill.proposer}</span><span><i class="fa-regular fa-clock"></i> ${bill.deadline}</span></div>
+            <h4>${bill.title}</h4>
+            <div class="vote-bar"><div class="yes" style="width:${(bill.votes.yes/600)*100}%"></div><div class="no" style="width:${(bill.votes.no/600)*100}%"></div><div class="abs" style="width:${(bill.votes.abstain/600)*100}%"></div></div>
+            <div class="bill-actions"><button class="vote-btn yes">KABUL</button><button class="vote-btn no">RED</button></div>
+        </div>
+    `).join('');
+}
+
+// --- HEMICYCLE ve EVENTLER (AYNI) ---
+function generateHemicycle() {
+    const wrapper = document.getElementById('hemicycle-wrapper');
+    const legend = document.getElementById('seat-legend');
+    wrapper.innerHTML = ''; legend.innerHTML = '';
+    let allSeats = [];
+    parliamentSeats.forEach(group => {
+        for(let i=0; i<group.count; i++) allSeats.push({ color: group.color, party: group.party });
+        legend.innerHTML += `<div class="legend-item"><span class="dot" style="background:${group.color}"></span> ${group.short} (${group.count})</div>`;
+    });
+    const rows = 12; const baseRadius = 60; const rowSpacing = 20; let seatIndex = 0;
+    for (let r = 1; r <= rows; r++) {
+        const radius = baseRadius + (r * rowSpacing);
+        const arcLength = Math.PI * radius; 
+        const seatsInRow = Math.floor(arcLength / 13);
+        for (let s = 0; s < seatsInRow; s++) {
+            if (seatIndex >= allSeats.length) break;
+            const seatData = allSeats[seatIndex];
+            const angleStep = 180 / (seatsInRow - 1 || 1);
+            const angle = 180 - (s * angleStep);
+            const radians = (angle * Math.PI) / 180;
+            const x = radius * Math.cos(radians);
+            const y = radius * Math.sin(radians);
+            const dot = document.createElement('div');
+            dot.className = 'seat-dot'; dot.style.backgroundColor = seatData.color;
+            dot.style.left = `calc(50% + ${x}px)`; dot.style.bottom = `${y}px`; dot.title = seatData.party;
+            wrapper.appendChild(dot); seatIndex++;
+        }
+    }
+}
+
 function setupEvents() {
     const modal = document.getElementById('constitution-modal');
-    document.getElementById('btn-constitution').addEventListener('click', () => {
-        modal.style.display = 'flex';
-    });
-    document.querySelector('.close-modal').addEventListener('click', () => {
-        modal.style.display = 'none';
-    });
-    modal.addEventListener('click', (e) => {
-        if(e.target === modal) modal.style.display = 'none';
-    });
+    document.getElementById('btn-constitution').addEventListener('click', () => modal.style.display = 'flex');
+    document.querySelector('.close-modal').addEventListener('click', () => modal.style.display = 'none');
+    modal.addEventListener('click', (e) => { if(e.target===modal) modal.style.display='none'; });
 }
