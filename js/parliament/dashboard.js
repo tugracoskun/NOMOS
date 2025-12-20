@@ -5,31 +5,33 @@ export function renderParliament(container) {
     container.innerHTML = `
         <div class="parliament-layout">
             
-            <!-- HEADER -->
-            <div class="state-header">
-                <div class="state-info">
-                    <img src="https://flagcdn.com/80x60/tr.png" class="state-flag">
-                    <div>
-                        <h1>Türkiye Cumhuriyeti Meclisi</h1>
-                        <span class="regime-tag">Cumhuriyet • Çok Partili Sistem</span>
-                    </div>
-                </div>
-                <div class="actions">
-                    <button class="action-btn red" id="btn-constitution"><i class="fa-solid fa-book-journal-whills"></i> Anayasa</button>
-                    <button class="action-btn blue"><i class="fa-solid fa-check-to-slot"></i> Seçimler</button>
-                </div>
-            </div>
-
             <!-- GRID ALANI -->
             <div class="parliament-grid-system">
                 
-                <!-- 1. HEMICYCLE (SOL ÜST) -->
+                <!-- 1. HEMICYCLE (SOL ÜST - ARTIK HEADER BURADA) -->
                 <div class="grid-area-hemicycle">
+                    
+                    <!-- ENTEGRE HEADER -->
+                    <div class="integrated-header">
+                        <div class="state-info">
+                            <img src="https://flagcdn.com/80x60/tr.png" class="state-flag">
+                            <div>
+                                <h1>Türkiye Cumhuriyeti Meclisi</h1>
+                                <span class="regime-tag">Cumhuriyet • Çok Partili Sistem</span>
+                            </div>
+                        </div>
+                        <div class="actions">
+                            <button class="action-btn red" id="btn-constitution"><i class="fa-solid fa-book-journal-whills"></i> Anayasa</button>
+                            <button class="action-btn blue"><i class="fa-solid fa-check-to-slot"></i> Seçimler</button>
+                        </div>
+                    </div>
+
+                    <!-- GRAFİK -->
                     <div class="hemicycle-wrapper" id="hemicycle-wrapper"></div>
                     <div class="seat-legend" id="seat-legend"></div>
                 </div>
 
-                <!-- 2. SAĞ PANEL (ÜST: SON YASALAR + ALT: ANKETLER) -->
+                <!-- 2. SAĞ PANEL (SON YASALAR + ANKETLER) -->
                 <div class="grid-area-right-panel">
                     
                     <!-- Kısım A: Son Yasalar -->
@@ -41,7 +43,7 @@ export function renderParliament(container) {
                         </ul>
                     </div>
 
-                    <!-- Kısım B: Seçim Anketleri (Buraya taşındı) -->
+                    <!-- Kısım B: Anketler -->
                     <div class="sub-panel">
                         <div class="panel-header"><h3><i class="fa-solid fa-chart-pie"></i> Seçim Anketleri</h3></div>
                         <div class="polls-list" id="polls-list"></div>
@@ -55,15 +57,12 @@ export function renderParliament(container) {
                     <div class="bills-container" id="bills-grid"></div>
                 </div>
 
-                <!-- 4. PARTİ DAĞILIMI LİSTESİ (SAĞ ALT - YENİ) -->
+                <!-- 4. PARTİ DAĞILIMI (SAĞ ALT) -->
                 <div class="grid-area-parties">
                     <div class="panel-header"><h3><i class="fa-solid fa-users-rectangle"></i> Parti Durumları</h3></div>
                     <div class="parliament-parties-list">
-                        <!-- Meclistekiler -->
                         <div class="list-group-title">MECLİSTEKİ PARTİLER</div>
                         ${renderParliamentPartiesList()}
-                        
-                        <!-- Dışarıdakiler -->
                         <div class="list-group-title">BARAJ ALTI</div>
                         ${renderOutsidePartiesList()}
                     </div>
@@ -92,8 +91,7 @@ export function renderParliament(container) {
     }, 50);
 }
 
-// --- YARDIMCI HTML GENERATORS ---
-
+// --- YARDIMCI HTML GENERATORS --- (AYNI KALIYOR)
 function renderParliamentPartiesList() {
     return parliamentSeats.map(p => `
         <div class="pp-row">
@@ -119,10 +117,7 @@ function renderPolls() {
         <div class="poll-row">
             <div class="poll-name">${poll.party}</div>
             <div class="poll-track"><div class="poll-fill" style="width:${poll.rate}%"></div></div>
-            <div class="poll-val">
-                <span>%${poll.rate}</span>
-                <small class="${poll.change.includes('+')?'green':'red'}">${poll.change}</small>
-            </div>
+            <div class="poll-val"><span>%${poll.rate}</span><small class="${poll.change.includes('+')?'green':'red'}">${poll.change}</small></div>
         </div>
     `).join('');
 }
@@ -138,7 +133,6 @@ function renderBills() {
     `).join('');
 }
 
-// --- HEMICYCLE ve EVENTLER (AYNI) ---
 function generateHemicycle() {
     const wrapper = document.getElementById('hemicycle-wrapper');
     const legend = document.getElementById('seat-legend');

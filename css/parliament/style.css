@@ -3,7 +3,7 @@
    ========================================= */
 .parliament-layout {
     padding: 20px;
-    padding-bottom: 60px; /* ALT BOŞLUK EKLENDİ */
+    padding-bottom: 60px;
     max-width: 1250px;
     margin: 0 auto;
     display: flex;
@@ -14,32 +14,14 @@
 
 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-/* HEADER */
-.state-header {
-    display: flex; justify-content: space-between; align-items: center;
-    background: linear-gradient(90deg, var(--bg-card) 0%, rgba(20,30,45,0) 100%);
-    padding: 20px; border-radius: 12px; border-left: 5px solid #ef4444;
-    border: 1px solid var(--border);
-}
-.state-info { display: flex; align-items: center; gap: 20px; }
-.state-flag { height: 50px; border-radius: 4px; box-shadow: 0 0 10px rgba(0,0,0,0.5); }
-.state-info h1 { font-size: 1.8rem; color: var(--text-light); margin-bottom: 5px; }
-.regime-tag { background: rgba(255,255,255,0.1); padding: 4px 10px; border-radius: 4px; font-size: 0.8rem; color: var(--text-dim); }
-.actions { display: flex; gap: 10px; }
-.action-btn { padding: 10px 20px; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; color: white; display: flex; align-items: center; gap: 8px; transition: 0.2s; }
-.action-btn:hover { transform: translateY(-2px); }
-.action-btn.red { background: #ef4444; } .action-btn.blue { background: #3b82f6; }
-
-/* =========================================
-   YENİ GRID SİSTEMİ
-   ========================================= */
+/* GRID SİSTEMİ */
 .parliament-grid-system {
     display: grid;
-    grid-template-columns: 3fr 1.2fr; /* Sol geniş, Sağ dar */
+    grid-template-columns: 3fr 1.2fr;
     gap: 20px;
     grid-template-areas:
-        "hemi right"   /* Sol: Hemicycle | Sağ: Right Panel (Logs+Polls) */
-        "bills parties"; /* Sol: Bills | Sağ: Parties List */
+        "hemi right"
+        "bills parties";
 }
 
 /* KUTULARIN ORTAK STİLİ */
@@ -51,43 +33,62 @@
     display: flex; flex-direction: column;
 }
 
-.panel-header { margin-bottom: 15px; border-bottom: 1px solid var(--border); padding-bottom: 10px; }
-.panel-header h3 { font-size: 1.1rem; color: var(--text-light); font-weight: 600; display: flex; align-items: center; gap: 10px; }
-
-/* 1. HEMICYCLE (SOL ÜST) */
+/* 1. HEMICYCLE (ARTIK HEADER'I İÇERİYOR) */
 .grid-area-hemicycle {
     grid-area: hemi;
-    align-items: center; justify-content: flex-end; padding-top: 40px; min-height: 380px; overflow: hidden;
+    /* Eskiden justify-content: flex-end vardı, artık normal akış */
+    justify-content: flex-start; 
+    padding: 0; /* Padding'i sıfırladık, içindekiler halledecek */
+    overflow: hidden;
 }
-.hemicycle-wrapper { width: 100%; height: 300px; position: relative; display: flex; justify-content: center; }
+
+/* --- YENİ ENTEGRE HEADER --- */
+.integrated-header {
+    display: flex; justify-content: space-between; align-items: center;
+    background: linear-gradient(90deg, rgba(20,30,45,0.8) 0%, rgba(20,30,45,0) 100%);
+    padding: 20px 25px;
+    border-bottom: 1px solid var(--border);
+}
+.state-info { display: flex; align-items: center; gap: 20px; }
+.state-flag { height: 45px; border-radius: 4px; box-shadow: 0 0 10px rgba(0,0,0,0.5); }
+.state-info h1 { font-size: 1.5rem; color: var(--text-light); margin-bottom: 3px; }
+.regime-tag { background: rgba(255,255,255,0.1); padding: 3px 8px; border-radius: 4px; font-size: 0.75rem; color: var(--text-dim); }
+
+.actions { display: flex; gap: 10px; }
+.action-btn { padding: 8px 16px; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; color: white; display: flex; align-items: center; gap: 8px; transition: 0.2s; font-size: 0.9rem; }
+.action-btn:hover { transform: translateY(-2px); }
+.action-btn.red { background: #ef4444; } .action-btn.blue { background: #3b82f6; }
+
+/* GRAFİK ALANI */
+.hemicycle-wrapper {
+    width: 100%; height: 320px; position: relative; display: flex; justify-content: center;
+    margin-top: 20px; /* Header'dan biraz uzaklaşsın */
+}
 .seat-dot { position: absolute; width: 10px; height: 10px; border-radius: 50%; box-shadow: 0 1px 3px rgba(0,0,0,0.8); transition: 0.2s; cursor: pointer; transform: translate(-50%, 50%); }
 .seat-dot:hover { transform: translate(-50%, 50%) scale(2); z-index: 10; box-shadow: 0 0 10px white; }
-.seat-legend { display: flex; gap: 15px; flex-wrap: wrap; justify-content: center; margin-top: 10px; padding: 10px; background: rgba(0,0,0,0.2); border-radius: 8px; width: 100%; }
+.seat-legend { display: flex; gap: 15px; flex-wrap: wrap; justify-content: center; padding: 15px; background: rgba(0,0,0,0.2); width: 100%; margin-top: auto; }
 .legend-item { display: flex; align-items: center; gap: 6px; font-size: 0.8rem; color: var(--text-dim); }
 .dot { width: 8px; height: 8px; border-radius: 50%; }
 
-/* 2. SAĞ PANEL (ÜST: LOGS + POLLS) */
-.grid-area-right-panel {
-    grid-area: right;
-    gap: 30px; /* İçindeki iki kutu arası boşluk */
-}
 
-/* Alt-panel (Logs ve Polls için) */
+/* 2. SAĞ PANEL */
+.grid-area-right-panel { grid-area: right; gap: 30px; }
 .sub-panel { display: flex; flex-direction: column; gap: 10px; }
+.panel-header { margin-bottom: 10px; border-bottom: 1px solid var(--border); padding-bottom: 8px; }
+.panel-header h3 { font-size: 1rem; color: var(--text-light); font-weight: 700; display: flex; align-items: center; gap: 10px; }
 
-/* Logs */
+/* Logs & Polls Styles (Aynı) */
 .logs-list { list-style: none; display: flex; flex-direction: column; gap: 12px; }
 .log-item { display: flex; gap: 12px; padding-bottom: 12px; border-bottom: 1px solid rgba(255,255,255,0.05); }
 .log-item:last-child { border: none; }
 .log-item i { font-size: 1.2rem; margin-top: 3px; }
 .log-item.passed i { color: #4ade80; } .log-item.failed i { color: #f87171; }
 .log-item div { display: flex; flex-direction: column; }
-.log-item strong { color: var(--text-light); font-size: 0.95rem; }
-.log-item small { color: var(--text-dim); font-size: 0.8rem; }
+.log-item strong { color: var(--text-light); font-size: 0.9rem; }
+.log-item small { color: var(--text-dim); font-size: 0.75rem; }
 
-/* Polls */
 .polls-list { display: flex; flex-direction: column; gap: 12px; }
-.poll-row { display: flex; align-items: center; gap: 10px; font-size: 0.85rem; }
+.poll-row { display: flex; align-items: center; gap: 10px; font-size: 0.8rem; }
 .poll-name { width: 90px; color: #cbd5e1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .poll-track { flex: 1; height: 6px; background: rgba(255,255,255,0.1); border-radius: 3px; }
 .poll-fill { height: 100%; background: var(--primary); border-radius: 3px; }
@@ -96,7 +97,7 @@
 .poll-val small { font-size: 0.7rem; }
 .green { color: #4ade80; } .red { color: #f87171; }
 
-/* 3. AKTİF TASARILAR (SOL ALT) */
+/* 3. BILLS */
 .grid-area-bills { grid-area: bills; }
 .bills-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 15px; }
 .bill-card { background: rgba(255,255,255,0.02); border: 1px solid var(--border); border-radius: 8px; padding: 15px; display: flex; flex-direction: column; gap: 10px; }
@@ -110,20 +111,12 @@
 .vote-btn.no { background: rgba(248, 113, 113, 0.1); color: #f87171; border: 1px solid #f87171; }
 .vote-btn:hover { background: currentColor; color: #000; }
 
-/* 4. PARTİ LİSTESİ (SAĞ ALT - YENİ) */
+/* 4. PARTIES LIST */
 .grid-area-parties { grid-area: parties; }
 .parliament-parties-list { display: flex; flex-direction: column; gap: 8px; max-height: 300px; overflow-y: auto; }
-.parliament-parties-list::-webkit-scrollbar { width: 4px; }
-.parliament-parties-list::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
-
 .list-group-title { font-size: 0.7rem; color: var(--text-dim); font-weight: 800; margin-top: 10px; margin-bottom: 5px; letter-spacing: 1px; }
 .list-group-title:first-child { margin-top: 0; }
-
-.pp-row {
-    display: flex; align-items: center; gap: 10px;
-    background: rgba(255,255,255,0.02); padding: 8px; border-radius: 6px;
-    border: 1px solid transparent;
-}
+.pp-row { display: flex; align-items: center; gap: 10px; background: rgba(255,255,255,0.02); padding: 8px; border-radius: 6px; border: 1px solid transparent; }
 .pp-row:hover { border-color: var(--border); background: rgba(255,255,255,0.05); }
 .pp-color { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
 .pp-name { flex: 1; font-size: 0.9rem; color: #cbd5e1; }
