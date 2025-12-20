@@ -2,6 +2,10 @@
 import { parliamentSeats, activeBills, electionPolls, constitutionArticles } from './data.js';
 
 export function renderParliament(container) {
+    // ... (renderParliament fonksiyonunun HTML kısmı AYNI KALSIN) ...
+    // Sadece kolaylık olsun diye HTML kısmını tekrar yazmıyorum,
+    // mevcut HTML kodunu koru. Sadece aşağıdaki generateHemicycle fonksiyonunu değiştir.
+    
     container.innerHTML = `
         <div class="parliament-layout">
             
@@ -68,72 +72,82 @@ export function renderParliament(container) {
         </div>
     `;
 
-    // Fonksiyonları çalıştır
     generateHemicycle();
     renderBills();
     renderPolls();
     setupEvents();
 }
 
-// --- 1. HEMICYCLE (YARIM DAİRE) ÇİZİMİ ---
+// --- 1. HEMICYCLE (YARIM DAİRE) - GÜNCELLENMİŞ VERSİYON ---
 function generateHemicycle() {
     const wrapper = document.getElementById('hemicycle-wrapper');
     const legend = document.getElementById('seat-legend');
     
-    // Partileri tek bir düz listede topla (Koltuk sayısı kadar nokta)
+    // Temizle (Tekrar çizimlerde üst üste binmesin)
+    wrapper.innerHTML = '';
+    legend.innerHTML = '';
+
+    // Partileri tek bir düz listede topla
     let allSeats = [];
     parliamentSeats.forEach(group => {
         for(let i=0; i<group.count; i++) {
             allSeats.push({ color: group.color, party: group.party });
         }
-        // Legend (Alt açıklama) ekle
         legend.innerHTML += `<div class="legend-item"><span class="dot" style="background:${group.color}"></span> ${group.short} (${group.count})</div>`;
     });
 
-    // Yarım Daire Matematiği
     const totalSeats = allSeats.length;
-    const rows = 10; // Kaç sıra koltuk olacak
+    
+    // AYARLAR (Burayı küçülttük)
+    const rows = 12; // Sıra sayısını artırıp sıkıştıralım
+    const baseRadius = 60; // En içteki çemberin yarıçapı (Eskiden 100'dü)
+    const rowSpacing = 20; // Sıralar arası mesafe (Eskiden 25'ti)
+    
     let seatIndex = 0;
 
     for (let r = 1; r <= rows; r++) {
-        // Dışarıdaki sıralar daha fazla koltuk alır
-        const radius = 100 + (r * 25); // Yarıçap genişler
-        const seatsInRow = Math.floor((Math.PI * radius) / 12); // Çevreye göre sığacak koltuk hesabı (12px boşluk)
+        const radius = baseRadius + (r * rowSpacing);
+        // Arkadaki sıralar daha geniş olduğu için daha fazla koltuk alır
+        const arcLength = Math.PI * radius; 
+        const seatWidth = 10; // Koltuk genişliği + boşluk
+        const seatsInRow = Math.floor(arcLength / (seatWidth * 1.3)); // 1.3 boşluk faktörü
         
-        // Bu sıraya sığacak koltukları yerleştir
         for (let s = 0; s < seatsInRow; s++) {
             if (seatIndex >= totalSeats) break;
 
             const seatData = allSeats[seatIndex];
             
             // Açıyı hesapla (180 dereceye yay)
-            const angleStep = 180 / (seatsInRow - 1);
-            const angle = 180 - (s * angleStep); // Soldan sağa
+            // Kenarlardan biraz boşluk bırakmak için 10 derece ve 170 derece arası çalışalım
+            const startAngle = 180;
+            const endAngle = 0;
+            const totalAngle = startAngle - endAngle;
+            
+            const angleStep = totalAngle / (seatsInRow - 1 || 1); // 0'a bölme hatasını önle
+            const angle = startAngle - (s * angleStep);
+            
             const radians = (angle * Math.PI) / 180;
 
-            // Koordinatlar (Merkeze göre)
-            const x = radius * Math.cos(radians); // Cosinus X verir
-            const y = radius * Math.sin(radians); // Sinus Y verir
+            // Koordinatlar
+            const x = radius * Math.cos(radians);
+            const y = radius * Math.sin(radians);
 
             const dot = document.createElement('div');
             dot.className = 'seat-dot';
             dot.style.backgroundColor = seatData.color;
-            // Merkeze hizalama (wrapper'ın ortası %50, altı %100)
-            dot.style.left = `calc(50% + ${x}px)`; 
-            dot.style.bottom = `${y}px`;
             
-            // Tooltip
-            dot.title = seatData.party; // Basit tooltip, ileride CSS ile güzelleşir
-
+            // Pozisyonlama
+            dot.style.left = `calc(50% + ${x}px)`; // X ekseninde merkeze göre
+            dot.style.bottom = `${y}px`; // Y ekseninde aşağıdan yukarı
+            
+            dot.title = seatData.party;
             wrapper.appendChild(dot);
             seatIndex++;
         }
     }
-    
-    // Kalan koltuk varsa (matematiksel yuvarlama hatası) onları da en arkaya ekleyebiliriz ama şimdilik kalsın.
 }
 
-// --- 2. YASA TASARILARI ---
+// ... (renderBills, renderPolls, setupEvents fonksiyonları AYNI kalacak) ...
 function renderBills() {
     const grid = document.getElementById('bills-grid');
     grid.innerHTML = activeBills.map(bill => `
@@ -160,7 +174,6 @@ function renderBills() {
     `).join('');
 }
 
-// --- 3. ANKETLER ---
 function renderPolls() {
     const list = document.getElementById('polls-list');
     list.innerHTML = electionPolls.map(poll => `
@@ -177,7 +190,6 @@ function renderPolls() {
     `).join('');
 }
 
-// --- EVENTLER ---
 function setupEvents() {
     const modal = document.getElementById('constitution-modal');
     document.getElementById('btn-constitution').addEventListener('click', () => {
