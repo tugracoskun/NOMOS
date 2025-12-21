@@ -1,32 +1,38 @@
 // HARİTA STİLLERİ VE RENKLENDİRME
+import { getOverriddenName } from './editor.js';
 
 // 1. ZEMİN KATMANI (Sadece Okyanus/Arka Plan etkisi için)
 export function getBaseCountryStyle(feature) {
     return {
-        fillColor: '#111827', // Koyu zemin (Okyanusla uyumlu)
+        fillColor: '#111827', // Koyu zemin
         weight: 0,
         opacity: 0,
         fillOpacity: 1
     };
 }
 
-// 2. DETAY KATMANI (EYALETLER - RENGARENK)
+// 2. DETAY KATMANI (EYALETLER - RENGARENK & EDİTÖR DESTEKLİ)
 export function getProvinceStyle(feature) {
-    // İsim Bulucu (Veri setlerinde farklılık olabilir)
     const p = feature.properties;
-    // Bulgaristan verisinde bazen 'name' yerine başka keyler olabilir, hepsini tarıyoruz
-    const name = p.name || p.NAME || p.Name || p.NAME_1 || p.VARNAME_1 || p.lektur || "Bölge-" + Math.random();
+    
+    // 1. Önce kayıtlı bir isim değişikliği var mı kontrol et (Dev Mode)
+    let name = getOverriddenName(feature);
+    
+    // 2. Yoksa GeoJSON içindeki olası etiketleri tara
+    if (!name) {
+        name = p.name || p.NAME || p.Name || p.NAME_1 || p.VARNAME_1 || p.lektur || 
+               p.bulgarian_name || p.NUTS3_NAME || p.province || "Bölge-" + Math.random();
+    }
 
-    // DÜZELTME BURADA:
-    // Artık ülkeye göre değil, doğrudan ŞEHİR İSMİNE göre renk üretiyoruz.
-    // Bu sayede her şehir bambaşka bir renk alacak.
+    // 3. İsme göre benzersiz renk üret
+    // (İsim değişirse renk de otomatik değişir)
     const color = stringToColor(name);
 
     return {
         fillColor: color, 
         weight: 0.5,          // İnce sınır
         opacity: 1,
-        color: '#000000',     // SINIR RENGİ: Siyah (Net ayrım için)
+        color: '#000000',     // SINIR RENGİ: Siyah
         fillOpacity: 1        // Tam dolu
     };
 }
@@ -45,13 +51,13 @@ export function getInternationalBorderStyle(feature) {
 
 // --- YARDIMCI FONKSİYONLAR ---
 
-// Renk Üretici (Canlı ve Rastgele Görünümlü)
+// Renk Üretici (Canlı ve Rastgele Görünümlü - HSL)
 function stringToColor(str) {
     if (!str) return "#333";
     
     let hash = 0;
     for (let i = 0; i < str.length; i++) {
-        // Hash algoritmasını biraz karıştıralım ki birbirine yakın isimler farklı renk olsun
+        // Hash algoritması (String'i sayıya çevir)
         hash = str.charCodeAt(i) + ((hash << 5) - hash);
         hash = hash & hash; 
     }
@@ -59,10 +65,10 @@ function stringToColor(str) {
     // HSL Ayarları (Rival Regions Paleti)
     const h = Math.abs(hash) % 360; // Her renk tonu olabilir
     
-    // Doygunluk (Saturation): %50-70 arası (Canlı ama kör etmeyen)
+    // Doygunluk (Saturation): %50-70 arası (Canlı)
     const s = 50 + (Math.abs(hash) % 20); 
     
-    // Parlaklık (Lightness): %35-55 arası (Koyu temaya uygun, pastel)
+    // Parlaklık (Lightness): %35-55 arası (Koyu temaya uygun)
     const l = 35 + (Math.abs(hash) % 20); 
 
     return `hsl(${h}, ${s}%, ${l}%)`; 

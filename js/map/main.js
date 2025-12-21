@@ -1,6 +1,7 @@
 // HARİTA MODÜLÜ ANA DOSYASI
 import { mapConfig } from './config.js';
 import { loadLayers } from './layers.js';
+import { initEditor } from './editor.js'; // Geliştirici Modu
 
 let mapInstance = null;
 
@@ -17,20 +18,23 @@ export function initMap(containerId) {
         attributionControl: false,
         
         // --- SMOOTH ZOOM AYARLARI ---
-        zoomSnap: 0,           // KİLİT NOKTA: Haritanın 1, 2, 3 diye tam sayılara yapışmasını engeller.
-        zoomDelta: 0.1,        // Tekerleği çevirince ne kadar zoom yapacağını belirler (Düşük = Daha hassas).
-        wheelPxPerZoomLevel: 120, // Tekerlek hassasiyeti (Yüksek değer = Daha yavaş ve kontrollü zoom).
+        zoomSnap: 0,
+        zoomDelta: 0.1,
+        wheelPxPerZoomLevel: 120,
         
-        // Diğer Ayarlar
+        // Sınırlandırmalar
         minZoom: mapConfig.minZoom, 
         maxZoom: mapConfig.maxZoom,
         maxBounds: mapConfig.maxBounds,
-        maxBoundsViscosity: 1.0, // Kenarlara çarpınca esnemesin, sert dursun
-        preferCanvas: true       // Performans için şart
+        maxBoundsViscosity: 1.0,
+        preferCanvas: true
     }).setView(mapConfig.startView, mapConfig.startZoom);
 
     // Zoom butonlarını sağ alta ekle
     L.control.zoom({ position: 'bottomright' }).addTo(mapInstance);
+
+    // --- GELİŞTİRİCİ EDİTÖRÜNÜ BAŞLAT ---
+    initEditor(mapInstance);
 
     // Katmanları Yükle
     loadLayers(mapInstance);
