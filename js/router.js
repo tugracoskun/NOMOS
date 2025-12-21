@@ -1,17 +1,21 @@
 // ROUTER MODÜLÜ
-// Sayfa geçişlerini ve URL yönetimini sağlar.
+// Sayfa geçişlerini, URL yönetimini ve Geçmiş (History) API'sini yönetir.
 
 import { initMap, destroyMap } from './map.js';
-import { setupChat, initFakeChat } from './chat.js';
+import { renderHome } from './home.js';
 import { renderPartiesPage } from './parties/main.js';
 import { renderParliamentPage } from './parliament/main.js';
 
 const appContainer = document.getElementById('app-container');
 
+// ========================================================
 // 1. SAYFA YÜKLEME (View Render)
+// ========================================================
 export function loadPage(pageName, subView = null, id = null) {
-    // Harita temizliği (Bellek sızıntısını önler)
-    if (pageName !== 'map') { destroyMap(); }
+    // Harita temizliği (Bellek sızıntısını önlemek için)
+    if (pageName !== 'map') { 
+        destroyMap(); 
+    }
     
     // Menüdeki aktif ışığını güncelle
     updateActiveMenu(pageName);
@@ -20,18 +24,22 @@ export function loadPage(pageName, subView = null, id = null) {
 
     switch (pageName) {
         case 'home':
-            renderHome();
+            // Ana Sayfa ve Chat modülü
+            renderHome(appContainer);
             break;
             
         case 'map':
+            // Harita Modülü
             renderMap();
             break;
             
         case 'parties':
+            // Partiler Modülü (Liste, Oluşturma veya Detay)
             renderPartiesPage(appContainer, subView, id);
             break;
             
         case 'parliament':
+            // Meclis Modülü
             renderParliamentPage(appContainer);
             break;
 
@@ -44,39 +52,50 @@ export function loadPage(pageName, subView = null, id = null) {
             renderPlaceholder(pageName);
             break;
             
-        // Bilinmeyen bir sayfa gelirse de Placeholder göster
+        // Bilinmeyen bir sayfa gelirse Ana Sayfaya atma, Placeholder göster
         default:
             renderPlaceholder(pageName);
     }
 }
 
+// ========================================================
 // 2. GLOBAL YÖNLENDİRME (History API)
+// ========================================================
+// Tıklamalarda bu fonksiyon çağrılır. URL'i günceller ve sayfayı yükler.
 export function navigateTo(pageName, subView = null, id = null) {
     let hash = pageName;
     if (subView) hash += `/${subView}`;
     if (id) hash += `/${id}`;
 
-    // Aynı sayfadaysak işlem yapma
+    // Eğer zaten aynı sayfadaysak işlem yapma (Gereksiz history şişirme)
     const currentHash = window.location.hash.substring(1);
     if (currentHash === hash) return;
 
+    // URL'i güncelle ve geçmişe kaydet
     history.pushState({ page: pageName, view: subView, id: id }, null, `#${hash}`);
+    
+    // Sayfayı yükle
     loadPage(pageName, subView, id);
 }
 
-// 3. TARAYICI GEÇMİŞİ DİNLEYİCİSİ
+// ========================================================
+// 3. TARAYICI GEÇMİŞİ DİNLEYİCİSİ (Geri/İleri Tuşları)
+// ========================================================
 window.addEventListener('popstate', (event) => {
     handleInitialLoad();
 });
 
+// Sayfa ilk açıldığında veya F5 atıldığında URL'i analiz et
 export function handleInitialLoad() {
     const hash = window.location.hash.substring(1); // # işaretini at
     
+    // Hash yoksa ana sayfaya git
     if (!hash) {
         navigateTo('home');
         return;
     }
 
+    // Hash'i parçala (örn: parties/detail/5 -> ['parties', 'detail', '5'])
     const parts = hash.split('/');
     const page = parts[0];
     const subView = parts[1] || null;
@@ -85,55 +104,37 @@ export function handleInitialLoad() {
     loadPage(page, subView, id);
 }
 
-// YARDIMCI: Menü Aktifliği
+// ========================================================
+// 4. YARDIMCI FONKSİYONLAR
+// ========================================================
+
+// Menüdeki aktif sınıfını güncelle
 function updateActiveMenu(pageName) {
     document.querySelectorAll('.header-bottom a').forEach(link => {
         link.classList.remove('active');
+        // data-page özelliği eşleşen linki bul
         if (link.getAttribute('data-page') === pageName) {
             link.classList.add('active');
         }
     });
 }
 
-// --- RENDER FONKSİYONLARI ---
-
-function renderHome() {
-    appContainer.innerHTML = `
-        <div class="home-layout">
-            <div class="news-feed">
-                <div class="news-card">
-                    <div class="news-title">📢 Sistem Mesajı</div>
-                    <div class="news-body">NOMOS Yönetim Paneline hoşgeldiniz. Geliştirmeler devam ediyor.</div>
-                </div>
-            </div>
-            <div class="chat-widget">
-                <div class="chat-header">Global Chat</div>
-                <div id="chat-messages" class="chat-messages"></div>
-                <div class="chat-input-area">
-                    <input type="text" id="chat-input" placeholder="Mesaj...">
-                    <button id="chat-send-btn">></button>
-                </div>
-            </div>
-        </div>
-    `;
-    setupChat();
-    initFakeChat();
-}
-
+// Harita için kapsayıcı oluşturup başlatma
 function renderMap() { 
     appContainer.innerHTML = `<div id="game-map"></div>`; 
+    // DOM oluştuktan hemen sonra haritayı çiz
     setTimeout(() => initMap('game-map'), 50); 
 }
 
-// DİĞER SAYFALAR İÇİN BOŞ ŞABLON
+// Henüz yapılmamış sayfalar için "Yapım Aşamasında" ekranı
 function renderPlaceholder(title) {
-    // Türkçe başlık eşleştirmesi
+    // İngilizce ID'leri Türkçe Başlıklara Çevir
     const titles = {
         profile: 'Oyuncu Profili',
         trade: 'Ticaret Borsası',
         hangar: 'Askeri Hangar',
         messages: 'Gelen Kutusu',
-        social: 'Sosyal Medya'
+        social: 'Sosyal Medya Akışı'
     };
     
     const displayTitle = titles[title] || title.toUpperCase();
