@@ -3,15 +3,27 @@
    ========================================= */
 .home-layout-grid {
     display: grid;
-    /* Sol (280px) | Orta (Esnek) | Sağ (280px) */
-    grid-template-columns: 280px 1fr 280px; 
-    gap: 20px;
-    max-width: 1400px;
-    margin: 0 auto;
+    /* Sol (270px) | Orta (Esnek) | Sağ (270px) */
+    /* Yanları biraz kıstık ki ortadaki Chat'e yer kalsın ama 1250px'e sığsın */
+    grid-template-columns: 270px 1fr 270px; 
+    gap: 25px; /* Diğer sayfalarla aynı boşluk */
+    
+    /* KRİTİK AYAR 1: GENİŞLİK SINIRI */
+    max-width: 1250px; /* Partiler ve Meclis sayfasıyla birebir aynı */
+    margin: 0 auto;    /* Ortala */
+    
     padding: 20px;
-    height: calc(100vh - 60px); /* Sayfa taşmasını engelle */
+    
+    /* KRİTİK AYAR 2: ALT SINIR (Kırmızı Çizgi) */
+    /* Sayfa boyundan 80px çıkarıyoruz ki altta boşluk kalsın */
+    height: calc(100vh - 80px); 
+    
     overflow: hidden;
+    align-items: start;
+    animation: fadeIn 0.4s ease;
 }
+
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
 /* =========================================
    SOL VE SAĞ SÜTUNLAR (WIDGET ALANLARI)
