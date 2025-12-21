@@ -62,78 +62,99 @@ export function destroyMap() {
     }
 }
 
-// --- STİLLER ---
+// ... (Üst kısımdaki initMap ve destroyMap aynı kalsın) ...
 
-// 1. Zemin Stili (Sadece Ülke Sınırları)
+// --- STİLLER VE RENKLENDİRME ---
+
+// 1. ZEMİN KATMANI STİLİ (Detayı olmayan ülkeler için: Türkiye, Avrupa vb.)
 function getBaseCountryStyle(feature) {
     // Ülke ismine göre renk üret
-    const color = stringToColor(feature.properties.NAME || feature.properties.ADMIN);
+    const name = feature.properties.NAME || feature.properties.ADMIN || "Unknown";
+    const color = stringToColor(name);
+    
     return {
-        fillColor: color,
-        weight: 1,
-        opacity: 1,
-        color: '#000', // Ülke sınırları siyah
-        fillOpacity: 0.5 // Biraz daha soluk kalsın ki üstteki detay parlasın
+        fillColor: color,     // Canlı renk kullan
+        weight: 1,            // Sınır kalınlığı
+        opacity: 1,           // Sınır çizgisi netliği
+        color: '#475569',     // Sınır rengi (Açık gri) - Siyah yerine bunu kullanıyoruz
+        fillOpacity: 0.8      // DOLGUYU ARTIRDIK (Eskiden 0.5'ti, karanlık duruyordu)
     };
 }
 
-// 2. Eyalet Stili (Detaylı Sınırlar)
+// 2. DETAY KATMANI STİLİ (Eyaleti olanlar için: ABD, Rusya vb.)
 function getProvinceStyle(feature) {
     const admin = feature.properties.admin || "Unknown";
-    const color = stringToColor(admin); // Aynı ülkenin eyaletleri aynı ton olsun
+    const color = stringToColor(admin); // Ülkesiyle aynı tonu alsın
+    
     return {
         fillColor: color,
-        weight: 0.5,   // Eyalet sınırları daha ince
+        weight: 0.5,          // Eyalet sınırları daha ince olsun
         opacity: 1,
-        color: '#fff', // Eyalet sınırları beyaz/açık
-        fillOpacity: 0.8 // Daha canlı
+        color: '#ffffff',     // Eyalet sınırları BEYAZ olsun (ayırıcı özellik)
+        fillOpacity: 0.9      // Detaylı yerler biraz daha parlak olsun
     };
 }
 
-// Renk Üretici
+// RENK ÜRETİCİ (HASH FONKSİYONU)
 function stringToColor(str) {
-    if(!str) return "#333";
+    if (!str) return "#334155"; // İsimsizse varsayılan gri
     let hash = 0;
-    for (let i = 0; i < str.length; i++) { hash = str.charCodeAt(i) + ((hash << 5) - hash); }
-    let color = '#';
-    for (let i = 0; i < 3; i++) {
-        let value = (hash >> (i * 8)) & 0xFF;
-        value = Math.floor(value * 0.6); // Koyu tonlar
-        color += ('00' + value.toString(16)).substr(-2);
+    for (let i = 0; i < str.length; i++) {
+        hash = str.charCodeAt(i) + ((hash << 5) - hash);
     }
-    return color;
+    
+    // HSL (Hue, Saturation, Lightness) kullanarak daha dengeli renkler üretelim
+    // Hue: İsime göre değişsin (0-360)
+    // Saturation: %60 (Canlı ama göz yormayan)
+    // Lightness: %40 (Koyu tema uyumlu)
+    
+    const h = Math.abs(hash) % 360;
+    return `hsl(${h}, 60%, 40%)`; 
 }
 
-// --- ETKİLEŞİMLER ---
+// --- ETKİLEŞİMLER (AYNI KALSIN) ---
 
-// Zemin Etkileşimi (Ülke Bazlı)
+// Zemin Etkileşimi
 function onBaseInteraction(feature, layer) {
-    const name = feature.properties.NAME || "Ülke";
+    const name = feature.properties.NAME || feature.properties.ADMIN;
+    
     layer.on('click', (e) => {
         L.popup().setLatLng(e.latlng)
-            .setContent(`<div style="text-align:center"><b>${name}</b><br><small>Bölge verisi yok</small></div>`)
+            .setContent(`<div style="text-align:center; color:#0f172a"><b>${name}</b><br><small>Bölge verisi yok</small></div>`)
             .openOn(mapInstance);
+    });
+    
+    // Hover efekti
+    layer.on('mouseover', (e) => {
+        e.target.setStyle({ fillOpacity: 1, weight: 2, color: '#fff' });
+    });
+    layer.on('mouseout', (e) => {
+        // Eski stiline geri döndür
+        const style = getBaseCountryStyle(feature);
+        e.target.setStyle(style);
     });
 }
 
-// Detay Etkileşimi (Eyalet Bazlı)
+// Detay Etkileşimi
 function onProvinceInteraction(feature, layer) {
-    const name = feature.properties.name || "Bölge";
-    const admin = feature.properties.admin || "Ülke";
+    const name = feature.properties.name;
+    const admin = feature.properties.admin;
     
     layer.on({
         mouseover: (e) => {
-            e.target.setStyle({ weight: 2, color: '#60a5fa', fillOpacity: 1 });
+            e.target.setStyle({ weight: 2, color: '#fff', fillOpacity: 1 });
             e.target.bringToFront();
         },
         mouseout: (e) => {
-            provinceLayer.resetStyle(e.target);
+            // Eski stiline geri döndür
+            const style = getProvinceStyle(feature);
+            e.target.setStyle(style);
         },
         click: (e) => {
-            L.DomEvent.stopPropagation(e); // Alttaki ülkeye tıklamayı engelle
+            L.DomEvent.stopPropagation(e);
             mapInstance.fitBounds(e.target.getBounds());
             L.popup().setLatLng(e.latlng)
-                .setContent(`<div style="text-align:center"><b>${name}</b><br><small>${admin}</small><br><button>Yönet</button></div>`)
+                .setContent(`<div style="text-align:center; color:#0f172a"><b>${name}</b><br><small>${admin}</small><br><button style="margin-top:5px; cursor:pointer;">Yönet</button></div>`)
                 .openOn(mapInstance);
         }
     });
