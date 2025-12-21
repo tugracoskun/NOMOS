@@ -11,31 +11,42 @@ export async function initMap(containerId) {
         destroyMap();
     }
 
-    // 1. Harita Motorunu Oluştur
-    // TileLayer (Resim) kullanmıyoruz, zemin rengini CSS'den alacak.
+    // 1. DÜNYA SINIRLARINI BELİRLE
+    // Kullanıcının gidebileceği maksimum alan (Kuzey-Güney / Doğu-Batı)
+    const southWest = L.latLng(-85, -180);
+    const northEast = L.latLng(85, 180);
+    const bounds = L.latLngBounds(southWest, northEast);
+
+    // 2. Harita Motorunu Oluştur
     mapInstance = L.map(containerId, {
         zoomControl: false,
         attributionControl: false,
-        minZoom: 3,
-        maxZoom: 8,
-        maxBoundsViscosity: 1.0,
-        preferCanvas: true // Performans artışı
-    }).setView([39.0, 35.0], 5); // Türkiye odaklı
+        
+        // --- KRİTİK AYARLAR ---
+        minZoom: 3,             // En fazla bu kadar uzaklaşabilir (Dünya ekrana tam sığar, küçülmez)
+        maxZoom: 8,             // En fazla bu kadar yaklaşabilir
+        maxBounds: bounds,      // Haritayı yukarıdaki sınırlara hapset
+        maxBoundsViscosity: 1.0,// Kenara gelince esnemesin, taş gibi dursun
+        worldCopyJump: true,    // Yatayda dünya tekrar ederken atlama yapmasın (Akıcı olsun)
+        // ---------------------
+        
+        preferCanvas: true 
+    }).setView([39.0, 35.0], 5); // Türkiye odaklı başla
 
     L.control.zoom({ position: 'bottomright' }).addTo(mapInstance);
 
-    // 2. Veriyi Çek ve İşle (Natural Earth 50m - Yüksek Detay)
+    // 3. Veriyi Çek ve İşle
     console.log("Map: Veri indiriliyor...");
     
     try {
-        // GÜNCELLENEN GÜVENİLİR URL (Cloudfront CDN)
+        // Localdeki dosyayı çekiyoruz (Daha önce indirmiştik)
         const response = await fetch('./assets/world.json');
         
         if (!response.ok) throw new Error(`Dosya Bulunamadı: ${response.status}`);
         
         const data = await response.json();
 
-        // 3. Ülkeleri Haritaya Ekle
+        // 4. Ülkeleri Haritaya Ekle
         geoJsonLayer = L.geoJSON(data, {
             style: getCountryStyle,
             onEachFeature: onCountryInteraction
@@ -45,17 +56,20 @@ export async function initMap(containerId) {
 
     } catch (error) {
         console.error("Map Hatası:", error);
-        document.getElementById(containerId).innerHTML = `
-            <div style="display:flex; flex-direction:column; justify-content:center; align-items:center; height:100%; color:#ef4444; text-align:center;">
-                <i class="fa-solid fa-triangle-exclamation" style="font-size:2rem; margin-bottom:10px;"></i>
-                <p>Harita verisi yüklenemedi.</p>
-                <p style="font-size:0.8rem; color:#94a3b8;">${error.message}</p>
-            </div>
-        `;
+        // Hata durumunda ekrana mesaj bas (Eğer element varsa)
+        const container = document.getElementById(containerId);
+        if (container) {
+            container.innerHTML = `
+                <div style="display:flex; flex-direction:column; justify-content:center; align-items:center; height:100%; color:#ef4444; text-align:center;">
+                    <i class="fa-solid fa-triangle-exclamation" style="font-size:2rem; margin-bottom:10px;"></i>
+                    <p>Harita verisi yüklenemedi.</p>
+                </div>
+            `;
+        }
     }
 }
 
-// Haritayı bellekten siler (Sayfa değişince çağrılır)
+// Haritayı bellekten siler
 export function destroyMap() {
     if (mapInstance) {
         mapInstance.remove();
@@ -69,38 +83,33 @@ export function destroyMap() {
 
 function getCountryStyle(feature) {
     return {
-        fillColor: '#1e293b', // Ülke Rengi (Koyu Mavi-Gri)
+        fillColor: '#1e293b', // Ülke Rengi
         weight: 1,            // Sınır Kalınlığı
         opacity: 1,
-        color: '#475569',     // Sınır Rengi (Açık Gri)
-        fillOpacity: 1        // Tam Görünürlük (Alttaki denizi kapat)
+        color: '#475569',     // Sınır Rengi
+        fillOpacity: 1
     };
 }
 
 function onCountryInteraction(feature, layer) {
-    // Bu veri setinde ülke ismi genellikle 'name' veya 'admin' içindedir.
-    const countryName = feature.properties.name || feature.properties.admin || "Bilinmeyen Bölge";
+    const countryName = feature.properties.NAME || feature.properties.ADMIN || "Bilinmeyen Bölge";
 
     layer.on({
-        // Mouse üzerine gelince
         mouseover: (e) => {
             const l = e.target;
             l.setStyle({
                 weight: 2,
-                color: '#60a5fa',     // Parlak Mavi Çerçeve
-                fillColor: '#3b82f6'  // Parlak Mavi Dolgu
+                color: '#60a5fa',
+                fillColor: '#3b82f6'
             });
-            l.bringToFront(); // Öne çıkart
+            l.bringToFront();
         },
-        // Mouse gidince
         mouseout: (e) => {
             geoJsonLayer.resetStyle(e.target);
         },
-        // Tıklayınca
         click: (e) => {
-            mapInstance.fitBounds(e.target.getBounds()); // Oraya odaklan
+            mapInstance.fitBounds(e.target.getBounds());
             
-            // Popup aç
             L.popup()
                 .setLatLng(e.latlng)
                 .setContent(`
