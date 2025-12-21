@@ -1,12 +1,17 @@
 #game-map {
     width: 100%;
     height: 100%;
-    background-color: #0f172a; /* Deniz Rengi */
+    /* YENİ DENİZ RENGİ */
+    background-color: #51699C; 
     z-index: 1;
 }
 
-/* Leaflet Override */
-.leaflet-container { background: #0f172a !important; }
+/* Leaflet Varsayılan Arka Planı */
+.leaflet-container { 
+    background: #51699C !important; 
+}
+
+/* ... (Diğer stiller aynı kalsın: leaflet-bar, popup vb.) ... */
 .leaflet-bar a {
     background-color: var(--bg-card) !important;
     color: var(--text-light) !important;
