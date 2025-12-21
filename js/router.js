@@ -1,7 +1,7 @@
 // ROUTER MODÜLÜ
 // Sayfa geçişlerini, URL yönetimini ve Geçmiş (History) API'sini yönetir.
 
-import { initMap, destroyMap } from './map.js';
+import { initMap, destroyMap } from './map/main.js';
 import { renderHome } from './home.js';
 import { renderPartiesPage } from './parties/main.js';
 import { renderParliamentPage } from './parliament/main.js';
