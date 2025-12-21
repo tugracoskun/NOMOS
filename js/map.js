@@ -1,19 +1,17 @@
 // Harita Modülü
-// Dual Layer System: Countries (Base) + Provinces (Overlay)
+// Fix: Katman Sıralaması (Z-Index) ve Yüksek Çözünürlük
 
 let mapInstance = null;
-let countryLayer = null;  // Zemin (Ülkeler)
-let provinceLayer = null; // Detay (Eyaletler)
+let countryLayer = null;
+let provinceLayer = null;
 
 export async function initMap(containerId) {
     if (mapInstance) destroyMap();
 
-    // 1. Sınırlandırma
     const southWest = L.latLng(-85, -180);
     const northEast = L.latLng(85, 180);
     const bounds = L.latLngBounds(southWest, northEast);
 
-    // 2. Harita Motoru
     mapInstance = L.map(containerId, {
         zoomControl: false,
         attributionControl: false,
@@ -22,37 +20,55 @@ export async function initMap(containerId) {
         maxBounds: bounds,
         maxBoundsViscosity: 1.0,
         preferCanvas: true
-    }).setView([39.0, 35.0], 4); 
+    }).setView([39.0, 35.0], 5); // Türkiye
 
     L.control.zoom({ position: 'bottomright' }).addTo(mapInstance);
 
-    // --- KATMAN 1: ZEMİN (ÜLKELER) ---
-    // Bu katman "boşlukları" dolduracak.
+    // --- ÖNEMLİ: KATMAN SIRALAMASI (PANE) OLUŞTURMA ---
+    // Z-Index mantığı: Sayı ne kadar büyükse o kadar üstte görünür.
+    
+    // 1. Zemin Katmanı (En altta)
+    mapInstance.createPane('basePane');
+    mapInstance.getPane('basePane').style.zIndex = 400;
+
+    // 2. Detay Katmanı (En üstte)
+    mapInstance.createPane('detailPane');
+    mapInstance.getPane('detailPane').style.zIndex = 450; 
+
+    // -----------------------------------------------------
+
+    // 1. ADIM: ZEMİN KATMANI (Ülkeler)
+    // Sadece renk versin diye var.
     try {
         const resWorld = await fetch('./assets/world.json');
         if (resWorld.ok) {
             const worldData = await resWorld.json();
             countryLayer = L.geoJSON(worldData, {
+                pane: 'basePane', // <-- EN ALTA ZORLA
                 style: getBaseCountryStyle,
                 onEachFeature: onBaseInteraction
             }).addTo(mapInstance);
-            console.log("Map: Zemin katmanı (Ülkeler) yüklendi.");
         }
-    } catch (e) { console.error("Zemin harita hatası:", e); }
+    } catch (e) { console.error(e); }
 
-    // --- KATMAN 2: DETAY (EYALETLER) ---
-    // Bu katman var olan bölgeleri detaylandıracak.
+    // 2. ADIM: DETAY KATMANI (Eyaletler)
+    // Sınırları çizsin diye var.
+    // NOT: Kesin çözüm için ONLINE YÜKSEK ÇÖZÜNÜRLÜKLÜ veriyi çekiyoruz.
+    // Eğer yereldeki 14MB'lık dosyan varsa './assets/provinces.json' yapabilirsin.
     try {
-        const resProv = await fetch('./assets/provinces.json');
+        console.log("Map: Detay verisi çekiliyor...");
+        const resProv = await fetch('https://raw.githubusercontent.com/nvkelso/natural-earth-vector/master/geojson/ne_50m_admin_1_states_provinces.json');
+        
         if (resProv.ok) {
             const provData = await resProv.json();
             provinceLayer = L.geoJSON(provData, {
+                pane: 'detailPane', // <-- EN ÜSTE ZORLA
                 style: getProvinceStyle,
                 onEachFeature: onProvinceInteraction
             }).addTo(mapInstance);
-            console.log("Map: Detay katmanı (Eyaletler) yüklendi.");
+            console.log("Map: Detaylar çizildi.");
         }
-    } catch (e) { console.error("Detay harita hatası:", e); }
+    } catch (e) { console.error("Detay hatası:", e); }
 }
 
 export function destroyMap() {
@@ -62,99 +78,77 @@ export function destroyMap() {
     }
 }
 
-// ... (Üst kısımdaki initMap ve destroyMap aynı kalsın) ...
+// --- STİLLER ---
 
-// --- STİLLER VE RENKLENDİRME ---
-
-// 1. ZEMİN KATMANI STİLİ (Detayı olmayan ülkeler için: Türkiye, Avrupa vb.)
+// Zemin (Ülke) Rengi
 function getBaseCountryStyle(feature) {
-    // Ülke ismine göre renk üret
-    const name = feature.properties.NAME || feature.properties.ADMIN || "Unknown";
-    const color = stringToColor(name);
-    
-    return {
-        fillColor: color,     // Canlı renk kullan
-        weight: 1,            // Sınır kalınlığı
-        opacity: 1,           // Sınır çizgisi netliği
-        color: '#475569',     // Sınır rengi (Açık gri) - Siyah yerine bunu kullanıyoruz
-        fillOpacity: 0.8      // DOLGUYU ARTIRDIK (Eskiden 0.5'ti, karanlık duruyordu)
-    };
-}
-
-// 2. DETAY KATMANI STİLİ (Eyaleti olanlar için: ABD, Rusya vb.)
-function getProvinceStyle(feature) {
-    const admin = feature.properties.admin || "Unknown";
-    const color = stringToColor(admin); // Ülkesiyle aynı tonu alsın
-    
+    const color = stringToColor(feature.properties.NAME || feature.properties.ADMIN);
     return {
         fillColor: color,
-        weight: 0.5,          // Eyalet sınırları daha ince olsun
+        weight: 1.5,          // Kalın dış sınır
         opacity: 1,
-        color: '#ffffff',     // Eyalet sınırları BEYAZ olsun (ayırıcı özellik)
-        fillOpacity: 0.9      // Detaylı yerler biraz daha parlak olsun
+        color: '#000',        // Siyah ülke sınırı
+        fillOpacity: 1        // Tam görünür
     };
 }
 
-// RENK ÜRETİCİ (HASH FONKSİYONU)
+// Detay (Eyalet) Sınırları
+function getProvinceStyle(feature) {
+    return {
+        fillColor: 'transparent', // İÇİ BOŞ OLSUN (Alttaki ülkenin rengi görünsün)
+        weight: 0.5,              // İnce sınır
+        opacity: 1,
+        color: 'rgba(0, 0, 0, 0.5)', // Yarı saydam siyah çizgiler
+        fillOpacity: 0
+    };
+}
+
+// Renk Üretici (Daha canlı renkler için HSL)
 function stringToColor(str) {
-    if (!str) return "#334155"; // İsimsizse varsayılan gri
+    if(!str) return "#333";
     let hash = 0;
     for (let i = 0; i < str.length; i++) {
         hash = str.charCodeAt(i) + ((hash << 5) - hash);
     }
-    
-    // HSL (Hue, Saturation, Lightness) kullanarak daha dengeli renkler üretelim
-    // Hue: İsime göre değişsin (0-360)
-    // Saturation: %60 (Canlı ama göz yormayan)
-    // Lightness: %40 (Koyu tema uyumlu)
-    
     const h = Math.abs(hash) % 360;
-    return `hsl(${h}, 60%, 40%)`; 
+    return `hsl(${h}, 65%, 45%)`; 
 }
 
-// --- ETKİLEŞİMLER (AYNI KALSIN) ---
+// --- ETKİLEŞİMLER ---
 
-// Zemin Etkileşimi
 function onBaseInteraction(feature, layer) {
-    const name = feature.properties.NAME || feature.properties.ADMIN;
-    
-    layer.on('click', (e) => {
-        L.popup().setLatLng(e.latlng)
-            .setContent(`<div style="text-align:center; color:#0f172a"><b>${name}</b><br><small>Bölge verisi yok</small></div>`)
-            .openOn(mapInstance);
-    });
-    
-    // Hover efekti
-    layer.on('mouseover', (e) => {
-        e.target.setStyle({ fillOpacity: 1, weight: 2, color: '#fff' });
-    });
-    layer.on('mouseout', (e) => {
-        // Eski stiline geri döndür
-        const style = getBaseCountryStyle(feature);
-        e.target.setStyle(style);
-    });
+    // Zemin etkileşimi (Gerekirse açabiliriz, şimdilik boş)
 }
 
-// Detay Etkileşimi
 function onProvinceInteraction(feature, layer) {
-    const name = feature.properties.name;
-    const admin = feature.properties.admin;
-    
+    const name = feature.properties.name || feature.properties.NAME;
+    const admin = feature.properties.admin || feature.properties.ADMIN;
+
     layer.on({
         mouseover: (e) => {
-            e.target.setStyle({ weight: 2, color: '#fff', fillOpacity: 1 });
-            e.target.bringToFront();
+            // Üzerine gelince belirginleştir
+            e.target.setStyle({ 
+                weight: 1, 
+                color: '#fff', 
+                fillColor: '#fff', 
+                fillOpacity: 0.2 
+            });
         },
         mouseout: (e) => {
-            // Eski stiline geri döndür
-            const style = getProvinceStyle(feature);
-            e.target.setStyle(style);
+            // Eski haline döndür
+            provinceLayer.resetStyle(e.target);
         },
         click: (e) => {
             L.DomEvent.stopPropagation(e);
             mapInstance.fitBounds(e.target.getBounds());
             L.popup().setLatLng(e.latlng)
-                .setContent(`<div style="text-align:center; color:#0f172a"><b>${name}</b><br><small>${admin}</small><br><button style="margin-top:5px; cursor:pointer;">Yönet</button></div>`)
+                .setContent(`
+                    <div style="text-align:center;">
+                        <small style="color:#64748b; font-weight:bold;">${admin}</small><br>
+                        <b style="font-size:1.1rem; color:#0f172a;">${name}</b><br>
+                        <button style="margin-top:5px;">Yönet</button>
+                    </div>
+                `)
                 .openOn(mapInstance);
         }
     });
