@@ -1,126 +1,139 @@
 // Harita Modülü
-// Harita kurulumu ve yönetimi buradan yapılır.
+// Dual Layer System: Countries (Base) + Provinces (Overlay)
 
 let mapInstance = null;
-let geoJsonLayer = null;
+let countryLayer = null;  // Zemin (Ülkeler)
+let provinceLayer = null; // Detay (Eyaletler)
 
-// Haritayı başlatır
 export async function initMap(containerId) {
-    // Eğer harita zaten varsa önce temizle (Hata önlemi)
-    if (mapInstance) {
-        destroyMap();
-    }
+    if (mapInstance) destroyMap();
 
-    // 1. DÜNYA SINIRLARINI BELİRLE
-    // Kullanıcının gidebileceği maksimum alan (Kuzey-Güney / Doğu-Batı)
+    // 1. Sınırlandırma
     const southWest = L.latLng(-85, -180);
     const northEast = L.latLng(85, 180);
     const bounds = L.latLngBounds(southWest, northEast);
 
-    // 2. Harita Motorunu Oluştur
+    // 2. Harita Motoru
     mapInstance = L.map(containerId, {
         zoomControl: false,
         attributionControl: false,
-        
-        // --- KRİTİK AYARLAR ---
-        minZoom: 3,             // En fazla bu kadar uzaklaşabilir (Dünya ekrana tam sığar, küçülmez)
-        maxZoom: 8,             // En fazla bu kadar yaklaşabilir
-        maxBounds: bounds,      // Haritayı yukarıdaki sınırlara hapset
-        maxBoundsViscosity: 1.0,// Kenara gelince esnemesin, taş gibi dursun
-        worldCopyJump: true,    // Yatayda dünya tekrar ederken atlama yapmasın (Akıcı olsun)
-        // ---------------------
-        
-        preferCanvas: true 
-    }).setView([39.0, 35.0], 5); // Türkiye odaklı başla
+        minZoom: 3, 
+        maxZoom: 10,
+        maxBounds: bounds,
+        maxBoundsViscosity: 1.0,
+        preferCanvas: true
+    }).setView([39.0, 35.0], 4); 
 
     L.control.zoom({ position: 'bottomright' }).addTo(mapInstance);
 
-    // 3. Veriyi Çek ve İşle
-    console.log("Map: Veri indiriliyor...");
-    
+    // --- KATMAN 1: ZEMİN (ÜLKELER) ---
+    // Bu katman "boşlukları" dolduracak.
     try {
-        // Localdeki dosyayı çekiyoruz (Daha önce indirmiştik)
-        const response = await fetch('./assets/world.json');
-        
-        if (!response.ok) throw new Error(`Dosya Bulunamadı: ${response.status}`);
-        
-        const data = await response.json();
-
-        // 4. Ülkeleri Haritaya Ekle
-        geoJsonLayer = L.geoJSON(data, {
-            style: getCountryStyle,
-            onEachFeature: onCountryInteraction
-        }).addTo(mapInstance);
-
-        console.log("Map: Sınırlar başarıyla çizildi.");
-
-    } catch (error) {
-        console.error("Map Hatası:", error);
-        // Hata durumunda ekrana mesaj bas (Eğer element varsa)
-        const container = document.getElementById(containerId);
-        if (container) {
-            container.innerHTML = `
-                <div style="display:flex; flex-direction:column; justify-content:center; align-items:center; height:100%; color:#ef4444; text-align:center;">
-                    <i class="fa-solid fa-triangle-exclamation" style="font-size:2rem; margin-bottom:10px;"></i>
-                    <p>Harita verisi yüklenemedi.</p>
-                </div>
-            `;
+        const resWorld = await fetch('./assets/world.json');
+        if (resWorld.ok) {
+            const worldData = await resWorld.json();
+            countryLayer = L.geoJSON(worldData, {
+                style: getBaseCountryStyle,
+                onEachFeature: onBaseInteraction
+            }).addTo(mapInstance);
+            console.log("Map: Zemin katmanı (Ülkeler) yüklendi.");
         }
-    }
+    } catch (e) { console.error("Zemin harita hatası:", e); }
+
+    // --- KATMAN 2: DETAY (EYALETLER) ---
+    // Bu katman var olan bölgeleri detaylandıracak.
+    try {
+        const resProv = await fetch('./assets/provinces.json');
+        if (resProv.ok) {
+            const provData = await resProv.json();
+            provinceLayer = L.geoJSON(provData, {
+                style: getProvinceStyle,
+                onEachFeature: onProvinceInteraction
+            }).addTo(mapInstance);
+            console.log("Map: Detay katmanı (Eyaletler) yüklendi.");
+        }
+    } catch (e) { console.error("Detay harita hatası:", e); }
 }
 
-// Haritayı bellekten siler
 export function destroyMap() {
     if (mapInstance) {
         mapInstance.remove();
         mapInstance = null;
-        geoJsonLayer = null;
-        console.log("Map: Temizlendi.");
     }
 }
 
-// --- Stil ve Etkileşim Fonksiyonları ---
+// --- STİLLER ---
 
-function getCountryStyle(feature) {
+// 1. Zemin Stili (Sadece Ülke Sınırları)
+function getBaseCountryStyle(feature) {
+    // Ülke ismine göre renk üret
+    const color = stringToColor(feature.properties.NAME || feature.properties.ADMIN);
     return {
-        fillColor: '#1e293b', // Ülke Rengi
-        weight: 1,            // Sınır Kalınlığı
+        fillColor: color,
+        weight: 1,
         opacity: 1,
-        color: '#475569',     // Sınır Rengi
-        fillOpacity: 1
+        color: '#000', // Ülke sınırları siyah
+        fillOpacity: 0.5 // Biraz daha soluk kalsın ki üstteki detay parlasın
     };
 }
 
-function onCountryInteraction(feature, layer) {
-    const countryName = feature.properties.NAME || feature.properties.ADMIN || "Bilinmeyen Bölge";
+// 2. Eyalet Stili (Detaylı Sınırlar)
+function getProvinceStyle(feature) {
+    const admin = feature.properties.admin || "Unknown";
+    const color = stringToColor(admin); // Aynı ülkenin eyaletleri aynı ton olsun
+    return {
+        fillColor: color,
+        weight: 0.5,   // Eyalet sınırları daha ince
+        opacity: 1,
+        color: '#fff', // Eyalet sınırları beyaz/açık
+        fillOpacity: 0.8 // Daha canlı
+    };
+}
 
+// Renk Üretici
+function stringToColor(str) {
+    if(!str) return "#333";
+    let hash = 0;
+    for (let i = 0; i < str.length; i++) { hash = str.charCodeAt(i) + ((hash << 5) - hash); }
+    let color = '#';
+    for (let i = 0; i < 3; i++) {
+        let value = (hash >> (i * 8)) & 0xFF;
+        value = Math.floor(value * 0.6); // Koyu tonlar
+        color += ('00' + value.toString(16)).substr(-2);
+    }
+    return color;
+}
+
+// --- ETKİLEŞİMLER ---
+
+// Zemin Etkileşimi (Ülke Bazlı)
+function onBaseInteraction(feature, layer) {
+    const name = feature.properties.NAME || "Ülke";
+    layer.on('click', (e) => {
+        L.popup().setLatLng(e.latlng)
+            .setContent(`<div style="text-align:center"><b>${name}</b><br><small>Bölge verisi yok</small></div>`)
+            .openOn(mapInstance);
+    });
+}
+
+// Detay Etkileşimi (Eyalet Bazlı)
+function onProvinceInteraction(feature, layer) {
+    const name = feature.properties.name || "Bölge";
+    const admin = feature.properties.admin || "Ülke";
+    
     layer.on({
         mouseover: (e) => {
-            const l = e.target;
-            l.setStyle({
-                weight: 2,
-                color: '#60a5fa',
-                fillColor: '#3b82f6'
-            });
-            l.bringToFront();
+            e.target.setStyle({ weight: 2, color: '#60a5fa', fillOpacity: 1 });
+            e.target.bringToFront();
         },
         mouseout: (e) => {
-            geoJsonLayer.resetStyle(e.target);
+            provinceLayer.resetStyle(e.target);
         },
         click: (e) => {
+            L.DomEvent.stopPropagation(e); // Alttaki ülkeye tıklamayı engelle
             mapInstance.fitBounds(e.target.getBounds());
-            
-            L.popup()
-                .setLatLng(e.latlng)
-                .setContent(`
-                    <div style="text-align:center; min-width:100px;">
-                        <b style="color:#0f172a; font-size:14px;">${countryName}</b>
-                        <div style="margin-top:8px; display:flex; gap:5px; justify-content:center;">
-                            <button style="background:#3b82f6; color:white; border:none; padding:5px 10px; border-radius:4px; cursor:pointer; font-size:12px;">Profil</button>
-                            <button style="background:#ef4444; color:white; border:none; padding:5px 10px; border-radius:4px; cursor:pointer; font-size:12px;">Savaş</button>
-                        </div>
-                    </div>
-                `)
+            L.popup().setLatLng(e.latlng)
+                .setContent(`<div style="text-align:center"><b>${name}</b><br><small>${admin}</small><br><button>Yönet</button></div>`)
                 .openOn(mapInstance);
         }
     });
