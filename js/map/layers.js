@@ -1,95 +1,109 @@
-// KATMAN YÖNETİMİ
-import { dataUrls } from './config.js';
+// KATMAN YÖNETİMİ (MULTI-COUNTRY SUPPORT)
+import { dataUrls, detailedCountries } from './config.js';
 import { getBaseCountryStyle, getProvinceStyle, getInternationalBorderStyle } from './styles.js';
 import { onProvinceInteraction } from './events.js';
 
 let countryLayer = null;
-let provinceLayer = null;
+let provinceLayers = []; // Artık bir dizi, birden fazla ülke olabilir
 let borderLayer = null;
 
 export async function loadLayers(mapInstance) {
-    // --- PANE (KATMAN) SIRALAMASI ---
-    if (!mapInstance.getPane('basePane')) {
-        mapInstance.createPane('basePane');
-        mapInstance.getPane('basePane').style.zIndex = 300;
-    }
-    if (!mapInstance.getPane('detailPane')) {
-        mapInstance.createPane('detailPane');
-        mapInstance.getPane('detailPane').style.zIndex = 400; 
-    }
-    if (!mapInstance.getPane('borderPane')) {
-        mapInstance.createPane('borderPane');
-        mapInstance.getPane('borderPane').style.zIndex = 500;
-        mapInstance.getPane('borderPane').style.pointerEvents = 'none';
-    }
+    // Pane Ayarları (Sandviç)
+    setupPanes(mapInstance);
 
-    // --- 1. DÜNYA ZEMİNİ VE SINIRLARI (TÜRKİYE HARİÇ) ---
+    // --- 1. DÜNYA ZEMİNİ (DETAYLI ÜLKELER HARİÇ) ---
     try {
         const resWorld = await fetch(dataUrls.world);
         if (resWorld.ok) {
             const worldData = await resWorld.json();
             
+            // Temizlik
             if (countryLayer) mapInstance.removeLayer(countryLayer);
             if (borderLayer) mapInstance.removeLayer(borderLayer);
 
-            // FİLTRELEME FONKSİYONU
-            // Türkiye'yi (veya ileride özel harita ekleyeceğin ülkeleri)
-            // bu genel haritadan çıkartıyoruz ki çakışma olmasın.
-            const excludeTurkey = (feature) => {
+            // FİLTRELEME: Listede olan ülkeleri dünya haritasından çıkar
+            const excludeDetailed = (feature) => {
                 const name = feature.properties.NAME || feature.properties.ADMIN;
-                return name !== 'Turkey'; 
+                // Eğer ülke detailedCountries listesinde varsa, false döndür (çizme)
+                return !Object.keys(detailedCountries).includes(name);
             };
 
-            // KATMAN A: ZEMİN (Türkiye Hariç)
+            // ZEMİN (Dolgu)
             countryLayer = L.geoJSON(worldData, {
                 pane: 'basePane',
                 style: getBaseCountryStyle,
-                filter: excludeTurkey, // <-- FİLTRE BURADA
+                filter: excludeDetailed, 
                 interactive: false 
             }).addTo(mapInstance);
 
-            // KATMAN C: SİYAH KALIN SINIRLAR (Türkiye Hariç)
-            // Türkiye'nin sınırlarını detaylı dosya kendi çizecek
+            // DIŞ SINIRLAR (Çerçeve)
             borderLayer = L.geoJSON(worldData, {
                 pane: 'borderPane',
                 style: getInternationalBorderStyle,
-                filter: excludeTurkey, // <-- FİLTRE BURADA
+                filter: excludeDetailed,
                 interactive: false
             }).addTo(mapInstance);
         }
     } catch (e) { console.error("Zemin Hatası:", e); }
 
-    // --- 2. DETAYLI TÜRKİYE HARİTASI (MONTE EDİLİYOR) ---
-    try {
-        const resProv = await fetch(dataUrls.provinces);
-        
-        if (resProv.ok) {
-            const provData = await resProv.json();
-            
-            if (provinceLayer) mapInstance.removeLayer(provinceLayer);
+    // --- 2. DETAYLI ÜLKELERİ YÜKLE (DÖNGÜ) ---
+    // Listemizdeki her ülkeyi tek tek indirip ekler
+    
+    // Önceki detay katmanlarını temizle
+    provinceLayers.forEach(layer => mapInstance.removeLayer(layer));
+    provinceLayers = [];
 
-            // Türkiye İlleri
-            provinceLayer = L.geoJSON(provData, {
+    const countryNames = Object.keys(detailedCountries);
+    
+    // Her bir ülke için işlem yap
+    for (const countryName of countryNames) {
+        loadSingleCountry(mapInstance, countryName, detailedCountries[countryName]);
+    }
+}
+
+async function loadSingleCountry(mapInstance, countryName, url) {
+    try {
+        console.log(`Map: ${countryName} verisi indiriliyor...`);
+        const response = await fetch(url);
+        
+        if (response.ok) {
+            const data = await response.json();
+            
+            // A. Eyaletler (Orta Katman)
+            const layer = L.geoJSON(data, {
                 pane: 'detailPane',
-                style: getProvinceStyle,
-                onEachFeature: (feature, layer) => onProvinceInteraction(feature, layer, mapInstance, provinceLayer)
+                style: (feature) => getProvinceStyle(feature, countryName),
+                onEachFeature: (feature, layer) => onProvinceInteraction(feature, layer, mapInstance)
             }).addTo(mapInstance);
             
-            // --- EKSTRA: TÜRKİYE İÇİN DIŞ SINIR ÇİZİMİ ---
-            // Dünya haritasından Türkiye'yi sildiğimiz için, 
-            // detaylı dosyanın etrafına biz manuel kalın sınır çekelim ki bütünlük bozulmasın.
-            const turkeyBorder = L.geoJSON(provData, {
+            provinceLayers.push(layer);
+
+            // B. O ülkenin Dış Sınırı (En Üst Katman)
+            // Kendi detaylı verisinden kalın sınır çiziyoruz ki bütünlük bozulmasın
+            const border = L.geoJSON(data, {
                 pane: 'borderPane',
-                style: {
-                    color: '#000000',
-                    weight: 2, // Kalın Siyah Dış Sınır
-                    fill: false,
-                    opacity: 1
-                },
+                style: { color: '#000', weight: 2, fill: false, opacity: 1 },
                 interactive: false
             }).addTo(mapInstance);
+            
+            provinceLayers.push(border); // Temizlik için listeye ekle
 
-            console.log("Map: Hibrit sistem yüklendi (Dünya + Detaylı Türkiye).");
+        } else {
+            console.warn(`Map: ${countryName} yüklenemedi.`);
         }
-    } catch (e) { console.error("Detay Hatası:", e); }
+    } catch (e) {
+        console.error(`${countryName} Hatası:`, e);
+    }
+}
+
+function setupPanes(mapInstance) {
+    if (!mapInstance.getPane('basePane')) {
+        mapInstance.createPane('basePane'); mapInstance.getPane('basePane').style.zIndex = 300;
+    }
+    if (!mapInstance.getPane('detailPane')) {
+        mapInstance.createPane('detailPane'); mapInstance.getPane('detailPane').style.zIndex = 400; 
+    }
+    if (!mapInstance.getPane('borderPane')) {
+        mapInstance.createPane('borderPane'); mapInstance.getPane('borderPane').style.zIndex = 500; mapInstance.getPane('borderPane').style.pointerEvents = 'none';
+    }
 }

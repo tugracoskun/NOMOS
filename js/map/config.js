@@ -1,21 +1,22 @@
-// HARİTA AYARLARI VE SABİTLER
+// HARİTA AYARLARI VE DETAYLI ÜLKE LİSTESİ
 
 export const mapConfig = {
     minZoom: 4,
     maxZoom: 10,
-    startView: [39.0, 35.0], // Türkiye'ye odaklan
-    startZoom: 6,            // Biraz daha yakından başla
-    maxBounds: [
-        [-85, -180],
-        [85, 180]
-    ]
+    startView: [41.0, 29.0], // İstanbul civarına odaklan (TR-GR-BG ortası)
+    startZoom: 6,
+    maxBounds: [[-85, -180], [85, 180]]
 };
 
 export const dataUrls = {
-    // Zemin (Dünya Ülkeleri - Siyah Arka Plan)
-    world: './assets/world.json',
-    
-    // DETAY KATMANI: SADECE TÜRKİYE (HIZLI VE KESİN ÇÖZÜM)
-    // Bu dosya hafif olduğu için anında İzmir, Ankara sınırlarını çizecek.
-    provinces: 'https://raw.githubusercontent.com/alpers/Turkey-Maps-GeoJSON/master/tr-cities.json'
+    world: './assets/world.json', // Zemin
+};
+
+// DETAYLI OLARAK YÜKLENECEK ÜLKELER
+// Anahtar (Key): assets/world.json içindeki ülke ismiyle AYNI olmalı (Filtreleme için)
+// Değer (Value): Yüklenecek detaylı GeoJSON linki
+export const detailedCountries = {
+    "Turkey": "https://raw.githubusercontent.com/alpers/Turkey-Maps-GeoJSON/master/tr-cities.json",
+    "Greece": "https://raw.githubusercontent.com/codeforamerica/click_that_hood/master/public/data/greece.geojson",
+    "Bulgaria": "https://raw.githubusercontent.com/codeforamerica/click_that_hood/master/public/data/bulgaria.geojson"
 };
