@@ -1,10 +1,10 @@
 // HARİTA AYARLARI VE SABİTLER
 
 export const mapConfig = {
-    minZoom: 4,  // Biraz daha yakın başlasın
+    minZoom: 4,
     maxZoom: 10,
-    startView: [39.0, 35.0], // Türkiye
-    startZoom: 5,
+    startView: [39.0, 35.0], // Türkiye'ye odaklan
+    startZoom: 6,            // Biraz daha yakından başla
     maxBounds: [
         [-85, -180],
         [85, 180]
@@ -12,10 +12,10 @@ export const mapConfig = {
 };
 
 export const dataUrls = {
-    // Zemin (Sadece kıtaları tutsun yeter)
+    // Zemin (Dünya Ülkeleri - Siyah Arka Plan)
     world: './assets/world.json',
     
-    // DETAYLI EYALETLER (10m - YÜKSEK ÇÖZÜNÜRLÜK)
-    // Buradaki '10m' ibaresi kritik. Türkiye'nin illeri burada var.
-    provinces: 'https://raw.githubusercontent.com/nvkelso/natural-earth-vector/master/geojson/ne_10m_admin_1_states_provinces.json'
+    // DETAY KATMANI: SADECE TÜRKİYE (HIZLI VE KESİN ÇÖZÜM)
+    // Bu dosya hafif olduğu için anında İzmir, Ankara sınırlarını çizecek.
+    provinces: 'https://raw.githubusercontent.com/alpers/Turkey-Maps-GeoJSON/master/tr-cities.json'
 };

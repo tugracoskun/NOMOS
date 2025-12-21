@@ -17,30 +17,29 @@ export async function loadLayers(mapInstance) {
         mapInstance.getPane('detailPane').style.zIndex = 400; 
     }
 
-    // 1. ZEMİNİ YÜKLE (GÜVENLİK AĞI)
-    // Bu dosya yerelde (assets/world.json) olduğu için anında açılır.
+    // 1. ZEMİNİ YÜKLE
     try {
-        const resWorld = await fetch('./assets/world.json');
+        const resWorld = await fetch(dataUrls.world);
         if (resWorld.ok) {
             const worldData = await resWorld.json();
-            
             if (countryLayer) mapInstance.removeLayer(countryLayer);
-
+            
             countryLayer = L.geoJSON(worldData, {
                 pane: 'basePane',
-                style: getBaseCountryStyle, // Artık görünür stili var
+                style: getBaseCountryStyle,
                 interactive: false 
             }).addTo(mapInstance);
-            console.log("Map: Zemin katmanı yüklendi.");
-        } else {
-            console.error("Map: assets/world.json bulunamadı!");
         }
     } catch (e) { console.error("Zemin Hatası:", e); }
 
-    // 2. DETAYI YÜKLE (EYALETLER)
-    // Bu dosya internetten gelir, geç gelebilir veya hata verebilir.
+    // 2. DETAYI YÜKLE (TÜRKİYE İLLERİ)
+    // Kullanıcıya bilgi verelim
+    const loadingPopup = L.popup()
+        .setLatLng(mapInstance.getCenter())
+        .setContent('<div style="text-align:center; color:black;">Şehirler yükleniyor...</div>')
+        .openOn(mapInstance);
+
     try {
-        console.log("Map: Detay verisi indiriliyor...");
         const resProv = await fetch(dataUrls.provinces);
         
         if (resProv.ok) {
@@ -53,11 +52,14 @@ export async function loadLayers(mapInstance) {
                 style: getProvinceStyle,
                 onEachFeature: (feature, layer) => onProvinceInteraction(feature, layer, mapInstance, provinceLayer)
             }).addTo(mapInstance);
-            console.log("Map: Detaylar başarıyla çizildi.");
+            
+            console.log("Map: Şehirler yüklendi.");
+            mapInstance.closePopup(); // Yükleme yazısını kapat
         } else {
-            console.warn("Map: Detaylı harita indirilemedi, zemin haritası kullanılıyor.");
+            console.error("Veri çekilemedi:", resProv.status);
         }
     } catch (e) { 
         console.error("Detay Hatası:", e); 
+        loadingPopup.setContent('<div style="color:red">Bağlantı Hatası!</div>');
     }
 }
