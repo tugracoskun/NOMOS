@@ -1,30 +1,39 @@
 // HARİTA STİLLERİ
 
-// 1. ZEMİN (DÜNYA)
+// 1. ZEMİN (EN ALT) - Sadece Dolgu
 export function getBaseCountryStyle(feature) {
     return {
-        fillColor: '#111827', // Çok koyu lacivert/siyah
-        weight: 1,
-        opacity: 1,
-        color: '#000000',     // Ülke sınırları siyah
+        fillColor: '#111827', // Koyu zemin
+        weight: 0,            // Sınır çizme (Üst katman çizecek)
+        opacity: 0,
+        color: 'transparent',
         fillOpacity: 1
     };
 }
 
-// 2. DETAY (İLLER) - CANLI RENKLER
+// 2. DETAY (ORTA) - İller
 export function getProvinceStyle(feature) {
-    // Veri setinden ismi al (tr-cities.json 'name' kullanır)
     const name = feature.properties.name || "Bölge";
-    
-    // Her şehre farklı bir ton ver
     const color = stringToColor(name);
 
     return {
         fillColor: color, 
-        weight: 1,            // Sınır kalınlığı
+        weight: 1,            
         opacity: 1,
-        color: '#ffffff',     // SINIRLAR BEYAZ (Net görünsün diye)
-        fillOpacity: 0.8      // Biraz şeffaf olsun ki zeminle kaynaşsın
+        color: 'rgba(255, 255, 255, 0.5)', // İÇ SINIRLAR BEYAZ VE İNCE
+        fillOpacity: 0.8
+    };
+}
+
+// 3. ULUSLARARASI SINIRLAR (EN ÜST) - YENİ
+export function getInternationalBorderStyle(feature) {
+    return {
+        fillColor: 'transparent', // İçi boş (Alttaki harita görünsün)
+        weight: 2,                // KALIN ÇİZGİ
+        opacity: 1,
+        color: '#000000',         // SİMSİYAH
+        fillOpacity: 0,
+        interactive: false        // Tıklanmasın
     };
 }
 
@@ -34,7 +43,6 @@ function stringToColor(str) {
     for (let i = 0; i < str.length; i++) {
         hash = str.charCodeAt(i) + ((hash << 5) - hash);
     }
-    // Biraz daha canlı renkler
     const h = Math.abs(hash) % 360;
     return `hsl(${h}, 60%, 40%)`; 
 }
