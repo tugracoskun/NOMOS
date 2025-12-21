@@ -1,47 +1,61 @@
 // KATMAN YÖNETİMİ
+// Harita verilerini çeker, filtreler ve katman (Pane) sırasına göre dizer.
+
 import { dataUrls, detailedCountries } from './config.js';
 import { getBaseCountryStyle, getProvinceStyle, getInternationalBorderStyle } from './styles.js';
 import { onProvinceInteraction } from './events.js';
 
+// Global değişkenler (Temizlik için)
 let countryLayer = null;
-let provinceLayers = [];
 let borderLayer = null;
+let provinceLayers = []; // Birden fazla detaylı ülke olduğu için dizi
 
 export async function loadLayers(mapInstance) {
-    // Pane Ayarları
-    if (!mapInstance.getPane('basePane')) { mapInstance.createPane('basePane'); mapInstance.getPane('basePane').style.zIndex = 300; }
-    if (!mapInstance.getPane('detailPane')) { mapInstance.createPane('detailPane'); mapInstance.getPane('detailPane').style.zIndex = 400; }
-    if (!mapInstance.getPane('borderPane')) { mapInstance.createPane('borderPane'); mapInstance.getPane('borderPane').style.zIndex = 500; mapInstance.getPane('borderPane').style.pointerEvents = 'none'; }
+    // --- PANE (KATMAN) AYARLARI ---
+    // 1. Zemin (Dolgu) - En Alt
+    if (!mapInstance.getPane('basePane')) {
+        mapInstance.createPane('basePane');
+        mapInstance.getPane('basePane').style.zIndex = 300;
+    }
+    // 2. Detay (Eyaletler/İller) - Orta
+    if (!mapInstance.getPane('detailPane')) {
+        mapInstance.createPane('detailPane');
+        mapInstance.getPane('detailPane').style.zIndex = 400; 
+    }
+    // 3. Sınır (Kalın Çerçeveler) - En Üst
+    if (!mapInstance.getPane('borderPane')) {
+        mapInstance.createPane('borderPane');
+        mapInstance.getPane('borderPane').style.zIndex = 500;
+        mapInstance.getPane('borderPane').style.pointerEvents = 'none'; // Tıklamayı engelle, sadece görsellik
+    }
 
-    // --- 1. DÜNYA ZEMİNİ (DETAYLILAR HARİÇ) ---
+    // --- 1. DÜNYA ZEMİNİ VE ANA SINIRLAR ---
     try {
         const resWorld = await fetch(dataUrls.world);
         if (resWorld.ok) {
             const worldData = await resWorld.json();
             
+            // Önceki katmanları temizle
             if (countryLayer) mapInstance.removeLayer(countryLayer);
             if (borderLayer) mapInstance.removeLayer(borderLayer);
 
-            // FİLTRELEME FONKSİYONU (Debug özellikli)
+            // FİLTRELEME FONKSİYONU
+            // Detaylı yükleyeceğimiz ülkeleri (Türkiye, Yunanistan vb.) bu ana haritadan çıkarıyoruz.
             const excludeDetailed = (feature) => {
                 const name = feature.properties.NAME || feature.properties.ADMIN || feature.properties.name;
-                
-                // Listemizde bu isim var mı?
-                const isDetailed = Object.keys(detailedCountries).includes(name);
-                
-                // Eğer detaylıysa FALSE döndür (Çizme), değilse TRUE döndür (Çiz)
-                return !isDetailed;
+                // Eğer ülke listemizde varsa FALSE döndür (Çizme)
+                return !Object.keys(detailedCountries).includes(name);
             };
 
-            // Zemin Katmanı
+            // KATMAN A: ZEMİN (Detaylı ülkeler hariç)
             countryLayer = L.geoJSON(worldData, {
                 pane: 'basePane',
                 style: getBaseCountryStyle,
-                filter: excludeDetailed, // Filtreyi uygula
+                filter: excludeDetailed, 
                 interactive: false 
             }).addTo(mapInstance);
 
-            // Sınır Katmanı
+            // KATMAN C: SİYAH KALIN SINIRLAR (Detaylı ülkeler hariç)
             borderLayer = L.geoJSON(worldData, {
                 pane: 'borderPane',
                 style: getInternationalBorderStyle,
@@ -52,42 +66,53 @@ export async function loadLayers(mapInstance) {
     } catch (e) { console.error("Zemin Hatası:", e); }
 
     // --- 2. DETAYLI ÜLKELERİ YÜKLE ---
+    // Önceki detay katmanlarını temizle
     provinceLayers.forEach(l => mapInstance.removeLayer(l));
     provinceLayers = [];
 
+    // Listemizdeki her ülke için döngü (TR, GR, BG...)
     for (const [countryName, url] of Object.entries(detailedCountries)) {
         loadSingleCountry(mapInstance, countryName, url);
     }
 }
 
+// Tek bir ülkeyi yükleyip monte eden fonksiyon
 async function loadSingleCountry(mapInstance, countryName, url) {
     try {
-        console.log(`Map: ${countryName} indiriliyor...`);
+        console.log(`Map: ${countryName} verisi yükleniyor...`);
         const response = await fetch(url);
+        
         if (response.ok) {
             const data = await response.json();
             
-            // A. Eyaletler
+            // A. Eyaletler (Orta Katman - Renkli ve Etkileşimli)
             const layer = L.geoJSON(data, {
                 pane: 'detailPane',
-                style: (feature) => getProvinceStyle(feature, countryName),
+                style: (feature) => getProvinceStyle(feature),
                 onEachFeature: (feature, layer) => onProvinceInteraction(feature, layer, mapInstance)
             }).addTo(mapInstance);
+            
             provinceLayers.push(layer);
 
-            // B. Dış Sınır (Simsiyah Çerçeve)
+            // B. O Ülkenin Dış Sınırı (En Üst Katman - Siyah Çerçeve)
+            // Bütünlüğü sağlamak için kendi verisinden sınır çiziyoruz
             const border = L.geoJSON(data, {
                 pane: 'borderPane',
-                style: { color: '#000', weight: 2, fill: false, opacity: 1 },
+                style: { 
+                    color: '#000000', 
+                    weight: 2, 
+                    fill: false, 
+                    opacity: 1 
+                },
                 interactive: false
             }).addTo(mapInstance);
-            provinceLayers.push(border);
             
-            console.log(`Map: ${countryName} eklendi.`);
+            provinceLayers.push(border); // Temizlik listesine ekle
+
         } else {
-            console.warn(`Map: ${countryName} verisi hatalı (${response.status})`);
+            console.warn(`Map: ${countryName} verisi bulunamadı (${url})`);
         }
     } catch (e) {
-        console.error(`${countryName} yüklenirken hata:`, e);
+        console.error(`${countryName} Yükleme Hatası:`, e);
     }
 }
