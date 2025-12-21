@@ -7,40 +7,57 @@ let countryLayer = null;
 let provinceLayer = null;
 
 export async function loadLayers(mapInstance) {
-    // --- PANE (KATMAN) SIRALAMASI ---
-    // Zemin (Ülkeler) altta, Detay (Eyaletler) üstte
-    mapInstance.createPane('basePane');
-    mapInstance.getPane('basePane').style.zIndex = 400;
+    // Pane Ayarları
+    if (!mapInstance.getPane('basePane')) {
+        mapInstance.createPane('basePane');
+        mapInstance.getPane('basePane').style.zIndex = 300;
+    }
+    if (!mapInstance.getPane('detailPane')) {
+        mapInstance.createPane('detailPane');
+        mapInstance.getPane('detailPane').style.zIndex = 400; 
+    }
 
-    mapInstance.createPane('detailPane');
-    mapInstance.getPane('detailPane').style.zIndex = 450; 
-
-    // 1. ZEMİNİ YÜKLE
+    // 1. ZEMİNİ YÜKLE (GÜVENLİK AĞI)
+    // Bu dosya yerelde (assets/world.json) olduğu için anında açılır.
     try {
-        const resWorld = await fetch(dataUrls.world);
+        const resWorld = await fetch('./assets/world.json');
         if (resWorld.ok) {
             const worldData = await resWorld.json();
+            
+            if (countryLayer) mapInstance.removeLayer(countryLayer);
+
             countryLayer = L.geoJSON(worldData, {
                 pane: 'basePane',
-                style: getBaseCountryStyle,
-                interactive: false // Ülkelere tıklanmasın, sadece renklendirsin
+                style: getBaseCountryStyle, // Artık görünür stili var
+                interactive: false 
             }).addTo(mapInstance);
+            console.log("Map: Zemin katmanı yüklendi.");
+        } else {
+            console.error("Map: assets/world.json bulunamadı!");
         }
-    } catch (e) { console.error("Zemin Katman Hatası:", e); }
+    } catch (e) { console.error("Zemin Hatası:", e); }
 
-    // 2. DETAYI YÜKLE (VORONOI)
+    // 2. DETAYI YÜKLE (EYALETLER)
+    // Bu dosya internetten gelir, geç gelebilir veya hata verebilir.
     try {
-        console.log("Map: Detay verisi çekiliyor...");
+        console.log("Map: Detay verisi indiriliyor...");
         const resProv = await fetch(dataUrls.provinces);
         
         if (resProv.ok) {
             const provData = await resProv.json();
+            
+            if (provinceLayer) mapInstance.removeLayer(provinceLayer);
+
             provinceLayer = L.geoJSON(provData, {
                 pane: 'detailPane',
                 style: getProvinceStyle,
                 onEachFeature: (feature, layer) => onProvinceInteraction(feature, layer, mapInstance, provinceLayer)
             }).addTo(mapInstance);
-            console.log("Map: Eyaletler yüklendi.");
+            console.log("Map: Detaylar başarıyla çizildi.");
+        } else {
+            console.warn("Map: Detaylı harita indirilemedi, zemin haritası kullanılıyor.");
         }
-    } catch (e) { console.error("Detay Katman Hatası:", e); }
+    } catch (e) { 
+        console.error("Detay Hatası:", e); 
+    }
 }

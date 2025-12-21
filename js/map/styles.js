@@ -1,37 +1,51 @@
 // HARİTA STİLLERİ VE RENKLENDİRME
 
-// 1. ZEMİN KATMANI (Ülkeler)
+// 1. ZEMİN KATMANI (ÜLKELER - GÜVENLİK İÇİN GÖRÜNÜR YAPTIK)
 export function getBaseCountryStyle(feature) {
-    const name = feature.properties.NAME || feature.properties.ADMIN;
     return {
-        fillColor: stringToColor(name), 
-        weight: 1,            // Ülke sınırı kalınlığı
+        fillColor: '#1e293b', // Varsayılan harita rengi (Koyu Mavi/Gri)
+        weight: 1,
         opacity: 1,
-        color: '#000000',     // Ülke sınırı SİYAH (Net ayrım)
-        fillOpacity: 1        // Tam doygun renk
+        color: '#000',        // Siyah sınır
+        fillOpacity: 1        // GÖRÜNÜR OLSUN (Eskiden 0'dı, hata buydu)
     };
 }
 
-// 2. DETAY KATMANI (Eyaletler/İller)
-// SORUN BURADAYDI: Siyah yapınca görünmüyordu. Beyaz yapıyoruz.
+// 2. DETAY KATMANI (EYALETLER)
 export function getProvinceStyle(feature) {
+    const admin = feature.properties.admin || "Unknown";
+    const name = feature.properties.name || "Unknown";
+
+    // Rengi hesapla
+    const baseHsl = getCountryBaseHsl(admin);
+    const variation = getStringHash(name) % 10; 
+    const finalLightness = baseHsl.l + (variation - 5); 
+
     return {
-        fillColor: 'transparent', // İçi boş (Alttaki ülkenin rengi görünsün)
-        weight: 0.5,              // İnce çizgi
+        fillColor: `hsl(${baseHsl.h}, ${baseHsl.s}%, ${finalLightness}%)`, 
+        weight: 0.5,
         opacity: 1,
-        color: 'rgba(255, 255, 255, 0.4)', // BEYAZ ve YARI SAYDAM (Voronoi Ağı)
-        fillOpacity: 0
+        color: '#1a1a1a', // Koyu gri sınır
+        fillOpacity: 1
     };
 }
 
-// HSL Renk Üretici (Ülke İsmine Göre Sabit Renk)
-function stringToColor(str) {
-    if(!str) return "#333";
+// --- YARDIMCI FONKSİYONLAR ---
+
+function getCountryBaseHsl(countryName) {
+    const hash = getStringHash(countryName);
+    const h = Math.abs(hash) % 360; 
+    const s = 65; 
+    const l = 50; 
+    return { h, s, l };
+}
+
+function getStringHash(str) {
     let hash = 0;
+    if (!str || str.length === 0) return hash;
     for (let i = 0; i < str.length; i++) {
-        hash = str.charCodeAt(i) + ((hash << 5) - hash);
+        hash = ((hash << 5) - hash) + str.charCodeAt(i);
+        hash |= 0;
     }
-    // Biraz daha pastel ve koyu tonlar (Göz yormayan strateji renkleri)
-    const h = Math.abs(hash) % 360;
-    return `hsl(${h}, 40%, 30%)`; 
+    return hash;
 }
