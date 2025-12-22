@@ -1,21 +1,22 @@
-// HARİTA AYARLARI VE LİNKLER
+// HARİTA AYARLARI
 
 export const mapConfig = {
     minZoom: 4,
     maxZoom: 10,
-    startView: [41.0, 35.0], 
-    startZoom: 6,
+    startView: [39.0, 35.0],
+    startZoom: 5,
     maxBounds: [[-85, -180], [85, 180]]
 };
 
 export const dataUrls = {
-    world: './assets/world.json',          // Zemin (Ülkeler)
-    allProvinces: './assets/all_provinces.json' // DETAY (Tüm Dünya İlleri)
+    world: './assets/world.json',          // Zemin
+    turkey: './assets/tr.json',            // Türkiye (Özel dosya kalsın)
+    
+    // KOMŞULAR İÇİN O BÜYÜK DOSYAYI KULLANIYORUZ
+    neighbors: './assets/all_provinces.json' 
 };
 
-// DETAYLI GÖSTERİLECEK ÜLKELER LİSTESİ
-// Artık dosya yolu yazmana gerek yok. Sadece ismini yazman yeterli!
-// Bu listedeki ülkelerin illeri haritada görünecek.
+// GÖSTERİLECEK ÜLKELER
 export const activeCountries = [
     "Turkey",
     "Greece",
@@ -26,5 +27,9 @@ export const activeCountries = [
     "Syria",
     "Georgia",
     "Armenia",
-    "Azerbaijan"
+    "Azerbaijan",
+    "Iraq",
+    "Iran",
+    "Cyprus",
+    "Russia"
 ];

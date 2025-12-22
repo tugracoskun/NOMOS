@@ -1,81 +1,98 @@
-// KATMAN YÖNETİMİ
-import { dataUrls, activeCountries } from './config.js';
+// KATMAN YÖNETİMİ (MAIN)
+import { dataUrls } from './config.js';
 import { getBaseCountryStyle, getProvinceStyle, getInternationalBorderStyle } from './styles.js';
 import { onProvinceInteraction } from './events.js';
+import { setupMapPanes } from './layer-setup.js'; // Yeni
+import { filterBaseLayer, filterNeighborLayer } from './layer-filters.js'; // Yeni
 
+// Global Referanslar (Temizlik için)
 let countryLayer = null;
-let provinceLayer = null;
+let provinceLayerGroup = null; // Grup yaptık, içine ekleyeceğiz
 let borderLayer = null;
 
 export async function loadLayers(mapInstance) {
-    // Pane Ayarları
-    if (!mapInstance.getPane('basePane')) { mapInstance.createPane('basePane'); mapInstance.getPane('basePane').style.zIndex = 300; }
-    if (!mapInstance.getPane('detailPane')) { mapInstance.createPane('detailPane'); mapInstance.getPane('detailPane').style.zIndex = 400; }
-    if (!mapInstance.getPane('borderPane')) { mapInstance.createPane('borderPane'); mapInstance.getPane('borderPane').style.zIndex = 500; mapInstance.getPane('borderPane').style.pointerEvents = 'none'; }
+    // 1. Pane Ayarlarını Yap
+    setupMapPanes(mapInstance);
 
-    // --- 1. ZEMİN (DÜNYA ÜLKELERİ) ---
+    // Detay Grubu Hazırla
+    if (provinceLayerGroup) {
+        mapInstance.removeLayer(provinceLayerGroup);
+    }
+    provinceLayerGroup = L.layerGroup().addTo(mapInstance);
+
+
+    // --- ADIM 1: DÜNYA ZEMİNİ (BASE) ---
     try {
-        const resWorld = await fetch(dataUrls.world);
-        if (resWorld.ok) {
-            const worldData = await resWorld.json();
+        const res = await fetch(dataUrls.world);
+        if (res.ok) {
+            const data = await res.json();
             
+            // Temizlik
             if (countryLayer) mapInstance.removeLayer(countryLayer);
             if (borderLayer) mapInstance.removeLayer(borderLayer);
 
-            // Filtre: Detaylı göstereceğimiz ülkeleri zemin haritasından çıkarıyoruz (Çakışma olmasın)
-            const excludeActive = (feature) => {
-                const name = feature.properties.NAME || feature.properties.ADMIN;
-                return !activeCountries.includes(name);
-            };
-
-            countryLayer = L.geoJSON(worldData, {
+            // Zemin (Dolgu)
+            countryLayer = L.geoJSON(data, {
                 pane: 'basePane',
                 style: getBaseCountryStyle,
-                filter: excludeActive, 
+                filter: filterBaseLayer, // filter-logic.js'den geliyor
                 interactive: false 
             }).addTo(mapInstance);
 
-            borderLayer = L.geoJSON(worldData, {
+            // Sınırlar (Çerçeve)
+            borderLayer = L.geoJSON(data, {
                 pane: 'borderPane',
                 style: getInternationalBorderStyle,
-                filter: excludeActive,
+                filter: filterBaseLayer,
                 interactive: false
             }).addTo(mapInstance);
         }
-    } catch (e) { console.error("Zemin Hatası:", e); }
+    } catch (e) { console.error("Zemin Yükleme Hatası:", e); }
 
-    // --- 2. DETAYLAR (TÜM İLLER DOSYASINDAN SEÇMECE) ---
+
+    // --- ADIM 2: DETAYLI ÜLKELER (HİBRİT) ---
+
+    // A. TÜRKİYE (Yüksek Detay - Yerel)
+    // Filtre: Hepsini al (True)
+    loadGeoJsonFile(mapInstance, dataUrls.turkey, () => true);
+
+    // B. KOMŞULAR (Orta Detay - Büyük Dosya)
+    // Filtre: Sadece listedekiler
+    loadGeoJsonFile(mapInstance, dataUrls.neighbors, filterNeighborLayer);
+}
+
+// Dosya Yükleyici Yardımcı Fonksiyon
+async function loadGeoJsonFile(mapInstance, url, filterFn) {
     try {
-        console.log("Map: Eyalet verisi yükleniyor...");
-        const resProv = await fetch(dataUrls.allProvinces);
+        console.log(`Veri yükleniyor: ${url}`);
+        const res = await fetch(url);
         
-        if (resProv.ok) {
-            const allData = await resProv.json();
+        if (res.ok) {
+            const data = await res.json();
             
-            if (provinceLayer) mapInstance.removeLayer(provinceLayer);
-
-            // FİLTRE: Sadece listedeki ülkelerin illerini al
-            const onlyActiveCountries = (feature) => {
-                const admin = feature.properties.admin || feature.properties.ADMIN;
-                return activeCountries.includes(admin);
-            };
-
-            provinceLayer = L.geoJSON(allData, {
+            // 1. Renkli Eyaletler
+            const layer = L.geoJSON(data, {
                 pane: 'detailPane',
                 style: getProvinceStyle,
-                filter: onlyActiveCountries, // Sadece Türkiye, Yunanistan vb. çiz
-                onEachFeature: (feature, layer) => onProvinceInteraction(feature, layer, mapInstance)
-            }).addTo(mapInstance);
-            
-            // Seçili ülkelerin kalın dış sınırını da çizelim
-            L.geoJSON(allData, {
+                filter: filterFn,
+                onEachFeature: (feature, l) => onProvinceInteraction(feature, l, mapInstance)
+            });
+            provinceLayerGroup.addLayer(layer);
+
+            // 2. Siyah Kalın Sınırlar (Ülke bütünlüğü için)
+            const borders = L.geoJSON(data, {
                 pane: 'borderPane',
                 style: { color: '#000', weight: 2, fill: false, opacity: 1 },
-                filter: onlyActiveCountries,
+                filter: filterFn,
                 interactive: false
-            }).addTo(mapInstance);
-
-            console.log("Map: Seçili ülkeler yüklendi.");
+            });
+            provinceLayerGroup.addLayer(borders);
+            
+            console.log(`Tamamlandı: ${url}`);
+        } else {
+            console.warn(`Dosya bulunamadı: ${url}`);
         }
-    } catch (e) { console.error("Detay Hatası:", e); }
+    } catch (e) { 
+        console.error(`Hata (${url}):`, e); 
+    }
 }
