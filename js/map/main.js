@@ -8,26 +8,30 @@ let mapInstance = null;
 export function initMap(containerId) {
     const container = document.getElementById(containerId);
     
-    // 1. Önce temizlik yap (Varsa eski haritayı sil)
+    // Temizlik
     if (mapInstance) {
         mapInstance.remove();
         mapInstance = null;
     }
 
-    // 2. Yükleme Ekranını (Loader) Enjekte Et
-    // Harita div'inin içine değil, yanına veya üstüne ekliyoruz ki harita oluşurken görünmesin.
-    // Ancak Leaflet container'ı temizlediği için, loader'ı dinamik ekleyip yöneteceğiz.
-    
-    // Container'ı sıfırla ve yapılandır
+    // 1. Şık Loader'ı HTML'e Bas
     container.innerHTML = `
         <div id="actual-map-div" style="width:100%; height:100%;"></div>
+        
         <div id="map-loader" class="map-loader-overlay">
-            <div class="radar-spinner"></div>
-            <div class="loading-text">UYDU VERİLERİ İŞLENİYOR...</div>
+            <div class="loader-content">
+                <div class="ring-outer"></div>
+                <div class="ring-middle"></div>
+                <div class="ring-inner"></div>
+            </div>
+            <div class="loader-text-group">
+                <div class="loading-title">UYDU BAĞLANTISI</div>
+                <div class="loading-subtitle">Veriler İşleniyor...</div>
+            </div>
         </div>
     `;
 
-    // 3. Haritayı Başlat (İçerdeki div'e)
+    // 2. Haritayı Başlat
     mapInstance = L.map('actual-map-div', {
         zoomControl: false,
         attributionControl: false,
@@ -43,19 +47,29 @@ export function initMap(containerId) {
     }).setView(mapConfig.startView, mapConfig.startZoom);
 
     L.control.zoom({ position: 'bottomright' }).addTo(mapInstance);
-
     initEditor(mapInstance);
 
-    // 4. Katmanları Yükle ve Bittiğinde Loader'ı Kaldır
-    // loadLayers fonksiyonu async olduğu için .then() kullanabiliriz.
-    loadLayers(mapInstance).then(() => {
-        // Yükleme bitti, loader'ı gizle
+    // 3. YÜKLEME VE BEKLEME MANTIĞI
+    
+    // A: Veri Yükleme İşlemi
+    const dataLoading = loadLayers(mapInstance);
+    
+    // B: Minimum Bekleme Süresi (2 Saniye) - Tasarım görünsün ve render otursun diye
+    const minWait = new Promise(resolve => setTimeout(resolve, 2000));
+
+    // İkisi de bitince loader'ı kaldır
+    Promise.all([dataLoading, minWait]).then(() => {
         const loader = document.getElementById('map-loader');
         if (loader) {
-            loader.classList.add('map-loader-hidden');
-            // Animasyon bitince DOM'dan tamamen sil (0.5s sonra)
+            // Yazıyı değiştir (Son dokunuş)
+            loader.querySelector('.loading-title').innerText = "BAĞLANTI KURULDU";
+            loader.querySelector('.loading-title').style.color = "#4ade80"; // Yeşil
+            loader.querySelector('.loading-subtitle').innerText = "Harita Hazır";
+            
+            // Kısa bir süre sonra yok et
             setTimeout(() => {
-                loader.remove();
+                loader.classList.add('map-loader-hidden');
+                setTimeout(() => loader.remove(), 800); // CSS transition süresi kadar bekle
             }, 500);
         }
     });

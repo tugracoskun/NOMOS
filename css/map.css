@@ -27,57 +27,104 @@
     box-shadow: 0 3px 14px rgba(0,0,0,0.4) !important;
 }
 
-/* --- HARİTA YÜKLEME EKRANI (LOADER) --- */
+/* --- SAVAŞ ODASI LOADER TASARIMI --- */
 .map-loader-overlay {
     position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: #050a14; /* Oyunun ana rengi */
-    z-index: 9999; /* Haritanın üzerinde olsun */
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    transition: opacity 0.5s ease-out; /* Yok olurken yumuşak geçiş */
+    top: 0; left: 0; width: 100%; height: 100%;
+    background-color: #050a14;
+    z-index: 9999;
+    display: flex; flex-direction: column; justify-content: center; align-items: center;
+    transition: opacity 0.8s ease-in-out;
+    
+    /* Tekno-Grid Arka Plan */
+    background-image: 
+        linear-gradient(rgba(59, 130, 246, 0.05) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(59, 130, 246, 0.05) 1px, transparent 1px);
+    background-size: 40px 40px;
+    overflow: hidden;
 }
 
-/* Radar Efekti */
-.radar-spinner {
-    width: 60px;
-    height: 60px;
-    border: 3px solid rgba(59, 130, 246, 0.3); /* Soluk mavi */
-    border-top: 3px solid #3b82f6; /* Parlak mavi */
+/* Tarama Çizgisi (Scanline) */
+.map-loader-overlay::after {
+    content: "";
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 5px;
+    background: rgba(59, 130, 246, 0.3);
+    box-shadow: 0 0 15px rgba(59, 130, 246, 0.5);
+    animation: scan 3s linear infinite;
+}
+
+/* Merkezdeki Daireler */
+.loader-content {
+    position: relative;
+    width: 120px; height: 120px;
+    display: flex; justify-content: center; align-items: center;
+}
+
+/* Dış Halka */
+.ring-outer {
+    position: absolute;
+    width: 100%; height: 100%;
+    border: 2px dashed rgba(59, 130, 246, 0.3);
     border-radius: 50%;
-    animation: spin 1s linear infinite;
-    margin-bottom: 20px;
-    box-shadow: 0 0 15px rgba(59, 130, 246, 0.2);
+    animation: spin-slow 10s linear infinite;
 }
 
-.loading-text {
+/* Orta Halka (Kesik) */
+.ring-middle {
+    position: absolute;
+    width: 80%; height: 80%;
+    border: 2px solid transparent;
+    border-top: 2px solid #3b82f6;
+    border-bottom: 2px solid #3b82f6;
+    border-radius: 50%;
+    animation: spin 2s linear infinite;
+    box-shadow: 0 0 20px rgba(59, 130, 246, 0.2);
+}
+
+/* İç Radar */
+.ring-inner {
+    position: absolute;
+    width: 50%; height: 50%;
+    background: rgba(59, 130, 246, 0.1);
+    border-radius: 50%;
+    animation: pulse 1.5s infinite alternate;
+}
+
+/* Yazı Grubu */
+.loader-text-group {
+    margin-top: 30px;
+    text-align: center;
+    z-index: 2;
+}
+
+.loading-title {
+    font-family: 'Courier New', monospace;
+    color: #fff;
+    font-size: 1.2rem;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-shadow: 0 0 10px rgba(59, 130, 246, 0.8);
+}
+
+.loading-subtitle {
     font-family: 'Inter', sans-serif;
     color: #94a3b8;
-    font-size: 0.9rem;
-    letter-spacing: 1px;
-    animation: pulse 1.5s infinite;
+    font-size: 0.8rem;
+    margin-top: 5px;
     text-transform: uppercase;
-    font-weight: 600;
 }
 
-@keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
+/* Animasyonlar */
+@keyframes scan {
+    0% { top: -10%; opacity: 0; }
+    10% { opacity: 1; }
+    90% { opacity: 1; }
+    100% { top: 110%; opacity: 0; }
 }
 
-@keyframes pulse {
-    0% { opacity: 0.6; }
-    50% { opacity: 1; }
-    100% { opacity: 0.6; }
-}
+@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+@keyframes spin-slow { 0% { transform: rotate(0deg); } 100% { transform: rotate(-360deg); } }
+@keyframes pulse { 0% { transform: scale(0.8); opacity: 0.5; } 100% { transform: scale(1); opacity: 1; } }
 
-/* Yüklendikten sonra gizlemek için sınıf */
-.map-loader-hidden {
-    opacity: 0;
-    pointer-events: none; /* Tıklamayı engelle */
-}
+.map-loader-hidden { opacity: 0; pointer-events: none; }
