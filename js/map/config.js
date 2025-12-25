@@ -3,15 +3,15 @@
 export const mapConfig = {
     minZoom: 4,
     maxZoom: 10,
-    startView: [48.0, 15.0], // Avrupa'nın tam ortası (Viyana civarı)
+    startView: [36.0, 28.0], // Akdeniz Ortası (Hem Avrupa hem Afrika görünür)
     startZoom: 5,
     maxBounds: [[-85, -180], [85, 180]]
 };
 
 export const dataUrls = {
     world: './assets/world.json',          // Zemin
-    turkey: './assets/tr.json',            // Türkiye (Özel)
-    neighbors: './assets/all_provinces.json' // Master Dosya
+    turkey: './assets/tr.json',            // Türkiye (Yüksek Detay)
+    neighbors: './assets/all_provinces.json' // Master Dosya (Tüm Dünya)
 };
 
 // GÖSTERİLECEK ÜLKELER LİSTESİ
@@ -25,21 +25,13 @@ export const activeCountries = [
     "Romania",
     "Cyprus",
 
-    // Kafkaslar & Ortadoğu & Asya
-    "Syria",
-    "Iraq",
-    "Iran",
-    "Georgia",
-    "Armenia",
-    "Azerbaijan",
-    "Russia",
-
     // Doğu Avrupa
     "Ukraine",
     "Moldova",
     "Belarus",
     "Poland",
-    "Czechia", // Çek Cumhuriyeti
+    "Czechia",
+    "Russia",
 
     // Baltıklar & İskandinavya
     "Estonia",
@@ -49,14 +41,33 @@ export const activeCountries = [
     "Sweden",
     "Norway",
 
-    // Batı & Orta Avrupa (YENİLER)
-    "Germany",      // Almanya
-    "France",       // Fransa
-    "Italy",        // İtalya
-    "Spain",        // İspanya
-    "Portugal",     // Portekiz
-    "Belgium",      // Belçika
-    "Netherlands",  // Hollanda
-    "Switzerland",  // İsviçre
-    "Austria"       // Avusturya (Bunu da ekledim, arada boşluk kalmasın)
+    // Batı & Orta Avrupa
+    "Germany",
+    "France",
+    "Italy",
+    "Spain",
+    "Portugal",
+    "Belgium",
+    "Netherlands",
+    "Switzerland",
+    "Austria",
+
+    // --- YENİ EKLENENLER (ORTA DOĞU & LEVANT) ---
+    "Syria",
+    "Iraq",
+    "Iran",
+    "Georgia",
+    "Armenia",
+    "Azerbaijan",
+    "Lebanon",   // Lübnan
+    "Jordan",    // Ürdün
+    "Israel",    // İsrail
+    "Palestine", // Filistin
+
+    // --- YENİ EKLENENLER (KUZEY AFRİKA) ---
+    "Egypt",     // Mısır
+    "Libya",     // Libya
+    "Tunisia",   // Tunus
+    "Algeria",   // Cezayir
+    "Morocco"    // Fas
 ];
