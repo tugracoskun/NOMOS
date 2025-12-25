@@ -3,15 +3,15 @@
 export const mapConfig = {
     minZoom: 4,
     maxZoom: 10,
-    startView: [50.0, 25.0], // Avrupa'nın ortasına biraz daha odaklanalım
+    startView: [48.0, 15.0], // Avrupa'nın tam ortası (Viyana civarı)
     startZoom: 5,
     maxBounds: [[-85, -180], [85, 180]]
 };
 
 export const dataUrls = {
     world: './assets/world.json',          // Zemin
-    turkey: './assets/tr.json',            // Türkiye (Yüksek Detay)
-    neighbors: './assets/all_provinces.json' // Tüm Dünya Arşivi (Master)
+    turkey: './assets/tr.json',            // Türkiye (Özel)
+    neighbors: './assets/all_provinces.json' // Master Dosya
 };
 
 // GÖSTERİLECEK ÜLKELER LİSTESİ
@@ -25,28 +25,38 @@ export const activeCountries = [
     "Romania",
     "Cyprus",
 
-    // Kafkaslar & Ortadoğu
+    // Kafkaslar & Ortadoğu & Asya
     "Syria",
     "Iraq",
     "Iran",
     "Georgia",
     "Armenia",
     "Azerbaijan",
+    "Russia",
 
     // Doğu Avrupa
     "Ukraine",
     "Moldova",
-    "Belarus",   // Beyaz Rusya
-    "Poland",    // Polonya
-    "Russia",    // Rusya
+    "Belarus",
+    "Poland",
+    "Czechia", // Çek Cumhuriyeti
 
-    // Baltıklar
+    // Baltıklar & İskandinavya
     "Estonia",
     "Latvia",
     "Lithuania",
-
-    // İskandinavya
     "Finland",
     "Sweden",
-    "Norway"
+    "Norway",
+
+    // Batı & Orta Avrupa (YENİLER)
+    "Germany",      // Almanya
+    "France",       // Fransa
+    "Italy",        // İtalya
+    "Spain",        // İspanya
+    "Portugal",     // Portekiz
+    "Belgium",      // Belçika
+    "Netherlands",  // Hollanda
+    "Switzerland",  // İsviçre
+    "Austria"       // Avusturya (Bunu da ekledim, arada boşluk kalmasın)
 ];
