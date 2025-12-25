@@ -1,51 +1,64 @@
 // HARİTA MODÜLÜ ANA DOSYASI
-// Harita motorunu başlatır, ayarlarını yapar ve katmanları yükler.
-
 import { mapConfig } from './config.js';
 import { loadLayers } from './layers.js';
-import { initEditor } from './editor.js'; // Geliştirici Modu
+import { initEditor } from './editor.js';
 
 let mapInstance = null;
 
 export function initMap(containerId) {
-    // Eğer harita daha önce oluşturulmuşsa, temizle (Memory leak önleme)
+    const container = document.getElementById(containerId);
+    
+    // 1. Önce temizlik yap (Varsa eski haritayı sil)
     if (mapInstance) {
         mapInstance.remove();
         mapInstance = null;
     }
 
-    // Harita Motorunu Başlat (Leaflet)
-    mapInstance = L.map(containerId, {
-        // Kontrolleri elle ekleyeceğiz
+    // 2. Yükleme Ekranını (Loader) Enjekte Et
+    // Harita div'inin içine değil, yanına veya üstüne ekliyoruz ki harita oluşurken görünmesin.
+    // Ancak Leaflet container'ı temizlediği için, loader'ı dinamik ekleyip yöneteceğiz.
+    
+    // Container'ı sıfırla ve yapılandır
+    container.innerHTML = `
+        <div id="actual-map-div" style="width:100%; height:100%;"></div>
+        <div id="map-loader" class="map-loader-overlay">
+            <div class="radar-spinner"></div>
+            <div class="loading-text">UYDU VERİLERİ İŞLENİYOR...</div>
+        </div>
+    `;
+
+    // 3. Haritayı Başlat (İçerdeki div'e)
+    mapInstance = L.map('actual-map-div', {
         zoomControl: false,
         attributionControl: false,
-        
-        // --- SMOOTH ZOOM AYARLARI (Modern Oyun Hissi) ---
-        zoomSnap: 0,           // Kademeli (1,2,3) zoom yerine kesirli (1.2, 1.5) zoom
-        zoomDelta: 0.1,        // Tekerlek her döndüğünde ne kadar yaklaşsın (Düşük = Hassas)
-        wheelPxPerZoomLevel: 120, // Tekerlek hassasiyeti (Yüksek = Daha yavaş ve kontrollü)
-        
-        // --- SINIRLANDIRMALAR ---
+        zoomSnap: 0,
+        zoomDelta: 0.1,
+        wheelPxPerZoomLevel: 120,
         minZoom: mapConfig.minZoom, 
         maxZoom: mapConfig.maxZoom,
         maxBounds: mapConfig.maxBounds,
-        maxBoundsViscosity: 1.0, // Kenarlara çarpınca esnemesin, sert dursun
-        
-        // --- PERFORMANS VE GÖRSELLİK ---
-        preferCanvas: true,      // Binlerce bölgeyi çizmek için Canvas kullan (Hız)
-        smoothFactor: 1.5        // Çizgileri yumuşat (Tırtıkları azaltır, performansı artırır)
+        maxBoundsViscosity: 1.0,
+        preferCanvas: true,
+        smoothFactor: 1.5
     }).setView(mapConfig.startView, mapConfig.startZoom);
 
-    // Zoom butonlarını sağ alta ekle
     L.control.zoom({ position: 'bottomright' }).addTo(mapInstance);
 
-    // --- GELİŞTİRİCİ EDİTÖRÜNÜ BAŞLAT ---
-    // (Sağ alttaki 'Dev Mode' butonu)
     initEditor(mapInstance);
 
-    // --- KATMANLARI YÜKLE ---
-    // (Zemin, Türkiye, Komşular vb.)
-    loadLayers(mapInstance);
+    // 4. Katmanları Yükle ve Bittiğinde Loader'ı Kaldır
+    // loadLayers fonksiyonu async olduğu için .then() kullanabiliriz.
+    loadLayers(mapInstance).then(() => {
+        // Yükleme bitti, loader'ı gizle
+        const loader = document.getElementById('map-loader');
+        if (loader) {
+            loader.classList.add('map-loader-hidden');
+            // Animasyon bitince DOM'dan tamamen sil (0.5s sonra)
+            setTimeout(() => {
+                loader.remove();
+            }, 500);
+        }
+    });
 }
 
 export function destroyMap() {

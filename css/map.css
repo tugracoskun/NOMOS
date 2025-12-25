@@ -26,3 +26,58 @@
     color: var(--text-light) !important;
     box-shadow: 0 3px 14px rgba(0,0,0,0.4) !important;
 }
+
+/* --- HARİTA YÜKLEME EKRANI (LOADER) --- */
+.map-loader-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #050a14; /* Oyunun ana rengi */
+    z-index: 9999; /* Haritanın üzerinde olsun */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    transition: opacity 0.5s ease-out; /* Yok olurken yumuşak geçiş */
+}
+
+/* Radar Efekti */
+.radar-spinner {
+    width: 60px;
+    height: 60px;
+    border: 3px solid rgba(59, 130, 246, 0.3); /* Soluk mavi */
+    border-top: 3px solid #3b82f6; /* Parlak mavi */
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-bottom: 20px;
+    box-shadow: 0 0 15px rgba(59, 130, 246, 0.2);
+}
+
+.loading-text {
+    font-family: 'Inter', sans-serif;
+    color: #94a3b8;
+    font-size: 0.9rem;
+    letter-spacing: 1px;
+    animation: pulse 1.5s infinite;
+    text-transform: uppercase;
+    font-weight: 600;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+@keyframes pulse {
+    0% { opacity: 0.6; }
+    50% { opacity: 1; }
+    100% { opacity: 0.6; }
+}
+
+/* Yüklendikten sonra gizlemek için sınıf */
+.map-loader-hidden {
+    opacity: 0;
+    pointer-events: none; /* Tıklamayı engelle */
+}
