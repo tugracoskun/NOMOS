@@ -1,73 +1,47 @@
 // HARİTA AYARLARI VE LİNKLER
 
 export const mapConfig = {
-    minZoom: 4,
+    minZoom: 3, // Amerika'yı görebilmek için biraz daha uzaklaşmaya izin verelim
     maxZoom: 10,
-    startView: [36.0, 28.0], // Akdeniz Ortası (Hem Avrupa hem Afrika görünür)
+    startView: [39.0, 35.0], // Türkiye merkezli başlasın
     startZoom: 5,
     maxBounds: [[-85, -180], [85, 180]]
 };
 
 export const dataUrls = {
     world: './assets/world.json',          // Zemin
-    turkey: './assets/tr.json',            // Türkiye (Yüksek Detay)
-    neighbors: './assets/all_provinces.json' // Master Dosya (Tüm Dünya)
+    turkey: './assets/tr.json',            // Türkiye (Özel)
+    neighbors: './assets/all_provinces.json' // Master Dosya
 };
 
 // GÖSTERİLECEK ÜLKELER LİSTESİ
 export const activeCountries = [
-    // Ana Vatan
-    "Turkey",
+    // --- KUZEY AMERİKA (YENİ) ---
+    "United States of America", // ABD
+    "Canada",                   // Kanada
 
-    // Balkanlar & Komşular
-    "Greece",
-    "Bulgaria",
-    "Romania",
-    "Cyprus",
+    // --- AVRUPA ---
+    "United Kingdom", // İngiltere
+    "Ireland",
+    "Germany", "France", "Italy", "Spain", "Portugal", 
+    "Belgium", "Netherlands", "Switzerland", "Austria",
+    "Czechia", "Hungary", "Slovakia", "Poland", "Belarus",
+    "Ukraine", "Moldova", "Romania", "Bulgaria", "Greece",
+    "Albania", "Bosnia and Herzegovina", "Kosovo", "Macedonia", 
+    "Serbia", "Montenegro", "Croatia", "Slovenia",
+    
+    // --- İSKANDİNAVYA & BALTIK ---
+    "Finland", "Sweden", "Norway", "Denmark",
+    "Estonia", "Latvia", "Lithuania",
 
-    // Doğu Avrupa
-    "Ukraine",
-    "Moldova",
-    "Belarus",
-    "Poland",
-    "Czechia",
-    "Russia",
+    // --- ORTA DOĞU & KAFKASLAR ---
+    "Turkey", // Ana Vatan
+    "Cyprus", "Syria", "Iraq", "Iran", "Georgia", "Armenia", "Azerbaijan",
+    "Lebanon", "Jordan", "Israel", "Palestine",
 
-    // Baltıklar & İskandinavya
-    "Estonia",
-    "Latvia",
-    "Lithuania",
-    "Finland",
-    "Sweden",
-    "Norway",
-
-    // Batı & Orta Avrupa
-    "Germany",
-    "France",
-    "Italy",
-    "Spain",
-    "Portugal",
-    "Belgium",
-    "Netherlands",
-    "Switzerland",
-    "Austria",
-
-    // --- YENİ EKLENENLER (ORTA DOĞU & LEVANT) ---
-    "Syria",
-    "Iraq",
-    "Iran",
-    "Georgia",
-    "Armenia",
-    "Azerbaijan",
-    "Lebanon",   // Lübnan
-    "Jordan",    // Ürdün
-    "Israel",    // İsrail
-    "Palestine", // Filistin
-
-    // --- YENİ EKLENENLER (KUZEY AFRİKA) ---
-    "Egypt",     // Mısır
-    "Libya",     // Libya
-    "Tunisia",   // Tunus
-    "Algeria",   // Cezayir
-    "Morocco"    // Fas
+    // --- KUZEY AFRİKA ---
+    "Egypt", "Libya", "Tunisia", "Algeria", "Morocco",
+    
+    // --- RUSYA ---
+    "Russia"
 ];
