@@ -1,98 +1,65 @@
-// KATMAN YÖNETİMİ (MAIN)
+// KATMAN YÖNETİMİ (GLOBAL VORONOI)
 import { dataUrls } from './config.js';
 import { getBaseCountryStyle, getProvinceStyle, getInternationalBorderStyle } from './styles.js';
 import { onProvinceInteraction } from './events.js';
-import { setupMapPanes } from './layer-setup.js'; // Yeni
-import { filterBaseLayer, filterNeighborLayer } from './layer-filters.js'; // Yeni
+import { generateVoronoiRegions } from './generator.js';
 
-// Global Referanslar (Temizlik için)
-let countryLayer = null;
-let provinceLayerGroup = null; // Grup yaptık, içine ekleyeceğiz
+let provinceLayer = null;
 let borderLayer = null;
 
 export async function loadLayers(mapInstance) {
-    // 1. Pane Ayarlarını Yap
-    setupMapPanes(mapInstance);
+    setupPanes(mapInstance);
 
-    // Detay Grubu Hazırla
-    if (provinceLayerGroup) {
-        mapInstance.removeLayer(provinceLayerGroup);
-    }
-    provinceLayerGroup = L.layerGroup().addTo(mapInstance);
+    // Loader Yazısı
+    const loaderText = document.querySelector('.loading-subtitle');
+    if(loaderText) loaderText.innerText = "Dünya Haritası Oluşturuluyor...";
 
-
-    // --- ADIM 1: DÜNYA ZEMİNİ (BASE) ---
     try {
+        // 1. DÜNYA SINIRLARINI ÇEK
         const res = await fetch(dataUrls.world);
-        if (res.ok) {
-            const data = await res.json();
-            
-            // Temizlik
-            if (countryLayer) mapInstance.removeLayer(countryLayer);
-            if (borderLayer) mapInstance.removeLayer(borderLayer);
+        if (!res.ok) throw new Error("Dünya haritası yüklenemedi");
+        
+        const worldData = await res.json();
+        const allGeneratedRegions = []; 
 
-            // Zemin (Dolgu)
-            countryLayer = L.geoJSON(data, {
-                pane: 'basePane',
-                style: getBaseCountryStyle,
-                filter: filterBaseLayer, // filter-logic.js'den geliyor
-                interactive: false 
-            }).addTo(mapInstance);
+        console.log("Map: Tüm dünya işleniyor...");
+        
+        // 2. TÜM ÜLKELERİ DÖNGÜYE SOK
+        // Antarktika (ATA) hariç hepsini al.
+        const targetCountries = worldData.features.filter(f => f.properties.ISO_A3 !== 'ATA');
 
-            // Sınırlar (Çerçeve)
-            borderLayer = L.geoJSON(data, {
-                pane: 'borderPane',
-                style: getInternationalBorderStyle,
-                filter: filterBaseLayer,
-                interactive: false
-            }).addTo(mapInstance);
-        }
-    } catch (e) { console.error("Zemin Yükleme Hatası:", e); }
+        targetCountries.forEach(country => {
+            // HER ÜLKE İÇİN 5 ŞEHİR ÜRET
+            const regions = generateVoronoiRegions(country, 5);
+            allGeneratedRegions.push(...regions);
+        });
 
+        // 3. HARITAYA EKLE
+        if (provinceLayer) mapInstance.removeLayer(provinceLayer);
+        if (borderLayer) mapInstance.removeLayer(borderLayer);
 
-    // --- ADIM 2: DETAYLI ÜLKELER (HİBRİT) ---
+        // A. Renkli Bölgeler (Voronoi Hücreleri)
+        provinceLayer = L.geoJSON({ type: "FeatureCollection", features: allGeneratedRegions }, {
+            pane: 'detailPane',
+            style: getProvinceStyle,
+            onEachFeature: (feature, l) => onProvinceInteraction(feature, l, mapInstance)
+        }).addTo(mapInstance);
 
-    // A. TÜRKİYE (Yüksek Detay - Yerel)
-    // Filtre: Hepsini al (True)
-    loadGeoJsonFile(mapInstance, dataUrls.turkey, () => true);
+        // B. Ülke Dış Sınırları (Kalın Çerçeve)
+        borderLayer = L.geoJSON({ type: "FeatureCollection", features: targetCountries }, {
+            pane: 'borderPane',
+            style: getInternationalBorderStyle,
+            interactive: false
+        }).addTo(mapInstance);
 
-    // B. KOMŞULAR (Orta Detay - Büyük Dosya)
-    // Filtre: Sadece listedekiler
-    loadGeoJsonFile(mapInstance, dataUrls.neighbors, filterNeighborLayer);
+        console.log(`Map: ${allGeneratedRegions.length} bölge oluşturuldu.`);
+
+    } catch (e) {
+        console.error("Harita Oluşturma Hatası:", e);
+    }
 }
 
-// Dosya Yükleyici Yardımcı Fonksiyon
-async function loadGeoJsonFile(mapInstance, url, filterFn) {
-    try {
-        console.log(`Veri yükleniyor: ${url}`);
-        const res = await fetch(url);
-        
-        if (res.ok) {
-            const data = await res.json();
-            
-            // 1. Renkli Eyaletler
-            const layer = L.geoJSON(data, {
-                pane: 'detailPane',
-                style: getProvinceStyle,
-                filter: filterFn,
-                onEachFeature: (feature, l) => onProvinceInteraction(feature, l, mapInstance)
-            });
-            provinceLayerGroup.addLayer(layer);
-
-            // 2. Siyah Kalın Sınırlar (Ülke bütünlüğü için)
-            const borders = L.geoJSON(data, {
-                pane: 'borderPane',
-                style: { color: '#000', weight: 2, fill: false, opacity: 1 },
-                filter: filterFn,
-                interactive: false
-            });
-            provinceLayerGroup.addLayer(borders);
-            
-            console.log(`Tamamlandı: ${url}`);
-        } else {
-            console.warn(`Dosya bulunamadı: ${url}`);
-        }
-    } catch (e) { 
-        console.error(`Hata (${url}):`, e); 
-    }
+function setupPanes(mapInstance) {
+    if (!mapInstance.getPane('detailPane')) { mapInstance.createPane('detailPane'); mapInstance.getPane('detailPane').style.zIndex = 400; }
+    if (!mapInstance.getPane('borderPane')) { mapInstance.createPane('borderPane'); mapInstance.getPane('borderPane').style.zIndex = 500; mapInstance.getPane('borderPane').style.pointerEvents = 'none'; }
 }
