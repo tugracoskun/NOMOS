@@ -7,7 +7,7 @@ let mapInstance = null;
 
 export function initMap(containerId) {
     const container = document.getElementById(containerId);
-    
+
     // Temizlik
     if (mapInstance) {
         mapInstance.remove();
@@ -32,28 +32,56 @@ export function initMap(containerId) {
     `;
 
     // 2. Haritayı Başlat
+    // Çok geniş buffer - ekranın çok dışını da render et
+    const wideRenderer = L.canvas({
+        padding: 2.0  // Görünür alanın %200 fazlasını render et (5x alan)
+    });
+
     mapInstance = L.map('actual-map-div', {
         zoomControl: false,
         attributionControl: false,
-        zoomSnap: 0,
-        zoomDelta: 0.1,
-        wheelPxPerZoomLevel: 120,
-        minZoom: mapConfig.minZoom, 
+        zoomSnap: 0.25,
+        zoomDelta: 0.25,
+        wheelPxPerZoomLevel: 80,
+        wheelDebounceTime: 40,
+        minZoom: mapConfig.minZoom,
         maxZoom: mapConfig.maxZoom,
         maxBounds: mapConfig.maxBounds,
         maxBoundsViscosity: 1.0,
         preferCanvas: true,
-        smoothFactor: 1.5
+        renderer: wideRenderer,  // Geniş buffer kullan
+        smoothFactor: 2.0,
+        inertia: true,
+        inertiaDeceleration: 3000,
+        inertiaMaxSpeed: 1500
     }).setView(mapConfig.startView, mapConfig.startZoom);
 
     L.control.zoom({ position: 'bottomright' }).addTo(mapInstance);
     initEditor(mapInstance);
 
+    // DEV: Zoom seviyesi göstergesi (sağ alt)
+    const zoomDisplay = L.control({ position: 'bottomright' });
+    zoomDisplay.onAdd = function () {
+        const div = L.DomUtil.create('div', 'zoom-level-display');
+        div.innerHTML = `Zoom: ${mapInstance.getZoom().toFixed(1)}`;
+        div.style.cssText = 'background: rgba(0,0,0,0.7); color: #4ade80; padding: 4px 8px; border-radius: 4px; font-family: monospace; font-size: 12px; margin-bottom: 5px;';
+        return div;
+    };
+    zoomDisplay.addTo(mapInstance);
+
+    // Zoom değiştiğinde güncelle
+    mapInstance.on('zoomend', () => {
+        const display = document.querySelector('.zoom-level-display');
+        if (display) {
+            display.innerHTML = `Zoom: ${mapInstance.getZoom().toFixed(1)}`;
+        }
+    });
+
     // 3. YÜKLEME VE BEKLEME MANTIĞI
-    
+
     // A: Veri Yükleme İşlemi
     const dataLoading = loadLayers(mapInstance);
-    
+
     // B: Minimum Bekleme Süresi (2 Saniye) - Tasarım görünsün ve render otursun diye
     const minWait = new Promise(resolve => setTimeout(resolve, 2000));
 
@@ -65,7 +93,7 @@ export function initMap(containerId) {
             loader.querySelector('.loading-title').innerText = "BAĞLANTI KURULDU";
             loader.querySelector('.loading-title').style.color = "#4ade80"; // Yeşil
             loader.querySelector('.loading-subtitle').innerText = "Harita Hazır";
-            
+
             // Kısa bir süre sonra yok et
             setTimeout(() => {
                 loader.classList.add('map-loader-hidden');

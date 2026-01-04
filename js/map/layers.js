@@ -44,14 +44,16 @@ export async function loadLayers(mapInstance) {
         provinceLayer = L.geoJSON({ type: "FeatureCollection", features: allGeneratedRegions }, {
             pane: 'detailPane',
             style: getProvinceStyle,
-            onEachFeature: (feature, l) => onProvinceInteraction(feature, l, mapInstance)
+            onEachFeature: (feature, l) => onProvinceInteraction(feature, l, mapInstance),
+            bubblingMouseEvents: false  // Performans için
         }).addTo(mapInstance);
 
         // B. Ülke Dış Sınırları (Kalın Çerçeve)
         borderLayer = L.geoJSON({ type: "FeatureCollection", features: targetCountries }, {
             pane: 'borderPane',
             style: getInternationalBorderStyle,
-            interactive: false
+            interactive: false,
+            bubblingMouseEvents: false
         }).addTo(mapInstance);
 
         // C. ÜLKE ETİKETLERİ
