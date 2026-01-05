@@ -54,7 +54,7 @@ export function initMap(containerId) {
                     <div class="city-stat-value" id="city-economy">0</div>
                 </div>
                 <div class="city-stat resource-stat">
-                    <div class="city-stat-icon" id="city-resource-icon">🌾</div>
+                    <div class="city-stat-icon" id="city-resource-icon"><i class="fa-solid fa-wheat-awn"></i></div>
                     <div class="city-stat-label">Kaynak</div>
                     <div class="city-stat-value" id="city-resource-name">-</div>
                 </div>

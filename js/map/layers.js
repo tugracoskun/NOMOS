@@ -24,6 +24,7 @@ export async function loadLayers(mapInstance) {
 
         const worldData = await res.json();
         const allGeneratedRegions = [];
+        let globalRegionCounter = 0; // Global unique counter
 
         console.log("Map: Tüm dünya işleniyor...");
 
@@ -32,8 +33,9 @@ export async function loadLayers(mapInstance) {
         const targetCountries = worldData.features.filter(f => f.properties.ISO_A3 !== 'ATA');
 
         targetCountries.forEach(country => {
-            // HER ÜLKE İÇİN 5 ŞEHİR ÜRET
-            const regions = generateVoronoiRegions(country, 5);
+            // HER ÜLKE İÇİN 5 ŞEHİR ÜRET - global counter ile
+            const regions = generateVoronoiRegions(country, 5, globalRegionCounter);
+            globalRegionCounter += regions.length; // Counter'ı artır
             allGeneratedRegions.push(...regions);
         });
 

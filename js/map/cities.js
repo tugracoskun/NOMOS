@@ -69,6 +69,8 @@ const defaultCityNames = ["City A", "City B", "City C", "City D", "City E"];
 
 // Şehir verilerini oluştur (marker olmadan, sadece veri)
 export function createCityMarkers(regions, mapInstance) {
+    console.log(`DEBUG: createCityMarkers fonksiyonuna ${regions.length} bölge geldi`);
+
     // Önceki verileri temizle
     cityDataByRegion = {};
 
@@ -77,17 +79,22 @@ export function createCityMarkers(regions, mapInstance) {
         const countryName = region.properties.ADMIN || region.properties.NAME || "";
         const regionId = region.properties.regionId || `region_${index}`;
 
-        // Ülkeye göre şehir ismini al
-        const cityNames = cityNamesByCountry[countryName] || defaultCityNames;
-        const regionIndex = parseInt(regionId.split('_')[1]) || 0;
-        const cityName = cityNames[regionIndex % cityNames.length];
+        // Benzersiz şehir ID'si oluştur (editör ile düzeltilebilir)
+        const cityId = `CITY_${String(index).padStart(4, '0')}`;
+        const cityName = cityId; // Şimdilik ID'yi isim olarak kullan
 
-        // Bölgeye özel kaynak ata
-        const resource = assignResourceToRegion(countryName, regionIndex);
+        // DEBUG: İlk 10 şehri logla
+        if (index < 10) {
+            console.log(`DEBUG: index=${index}, cityId=${cityId}, country=${countryName}, regionId=${regionId}`);
+        }
+
+        // Bölgeye özel kaynak ata - GLOBAL INDEX KULLAN!
+        const resource = assignResourceToRegion(countryName, index);
 
         // Şehir verisi
         const cityData = {
-            name: cityName,
+            id: cityId, // Benzersiz ID
+            name: cityName, // Şimdilik ID, editör ile değiştirilebilir
             country: countryName,
             regionId: regionId,
             population: Math.floor(Math.random() * 5000000) + 100000,
@@ -95,11 +102,20 @@ export function createCityMarkers(regions, mapInstance) {
             resource: resource // Bölgeye özel kaynak
         };
 
-        // Bölge ID'sine göre şehir verisini sakla
-        cityDataByRegion[regionId] = cityData;
+        // Benzersiz cityId ile sakla
+        cityDataByRegion[cityId] = cityData;
+    });
+
+    // DEBUG: Kaç farklı kaynak kullanıldığını kontrol et
+    const uniqueResources = new Set();
+    Object.values(cityDataByRegion).forEach(city => {
+        if (city.resource) {
+            uniqueResources.add(city.resource.name);
+        }
     });
 
     console.log(`Cities: ${Object.keys(cityDataByRegion).length} şehir verisi oluşturuldu.`);
+    console.log(`Unique Resources: ${uniqueResources.size} farklı kaynak kullanıldı:`, Array.from(uniqueResources));
 }
 
 // Zoom seviyesine göre görünürlük (artık kullanılmıyor ama uyumluluk için)
@@ -120,9 +136,10 @@ export function openCityPanel(cityData) {
     document.getElementById('city-population').textContent = cityData.population.toLocaleString();
     document.getElementById('city-economy').textContent = cityData.economy;
 
-    // Kaynak bilgisini güncelle
+    // Kaynak bilgisini güncelle (Font Awesome icon)
     if (cityData.resource) {
-        document.getElementById('city-resource-icon').textContent = cityData.resource.icon;
+        const iconElement = document.getElementById('city-resource-icon');
+        iconElement.innerHTML = `<i class="${cityData.resource.icon}"></i>`;
         document.getElementById('city-resource-name').textContent = cityData.resource.name;
     }
 
@@ -144,7 +161,18 @@ export function setupCityPane(mapInstance) {
     // Marker olmadığı için boş
 }
 
-// Bölge ID'sine göre şehir verisini al
-export function getCityDataByRegion(regionId) {
-    return cityDataByRegion[regionId] || null;
+// Şehir verisini al (cityId veya regionId ile)
+export function getCityDataByRegion(lookupKey) {
+    // Önce direkt lookup dene
+    let data = cityDataByRegion[lookupKey];
+
+    // Bulunamadıysa, tüm şehirlerde regionId ile ara
+    if (!data) {
+        data = Object.values(cityDataByRegion).find(city => city.regionId === lookupKey);
+    }
+
+    if (!data) {
+        console.warn(`getCityDataByRegion: ${lookupKey} bulunamadı!`);
+    }
+    return data || null;
 }

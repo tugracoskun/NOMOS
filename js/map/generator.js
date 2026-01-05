@@ -1,7 +1,7 @@
 // HARİTA ÜRETİM MOTORU (VORONOI GENERATOR)
 // GÜÇLENDİRİLMİŞ VERSİYON: Ana kara tespiti ile Fransa gibi dağınık ülkeleri böler.
 
-export function generateVoronoiRegions(countryFeature, numPoints = 5) {
+export function generateVoronoiRegions(countryFeature, numPoints = 5, startIndex = 0) {
     try {
         let searchBbox = turf.bbox(countryFeature);
 
@@ -67,14 +67,14 @@ export function generateVoronoiRegions(countryFeature, numPoints = 5) {
         voronoiPolygons.features.forEach((cell, index) => {
             try {
                 const clipped = turf.intersect(cell, countryFeature);
-                
+
                 if (clipped) {
                     // Eğer kesme işlemi MultiPolygon döndürürse (örneğin Fransa + Korsika aynı hücredeyse)
                     // bunu tek bir feature olarak kabul et.
                     clipped.properties = {
-                        ...countryFeature.properties, 
+                        ...countryFeature.properties,
                         regionName: `Bölge ${index + 1}`,
-                        regionId: `${countryFeature.properties.ISO_A3 || 'UNK'}_${index}`
+                        regionId: `REGION_${String(startIndex + index).padStart(4, '0')}`
                     };
                     clippedRegions.push(clipped);
                 }
