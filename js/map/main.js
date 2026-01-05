@@ -2,6 +2,7 @@
 import { mapConfig } from './config.js';
 import { loadLayers } from './layers.js';
 import { initEditor } from './editor.js';
+import { closeCityPanel } from './cities.js';
 
 let mapInstance = null;
 
@@ -14,7 +15,7 @@ export function initMap(containerId) {
         mapInstance = null;
     }
 
-    // 1. Şık Loader'ı HTML'e Bas
+    // 1. Şık Loader'ı ve City Panel'i HTML'e Bas
     container.innerHTML = `
         <div id="actual-map-div" style="width:100%; height:100%;"></div>
         
@@ -27,6 +28,36 @@ export function initMap(containerId) {
             <div class="loader-text-group">
                 <div class="loading-title">UYDU BAĞLANTISI</div>
                 <div class="loading-subtitle">Veriler İşleniyor...</div>
+            </div>
+        </div>
+
+        <!-- Şehir Detay Paneli -->
+        <div id="city-detail-panel">
+            <div class="city-panel-header">
+                <div class="city-panel-title">
+                    <h2 id="city-name">Şehir Adı</h2>
+                    <span class="city-country-label" id="city-country">Ülke</span>
+                </div>
+                <button class="city-panel-close" onclick="window.closeCityPanel()">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            <div class="city-panel-body">
+                <div class="city-stat">
+                    <div class="city-stat-icon">👥</div>
+                    <div class="city-stat-label">Nüfus</div>
+                    <div class="city-stat-value" id="city-population">0</div>
+                </div>
+                <div class="city-stat">
+                    <div class="city-stat-icon">💰</div>
+                    <div class="city-stat-label">Ekonomi</div>
+                    <div class="city-stat-value" id="city-economy">0</div>
+                </div>
+                <div class="city-stat resource-stat">
+                    <div class="city-stat-icon" id="city-resource-icon">🌾</div>
+                    <div class="city-stat-label">Kaynak</div>
+                    <div class="city-stat-value" id="city-resource-name">-</div>
+                </div>
             </div>
         </div>
     `;
@@ -58,6 +89,9 @@ export function initMap(containerId) {
 
     L.control.zoom({ position: 'bottomright' }).addTo(mapInstance);
     initEditor(mapInstance);
+
+    // Şehir paneli kapatma fonksiyonunu global yap (onclick için)
+    window.closeCityPanel = closeCityPanel;
 
     // DEV: Zoom seviyesi göstergesi (sağ alt)
     const zoomDisplay = L.control({ position: 'bottomright' });

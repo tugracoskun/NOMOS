@@ -4,6 +4,7 @@ import { getBaseCountryStyle, getProvinceStyle, getInternationalBorderStyle } fr
 import { onProvinceInteraction } from './events.js';
 import { generateVoronoiRegions } from './generator.js';
 import { setupLabelPane, createCountryLabels, updateCountryLabelsOpacity } from './labels.js';
+import { setupCityPane, createCityMarkers, updateCityMarkersVisibility } from './cities.js';
 
 let provinceLayer = null;
 let borderLayer = null;
@@ -62,13 +63,21 @@ export async function loadLayers(mapInstance) {
         // Sadece ülke etiketleri (şehir isimleri ileride city details'da olacak)
         createCountryLabels(targetCountries, mapInstance);
 
-        // Zoom değiştiğinde opacity güncelle
+        // D. ŞEHİR MARKER'LARI
+        if (loaderText) loaderText.innerText = "Şehirler Yerleştiriliyor...";
+
+        setupCityPane(mapInstance);
+        createCityMarkers(allGeneratedRegions, mapInstance);
+
+        // Zoom değiştiğinde opacity güncelle (hem ülkeler hem şehirler)
         mapInstance.on('zoomend', () => {
             updateCountryLabelsOpacity(mapInstance.getZoom());
+            updateCityMarkersVisibility(mapInstance.getZoom());
         });
 
         // İlk yüklemede de opacity ayarla
         updateCountryLabelsOpacity(mapInstance.getZoom());
+        updateCityMarkersVisibility(mapInstance.getZoom());
 
         console.log(`Map: ${allGeneratedRegions.length} bölge oluşturuldu.`);
 

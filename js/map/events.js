@@ -1,17 +1,19 @@
 // HARİTA ETKİLEŞİMLERİ (EVENTS)
 import { getProvinceStyle, getBaseCountryStyle } from './styles.js';
 import { isEditorActive, openEditor, getSavedData } from './editor.js';
+import { getCityDataByRegion, openCityPanel } from './cities.js';
 
 // 1. DETAYLI EYALETLER İÇİN ETKİLEŞİM
 export function onProvinceInteraction(feature, layer, mapInstance) {
     const p = feature.properties;
-    
+
     // İsim Kontrolü (Editör veya GeoJSON)
     const saved = getSavedData(feature);
-    const regionName = saved?.name || p.name || p.NAME || p.Name || p.NAME_1 || p.VARNAME_1 || 
-                       p.lektur || p.bulgarian_name || p.NUTS3_NAME || p.province || "Bölge";
-                       
+    const regionName = saved?.name || p.name || p.NAME || p.Name || p.NAME_1 || p.VARNAME_1 ||
+        p.lektur || p.bulgarian_name || p.NUTS3_NAME || p.province || "Bölge";
+
     const countryName = p.admin || p.ADMIN || "Ülke";
+    const regionId = p.regionId; // Voronoi bölge ID'si
 
     layer.on({
         mouseover: (e) => {
@@ -25,11 +27,18 @@ export function onProvinceInteraction(feature, layer, mapInstance) {
         },
         click: (e) => {
             L.DomEvent.stopPropagation(e);
-            
+
             if (isEditorActive()) {
                 openEditor(feature, layer);
             } else {
-                L.popup().setLatLng(e.latlng).setContent(createPopupContent(countryName, regionName, true)).openOn(mapInstance);
+                // Bölgeye tıklayınca şehir detaylarını aç
+                const cityData = getCityDataByRegion(regionId);
+                if (cityData) {
+                    openCityPanel(cityData);
+                } else {
+                    // Şehir verisi yoksa eski popup'ı göster
+                    L.popup().setLatLng(e.latlng).setContent(createPopupContent(countryName, regionName, true)).openOn(mapInstance);
+                }
             }
         }
     });
@@ -51,7 +60,7 @@ export function onBaseInteraction(feature, layer, mapInstance) {
         },
         click: (e) => {
             L.DomEvent.stopPropagation(e);
-            
+
             // Tek parça ülkeler için popup (Editör yok, sadece yönetim)
             L.popup()
                 .setLatLng(e.latlng)

@@ -214,3 +214,224 @@
         0 0 4px rgba(0, 0, 0, 0.6);
     transform: translate(-50%, -50%);
 }
+
+/* --- ŞEHİR MARKER'LARI --- */
+
+/* Şehir Marker Container */
+.city-marker {
+    pointer-events: auto !important;
+    cursor: pointer;
+    transition: opacity 0.3s ease;
+}
+
+/* Şehir Noktası */
+.city-dot {
+    width: 8px;
+    height: 8px;
+    background: #fbbf24;
+    /* Altın sarısı */
+    border: 2px solid #ffffff;
+    border-radius: 50%;
+    box-shadow:
+        0 0 8px rgba(251, 191, 36, 0.8),
+        0 0 12px rgba(251, 191, 36, 0.4);
+    transition: all 0.2s ease;
+}
+
+.city-marker:hover .city-dot {
+    transform: scale(1.5);
+    background: #f59e0b;
+    box-shadow:
+        0 0 12px rgba(245, 158, 11, 1),
+        0 0 20px rgba(245, 158, 11, 0.6);
+}
+
+/* Şehir Tooltip */
+.city-tooltip {
+    background: rgba(0, 0, 0, 0.85) !important;
+    border: 1px solid #fbbf24 !important;
+    color: #fbbf24 !important;
+    font-family: 'Inter', sans-serif;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 4px 8px !important;
+    border-radius: 4px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+}
+
+.city-tooltip::before {
+    border-top-color: #fbbf24 !important;
+}
+
+/* Şehir İsmi Label */
+.city-name-label {
+    position: absolute;
+    top: 12px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-family: 'Inter', sans-serif;
+    font-size: 9px;
+    font-weight: 600;
+    color: #fbbf24;
+    text-align: center;
+    white-space: nowrap;
+    text-shadow:
+        1px 1px 2px rgba(0, 0, 0, 0.95),
+        -1px -1px 1px rgba(0, 0, 0, 0.8),
+        0 0 4px rgba(0, 0, 0, 0.8);
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+}
+
+.city-marker:hover .city-name-label {
+    color: #f59e0b;
+}
+
+
+/* --- ŞEHİR DETAY PANELİ --- */
+
+#city-detail-panel {
+    position: fixed;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%) translateY(100%);
+    width: 600px;
+    max-width: 90%;
+    background: linear-gradient(135deg, rgba(15, 23, 42, 0.98), rgba(30, 41, 59, 0.98));
+    border: 1px solid rgba(59, 130, 246, 0.3);
+    border-bottom: none;
+    border-radius: 12px 12px 0 0;
+    box-shadow:
+        0 -4px 20px rgba(0, 0, 0, 0.5),
+        0 0 40px rgba(59, 130, 246, 0.2);
+    z-index: 10000;
+    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    backdrop-filter: blur(10px);
+}
+
+#city-detail-panel.open {
+    transform: translateX(-50%) translateY(0);
+}
+
+/* Panel Header */
+.city-panel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 24px;
+    border-bottom: 1px solid rgba(59, 130, 246, 0.2);
+    background: rgba(59, 130, 246, 0.05);
+}
+
+.city-panel-title {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.city-panel-title h2 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #ffffff;
+    margin: 0;
+    text-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
+}
+
+.city-panel-title .city-country-label {
+    font-size: 0.85rem;
+    color: #94a3b8;
+    font-weight: 500;
+}
+
+.city-panel-close {
+    background: rgba(239, 68, 68, 0.1);
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    color: #ef4444;
+    width: 32px;
+    height: 32px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 18px;
+}
+
+.city-panel-close:hover {
+    background: rgba(239, 68, 68, 0.2);
+    border-color: #ef4444;
+    transform: scale(1.1);
+}
+
+/* Panel Body */
+.city-panel-body {
+    padding: 24px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 16px;
+}
+
+.city-stat {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    transition: all 0.2s ease;
+}
+
+.city-stat:hover {
+    background: rgba(59, 130, 246, 0.05);
+    border-color: rgba(59, 130, 246, 0.3);
+    transform: translateY(-2px);
+}
+
+.city-stat-label {
+    font-size: 0.75rem;
+    color: #94a3b8;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-weight: 600;
+}
+
+.city-stat-value {
+    font-size: 1.25rem;
+    color: #ffffff;
+    font-weight: 700;
+}
+
+.city-stat-icon {
+    font-size: 1.5rem;
+    margin-bottom: 4px;
+}
+
+/* Kaynak Kartı Özel Stil */
+.resource-stat {
+    background: linear-gradient(135deg, rgba(251, 191, 36, 0.1), rgba(245, 158, 11, 0.05));
+    border-color: rgba(251, 191, 36, 0.3);
+}
+
+.resource-stat:hover {
+    background: linear-gradient(135deg, rgba(251, 191, 36, 0.15), rgba(245, 158, 11, 0.1));
+    border-color: rgba(251, 191, 36, 0.5);
+}
+
+.resource-stat .city-stat-value {
+    color: #fbbf24;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    #city-detail-panel {
+        width: 100%;
+        max-width: 100%;
+        border-radius: 16px 16px 0 0;
+    }
+
+    .city-panel-body {
+        grid-template-columns: 1fr;
+    }
+}
