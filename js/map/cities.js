@@ -146,7 +146,7 @@ export function openCityPanel(cityData) {
     const panel = document.getElementById('city-detail-panel');
     if (!panel) return;
 
-    // Panel içeriğini güncelle
+    // Temel istatistikler
     document.getElementById('city-name').textContent = cityData.name;
     document.getElementById('city-country').textContent = cityData.country;
     document.getElementById('city-population').textContent = cityData.population.toLocaleString();
@@ -157,6 +157,30 @@ export function openCityPanel(cityData) {
         const iconElement = document.getElementById('city-resource-icon');
         iconElement.innerHTML = `<i class="${cityData.resource.icon}"></i>`;
         document.getElementById('city-resource-name').textContent = cityData.resource.name;
+    }
+
+    // Gelişmiş istatistikler
+    const infrastructure = cityData.infrastructure || 1;
+    const taxEfficiency = cityData.taxEfficiency || 100;
+    const cityValue = cityData.cityValue || 1;
+    const buildingCount = (cityData.buildings || []).length;
+
+    document.getElementById('city-infrastructure').textContent = `${infrastructure}/10`;
+    document.getElementById('city-tax-efficiency').textContent = `${taxEfficiency}%`;
+    document.getElementById('city-value').textContent = `${cityValue}/10`;
+    document.getElementById('city-buildings').textContent = buildingCount;
+
+    // "Daha Fazla Detay" butonu için event listener
+    const detailBtn = document.getElementById('city-detail-btn');
+    if (detailBtn) {
+        // Önceki listener'ı temizle
+        detailBtn.replaceWith(detailBtn.cloneNode(true));
+        const newBtn = document.getElementById('city-detail-btn');
+        newBtn.addEventListener('click', () => {
+            // Şehir sayfasına yönlendir (cityId ile)
+            window.location.hash = `city/${cityData.id}`;
+            closeCityPanel();
+        });
     }
 
     // Panel'i aç

@@ -3,6 +3,7 @@ import { mapConfig } from './config.js';
 import { loadLayers } from './layers.js';
 import { initEditor } from './editor.js';
 import { closeCityPanel } from './cities.js';
+import { createModePanelHTML, initModePanelEvents } from './modes.js';
 
 let mapInstance = null;
 
@@ -43,6 +44,7 @@ export function initMap(containerId) {
                 </button>
             </div>
             <div class="city-panel-body">
+                <!-- Üst Satır: Temel İstatistikler -->
                 <div class="city-stat">
                     <div class="city-stat-icon"><i class="fa-solid fa-users"></i></div>
                     <div class="city-stat-label">Nüfus</div>
@@ -58,8 +60,39 @@ export function initMap(containerId) {
                     <div class="city-stat-label">Kaynak</div>
                     <div class="city-stat-value" id="city-resource-name">-</div>
                 </div>
+                
+                <!-- Alt Satır: Gelişmiş İstatistikler -->
+                <div class="city-stat infra-stat">
+                    <div class="city-stat-icon"><i class="fa-solid fa-road"></i></div>
+                    <div class="city-stat-label">Altyapı</div>
+                    <div class="city-stat-value" id="city-infrastructure">1/10</div>
+                </div>
+                <div class="city-stat tax-stat">
+                    <div class="city-stat-icon"><i class="fa-solid fa-percent"></i></div>
+                    <div class="city-stat-label">Vergi Verimliliği</div>
+                    <div class="city-stat-value" id="city-tax-efficiency">100%</div>
+                </div>
+                <div class="city-stat value-stat">
+                    <div class="city-stat-icon"><i class="fa-solid fa-star"></i></div>
+                    <div class="city-stat-label">Eyalet Değeri</div>
+                    <div class="city-stat-value" id="city-value">1/10</div>
+                </div>
+                <div class="city-stat building-stat">
+                    <div class="city-stat-icon"><i class="fa-solid fa-city"></i></div>
+                    <div class="city-stat-label">Binalar</div>
+                    <div class="city-stat-value" id="city-buildings">0</div>
+                </div>
+            </div>
+            <div class="city-panel-footer">
+                <button class="city-detail-btn" id="city-detail-btn">
+                    <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                    Daha Fazla Detay
+                </button>
             </div>
         </div>
+        
+        <!-- Harita Modları Paneli -->
+        ${createModePanelHTML()}
     `;
 
     // 2. Haritayı Başlat
@@ -132,6 +165,9 @@ export function initMap(containerId) {
             setTimeout(() => {
                 loader.classList.add('map-loader-hidden');
                 setTimeout(() => loader.remove(), 800); // CSS transition süresi kadar bekle
+
+                // Harita Modları paneli event'lerini başlat
+                initModePanelEvents();
             }, 500);
         }
     });

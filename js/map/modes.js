@@ -1,0 +1,193 @@
+// HARİTA MODLARI SİSTEMİ
+// Haritayı farklı perspektiflerden görüntüleme
+
+export const mapModes = {
+    default: {
+        id: 'default',
+        name: 'Varsayılan',
+        icon: 'fa-solid fa-map',
+        description: 'Normal harita görünümü',
+        colorScheme: null // Varsayılan renkler
+    },
+    buildings: {
+        id: 'buildings',
+        name: 'Yapılar',
+        icon: 'fa-solid fa-city',
+        description: 'Şehirlerdeki bina sayısına göre',
+        colorScheme: {
+            low: '#fee2e2',    // Kırmızı açık (0-2 bina)
+            medium: '#fbbf24', // Sarı (3-5 bina)
+            high: '#22c55e'    // Yeşil (6+ bina)
+        },
+        getValue: (cityData) => (cityData.buildings || []).length
+    },
+    alliances: {
+        id: 'alliances',
+        name: 'İttifaklar',
+        icon: 'fa-solid fa-handshake',
+        description: 'Ülkeler arası ittifakları gösterir',
+        colorScheme: {
+            // Her ittifak farklı renk alacak
+            colors: ['#3b82f6', '#22c55e', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899']
+        },
+        getValue: (countryData) => countryData.allianceId || null
+    },
+    wars: {
+        id: 'wars',
+        name: 'Savaşlar',
+        icon: 'fa-solid fa-burst',
+        description: 'Aktif savaş bölgelerini gösterir',
+        colorScheme: {
+            atWar: '#ef4444',     // Kırmızı (savaşta)
+            neutral: '#64748b',   // Gri (nötr)
+            allied: '#22c55e'     // Yeşil (müttefik)
+        },
+        getValue: (countryData) => countryData.atWar || false
+    },
+    statistics: {
+        id: 'statistics',
+        name: 'İstatistik',
+        icon: 'fa-solid fa-chart-bar',
+        description: 'Kapsamlı istatistik görünümü',
+        colorScheme: null,
+        hasPanel: true // Bu mod özel bir panel açar
+    },
+    technology: {
+        id: 'technology',
+        name: 'Teknoloji',
+        icon: 'fa-solid fa-flask',
+        description: 'Teknoloji seviyesine göre',
+        colorScheme: {
+            low: '#fee2e2',
+            medium: '#dbeafe',
+            high: '#c084fc'
+        },
+        getValue: (cityData) => cityData.techIndex || 0
+    },
+    infrastructure: {
+        id: 'infrastructure',
+        name: 'Altyapı',
+        icon: 'fa-solid fa-road',
+        description: 'Altyapı seviyesine göre (1-10)',
+        colorScheme: {
+            gradient: ['#ef4444', '#f59e0b', '#eab308', '#84cc16', '#22c55e']
+        },
+        getValue: (cityData) => cityData.infrastructure || 1
+    },
+    population: {
+        id: 'population',
+        name: 'Nüfus',
+        icon: 'fa-solid fa-users',
+        description: 'Nüfus yoğunluğuna göre',
+        colorScheme: {
+            gradient: ['#dbeafe', '#93c5fd', '#3b82f6', '#1d4ed8', '#1e3a8a']
+        },
+        getValue: (cityData) => cityData.population || 0
+    }
+};
+
+// Aktif mod
+let currentMode = 'default';
+
+// Mod değiştir
+export function setMapMode(modeId) {
+    if (!mapModes[modeId]) {
+        console.warn(`Bilinmeyen harita modu: ${modeId}`);
+        return;
+    }
+
+    currentMode = modeId;
+    updateModePanel();
+    applyModeVisualization();
+
+    console.log(`Harita modu değiştirildi: ${modeId}`);
+}
+
+// Aktif modu al
+export function getCurrentMode() {
+    return currentMode;
+}
+
+// Mod panelini güncelle
+function updateModePanel() {
+    const buttons = document.querySelectorAll('.mode-btn');
+    buttons.forEach(btn => {
+        const modeId = btn.dataset.mode;
+        if (modeId === currentMode) {
+            btn.classList.add('active');
+        } else {
+            btn.classList.remove('active');
+        }
+    });
+
+    // Mod bilgi alanını güncelle
+    const infoEl = document.getElementById('mode-info');
+    if (infoEl) {
+        const mode = mapModes[currentMode];
+        infoEl.innerHTML = `
+            <i class="${mode.icon}"></i>
+            <span>${mode.name}</span>
+            <small>${mode.description}</small>
+        `;
+    }
+}
+
+// Mod görselleştirmesini uygula
+function applyModeVisualization() {
+    // Bu fonksiyon layers.js veya styles.js ile entegre edilecek
+    // Şimdilik event dispatch edelim
+    window.dispatchEvent(new CustomEvent('mapModeChanged', {
+        detail: { mode: currentMode, config: mapModes[currentMode] }
+    }));
+}
+
+// Mod paneli HTML'ini oluştur
+export function createModePanelHTML() {
+    const modeButtons = Object.values(mapModes).map(mode => `
+        <button class="mode-btn ${mode.id === currentMode ? 'active' : ''}" 
+                data-mode="${mode.id}" 
+                title="${mode.description}">
+            <i class="${mode.icon}"></i>
+            <span>${mode.name}</span>
+        </button>
+    `).join('');
+
+    return `
+        <div id="map-modes-panel" class="map-modes-panel collapsed">
+            <div class="modes-pull-tab" id="modes-pull-tab" title="Harita Modları">
+                <i class="fa-solid fa-chevron-left"></i>
+            </div>
+            <div class="modes-content">
+                <div class="mode-buttons">
+                    ${modeButtons}
+                </div>
+                <div id="mode-info" class="mode-info">
+                    <i class="fa-solid fa-map"></i>
+                    <span>Varsayılan</span>
+                    <small>Normal harita görünümü</small>
+                </div>
+            </div>
+        </div>
+    `;
+}
+
+// Panel event listener'larını kur
+export function initModePanelEvents() {
+    // Mod butonları
+    document.querySelectorAll('.mode-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const modeId = btn.dataset.mode;
+            setMapMode(modeId);
+        });
+    });
+
+    // Pull-tab (çekme kulpu)
+    const pullTab = document.getElementById('modes-pull-tab');
+    const panel = document.getElementById('map-modes-panel');
+
+    if (pullTab && panel) {
+        pullTab.addEventListener('click', () => {
+            panel.classList.toggle('collapsed');
+        });
+    }
+}
