@@ -44,12 +44,12 @@ export function initMap(containerId) {
             </div>
             <div class="city-panel-body">
                 <div class="city-stat">
-                    <div class="city-stat-icon">👥</div>
+                    <div class="city-stat-icon"><i class="fa-solid fa-users"></i></div>
                     <div class="city-stat-label">Nüfus</div>
                     <div class="city-stat-value" id="city-population">0</div>
                 </div>
                 <div class="city-stat">
-                    <div class="city-stat-icon">💰</div>
+                    <div class="city-stat-icon"><i class="fa-solid fa-coins"></i></div>
                     <div class="city-stat-label">Ekonomi</div>
                     <div class="city-stat-value" id="city-economy">0</div>
                 </div>
