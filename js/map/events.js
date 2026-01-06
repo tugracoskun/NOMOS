@@ -1,6 +1,6 @@
 // HARİTA ETKİLEŞİMLERİ (EVENTS)
 import { getProvinceStyle, getBaseCountryStyle } from './styles.js';
-import { isEditorActive, openEditor, getSavedData } from './editor.js';
+import { isEditorActive, openEditor, getSavedData, toggleRegionSelection } from './editor.js';
 import { getCityDataByRegion, openCityPanel } from './cities.js';
 
 // 1. DETAYLI EYALETLER İÇİN ETKİLEŞİM
@@ -29,7 +29,24 @@ export function onProvinceInteraction(feature, layer, mapInstance) {
             L.DomEvent.stopPropagation(e);
 
             if (isEditorActive()) {
-                openEditor(feature, layer);
+                // Ctrl tuşu ile çoklu seçim
+                if (e.originalEvent.ctrlKey) {
+                    const isSelected = toggleRegionSelection(feature);
+                    // Seçili bölgeleri görsel olarak vurgula
+                    if (isSelected) {
+                        layer.setStyle({
+                            fillColor: '#3b82f6',
+                            fillOpacity: 0.5,
+                            weight: 2,
+                            color: '#60a5fa'
+                        });
+                    } else {
+                        layer.setStyle(getProvinceStyle(feature));
+                    }
+                } else {
+                    // Normal tekli düzenleme
+                    openEditor(feature, layer);
+                }
             } else {
                 // Bölgeye tıklayınca şehir detaylarını aç
                 const cityData = getCityDataByRegion(regionId);

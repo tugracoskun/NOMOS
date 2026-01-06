@@ -1,7 +1,8 @@
 // ŞEHİR SİSTEMİ MODÜLÜ
 // Her ülkenin 5 şehrini Voronoi bölgelerinin merkezine yerleştirir
 
-import { assignResourceToRegion } from './resources.js';
+import { assignResourceToRegion, resourcesList } from './resources.js';
+import { getSavedData } from './editor.js';
 
 let currentOpenCity = null;
 let cityDataByRegion = {}; // Bölge ID'sine göre şehir verisi
@@ -71,40 +72,55 @@ const defaultCityNames = ["City A", "City B", "City C", "City D", "City E"];
 export function createCityMarkers(regions, mapInstance) {
     console.log(`DEBUG: createCityMarkers fonksiyonuna ${regions.length} bölge geldi`);
 
-    // Önceki verileri temizle
-    cityDataByRegion = {};
+    // Harita verilerini (localStorage) kontrol et
+    const savedMapData = window.savedMapData || {}; // Global veya import ile alacağız. 
+    // Not: editor.js'den import etmek en doğrusu, aşağıda import ekleyeceğiz.
+
+    // Ülke bazlı sayaçlar
+    const countryCityCounters = {};
 
     // Her bölge için bir şehir verisi oluştur
     regions.forEach((region, index) => {
         const countryName = region.properties.ADMIN || region.properties.NAME || "";
         const regionId = region.properties.regionId || `region_${index}`;
 
-        // Benzersiz şehir ID'si oluştur (editör ile düzeltilebilir)
-        const cityId = `CITY_${String(index).padStart(4, '0')}`;
-        const cityName = cityId; // Şimdilik ID'yi isim olarak kullan
+        // Ülke sayacını başlat
+        if (!countryCityCounters[countryName]) countryCityCounters[countryName] = 0;
 
-        // DEBUG: İlk 10 şehri logla
-        if (index < 10) {
-            console.log(`DEBUG: index=${index}, cityId=${cityId}, country=${countryName}, regionId=${regionId}`);
+        // İsim listesinden isim seç
+        let assignedName;
+        const nameList = cityNamesByCountry[countryName] || defaultCityNames;
+
+        if (countryCityCounters[countryName] < nameList.length) {
+            assignedName = nameList[countryCityCounters[countryName]];
+        } else {
+            // Liste bittiyse türet
+            assignedName = `${countryName} City ${countryCityCounters[countryName] + 1}`;
         }
+        countryCityCounters[countryName]++;
 
-        // Bölgeye özel kaynak ata - GLOBAL INDEX KULLAN!
+        // Benzersiz şehir ID'si oluştur (SABİT KALMALI)
+        const cityId = `CITY_${String(index).padStart(4, '0')}`;
+
+        // Bölgeye özel kaynak ata
         const resource = assignResourceToRegion(countryName, index);
 
         // Şehir verisi
         const cityData = {
-            id: cityId, // Benzersiz ID
-            name: cityName, // Şimdilik ID, editör ile değiştirilebilir
+            id: cityId,
+            name: assignedName, // Artık gerçek isim
+            originalName: assignedName,
             country: countryName,
             regionId: regionId,
             population: Math.floor(Math.random() * 5000000) + 100000,
             economy: Math.floor(Math.random() * 100) + 1,
-            resource: resource // Bölgeye özel kaynak
+            resource: resource
         };
 
         // Benzersiz cityId ile sakla
         cityDataByRegion[cityId] = cityData;
     });
+
 
     // DEBUG: Kaç farklı kaynak kullanıldığını kontrol et
     const uniqueResources = new Set();
@@ -171,8 +187,32 @@ export function getCityDataByRegion(lookupKey) {
         data = Object.values(cityDataByRegion).find(city => city.regionId === lookupKey);
     }
 
-    if (!data) {
-        console.warn(`getCityDataByRegion: ${lookupKey} bulunamadı!`);
+    if (data) {
+        // --- LIVE DATA MERGE ---
+        try {
+            const savedRaw = localStorage.getItem('nomos_map_data');
+            if (savedRaw) {
+                const savedJson = JSON.parse(savedRaw);
+                // Region ID (saved key) ile eşleşen veri var mı?
+                const savedItem = savedJson[data.regionId];
+
+                if (savedItem) {
+                    // İsim değişmiş mi?
+                    if (savedItem.name) data.name = savedItem.name;
+
+                    // Kaynak değişmiş mi?
+                    if (savedItem.resource) {
+                        // savedItem.resource STRING (örn: "Demir")
+                        // Bunu objeye çevir
+                        const foundRes = resourcesList.find(r => r.name === savedItem.resource);
+                        if (foundRes) {
+                            data.resource = foundRes;
+                        }
+                    }
+                }
+            }
+        } catch (e) { console.warn("City merge error:", e); }
     }
+
     return data || null;
 }

@@ -30,11 +30,17 @@ export function generateVoronoiRegions(countryFeature, numPoints = 5, startIndex
             }
         }
 
-        // 1. Rastgele Nokta Üretimi
-        // Artık daraltılmış alana (Ana Kara) ateş ediyoruz, isabet oranı artıyor.
-        // Yine de garanti olsun diye 20 katı nokta üretip filtriyoruz.
-        const options = { bbox: searchBbox };
-        const randomPoints = turf.randomPoint(numPoints * 20, options);
+        // --- DETERMINISTIC RANDOM (SEED BAĞIMLI) ---
+        // Harita her yüklendiğinde aynı sınırların oluşması için seed kullanıyoruz.
+        // Seed olarak ülke ismini kullanacağız.
+        const seedString = countryFeature.properties.ADMIN || countryFeature.properties.NAME || "Country";
+        const seed = stringToSeed(seedString);
+
+        // 1. Seed'li Rastgele Nokta Üretimi
+        // turf.randomPoint yerine kendi fonksiyonumuzu kullanıyoruz.
+        // Artık daraltılmış alana (Ana Kara) ateş ediyoruz.
+        // Garanti olsun diye 30 katı nokta üretip filtriyoruz.
+        const randomPoints = generateSeededPoints(numPoints * 30, searchBbox, seed);
 
         // 2. Sadece KARA üzerindeki noktaları seç (Orijinal ülke sınırlarına göre)
         const pointsInside = {
@@ -74,8 +80,11 @@ export function generateVoronoiRegions(countryFeature, numPoints = 5, startIndex
                     clipped.properties = {
                         ...countryFeature.properties,
                         regionName: `Bölge ${index + 1}`,
-                        regionId: `REGION_${String(startIndex + index).padStart(4, '0')}`
+                        regionId: `REGION_${String(startIndex + index).padStart(4, '0')}` // Unique ID
                     };
+                    // ÖNEMLİ: Editor ve veri sistemi için feature.id ataması
+                    clipped.id = clipped.properties.regionId;
+
                     clippedRegions.push(clipped);
                 }
             } catch (e) { }
@@ -98,4 +107,43 @@ function booleanPointInPolygon(point, polygon) {
     } catch (e) {
         return false;
     }
+}
+
+// --- SEEDED RANDOM YARDIMCILARI ---
+
+function stringToSeed(str) {
+    let h = 2166136261 >>> 0;
+    for (let i = 0; i < str.length; i++) {
+        h = Math.imul(h ^ str.charCodeAt(i), 16777619);
+    }
+    return h >>> 0;
+}
+
+function mulberry32(a) {
+    return function () {
+        var t = a += 0x6D2B79F5;
+        t = Math.imul(t ^ t >>> 15, t | 1);
+        t ^= t + Math.imul(t ^ t >>> 7, t | 61);
+        return ((t ^ t >>> 14) >>> 0) / 4294967296;
+    }
+}
+
+function generateSeededPoints(count, bbox, seed) {
+    const points = [];
+    const minX = bbox[0];
+    const minY = bbox[1];
+    const maxX = bbox[2];
+    const maxY = bbox[3];
+
+    const random = mulberry32(seed);
+
+    // Isınma turları (rastgeleliği dağıtmak için)
+    random(); random(); random();
+
+    for (let i = 0; i < count; i++) {
+        const x = minX + (maxX - minX) * random();
+        const y = minY + (maxY - minY) * random();
+        points.push(turf.point([x, y]));
+    }
+    return { type: "FeatureCollection", features: points };
 }

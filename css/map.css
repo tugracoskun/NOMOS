@@ -38,7 +38,7 @@
     width: 100%;
     height: 100%;
     background-color: #050a14;
-    z-index: 9999;
+    z-index: 999999;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -266,26 +266,30 @@
 /* Şehir İsmi Label */
 .city-name-label {
     position: absolute;
-    top: 12px;
+    top: 50%;
     left: 50%;
-    transform: translateX(-50%);
+    transform: translate(-50%, -50%);
+    /* Tam merkeze hizala */
     font-family: 'Inter', sans-serif;
-    font-size: 9px;
-    font-weight: 600;
+    font-size: 10px;
+    /* Biraz büyüttüm */
+    font-weight: 700;
     color: #fbbf24;
     text-align: center;
     white-space: nowrap;
     text-shadow:
-        1px 1px 2px rgba(0, 0, 0, 0.95),
-        -1px -1px 1px rgba(0, 0, 0, 0.8),
+        1px 1px 2px rgba(0, 0, 0, 1),
+        -1px -1px 1px rgba(0, 0, 0, 1),
         0 0 4px rgba(0, 0, 0, 0.8);
     pointer-events: none;
     transition: opacity 0.3s ease;
+    opacity: 0.8;
+    /* Hafif transparan */
 }
 
-.city-marker:hover .city-name-label {
-    color: #f59e0b;
-}
+/* Şehir üzerine gelince (Polygon hover) label parlasın */
+/* Bunu yapmak için JS tarafında class eklemek gerekebilir veya CSS sibling selector zordur. */
+/* Şimdilik sabit kalsın. */
 
 
 /* --- ŞEHİR DETAY PANELİ --- */
