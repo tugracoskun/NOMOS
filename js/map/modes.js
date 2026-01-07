@@ -143,29 +143,44 @@ function applyModeVisualization() {
 
 // Mod paneli HTML'ini oluştur
 export function createModePanelHTML() {
+    // Açık panel için sadece yazılı butonlar (ikonlar zaten sağda var)
     const modeButtons = Object.values(mapModes).map(mode => `
         <button class="mode-btn ${mode.id === currentMode ? 'active' : ''}" 
                 data-mode="${mode.id}" 
                 title="${mode.description}">
+            ${mode.name}
+        </button>
+    `).join('');
+
+    // Icon strip için sadece ikonlar
+    const iconStripButtons = Object.values(mapModes).map(mode => `
+        <button class="icon-strip-btn ${mode.id === currentMode ? 'active' : ''}" 
+                data-mode="${mode.id}" 
+                title="${mode.name}">
             <i class="${mode.icon}"></i>
-            <span>${mode.name}</span>
         </button>
     `).join('');
 
     return `
         <div id="map-modes-panel" class="map-modes-panel collapsed">
+            <!-- Pull-tab (sol kenarda toggle) -->
             <div class="modes-pull-tab" id="modes-pull-tab" title="Harita Modları">
                 <i class="fa-solid fa-chevron-left"></i>
             </div>
+            
+            <!-- İçerik (sol taraf, açıkken görünür) -->
             <div class="modes-content">
+                <div class="modes-header-inline">
+                    <span>Harita Modları</span>
+                </div>
                 <div class="mode-buttons">
                     ${modeButtons}
                 </div>
-                <div id="mode-info" class="mode-info">
-                    <i class="fa-solid fa-map"></i>
-                    <span>Varsayılan</span>
-                    <small>Normal harita görünümü</small>
-                </div>
+            </div>
+            
+            <!-- İkon şeridi (sağ taraf, her zaman görünür) -->
+            <div class="modes-icon-strip">
+                ${iconStripButtons}
             </div>
         </div>
     `;
@@ -173,21 +188,26 @@ export function createModePanelHTML() {
 
 // Panel event listener'larını kur
 export function initModePanelEvents() {
-    // Mod butonları
-    document.querySelectorAll('.mode-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-            const modeId = btn.dataset.mode;
-            setMapMode(modeId);
-        });
-    });
-
-    // Pull-tab (çekme kulpu)
-    const pullTab = document.getElementById('modes-pull-tab');
     const panel = document.getElementById('map-modes-panel');
+    const pullTab = document.getElementById('modes-pull-tab');
 
+    // Pull-tab toggle
     if (pullTab && panel) {
         pullTab.addEventListener('click', () => {
             panel.classList.toggle('collapsed');
         });
     }
+
+    // Mod butonları (hem ana panel hem icon strip)
+    document.querySelectorAll('.mode-btn, .icon-strip-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const modeId = btn.dataset.mode;
+            setMapMode(modeId);
+
+            // Her iki gruptaki butonları da güncelle
+            document.querySelectorAll('.mode-btn, .icon-strip-btn').forEach(b => {
+                b.classList.toggle('active', b.dataset.mode === modeId);
+            });
+        });
+    });
 }

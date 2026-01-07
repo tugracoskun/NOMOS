@@ -18,6 +18,7 @@ export function initMap(containerId) {
 
     // 1. Şık Loader'ı ve City Panel'i HTML'e Bas
     container.innerHTML = `
+        <link rel="stylesheet" href="css/mode-slider.css">
         <div id="actual-map-div" style="width:100%; height:100%;"></div>
         
         <div id="map-loader" class="map-loader-overlay">

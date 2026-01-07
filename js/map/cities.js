@@ -1,8 +1,8 @@
-// ŞEHİR SİSTEMİ MODÜLÜ
-// Her ülkenin 5 şehrini Voronoi bölgelerinin merkezine yerleştirir
+// ŞEHİR MODÜLÜ - Marker ve Panel Yönetimi
 
 import { assignResourceToRegion, resourcesList } from './resources.js';
 import { getSavedData } from './editor.js';
+// City page modülünden setCityData'yı dinamik import ile çekeceğiz (circular dependency önleme)
 
 let currentOpenCity = null;
 let cityDataByRegion = {}; // Bölge ID'sine göre şehir verisi
@@ -82,7 +82,7 @@ export function createCityMarkers(regions, mapInstance) {
     // Her bölge için bir şehir verisi oluştur
     regions.forEach((region, index) => {
         const countryName = region.properties.ADMIN || region.properties.NAME || "";
-        const regionId = region.properties.regionId || `region_${index}`;
+        const regionId = region.properties.regionId || `region_${index} `;
 
         // Ülke sayacını başlat
         if (!countryCityCounters[countryName]) countryCityCounters[countryName] = 0;
@@ -95,12 +95,12 @@ export function createCityMarkers(regions, mapInstance) {
             assignedName = nameList[countryCityCounters[countryName]];
         } else {
             // Liste bittiyse türet
-            assignedName = `${countryName} City ${countryCityCounters[countryName] + 1}`;
+            assignedName = `${countryName} City ${countryCityCounters[countryName] + 1} `;
         }
         countryCityCounters[countryName]++;
 
         // Benzersiz şehir ID'si oluştur (SABİT KALMALI)
-        const cityId = `CITY_${String(index).padStart(4, '0')}`;
+        const cityId = `CITY_${String(index).padStart(4, '0')} `;
 
         // Bölgeye özel kaynak ata
         const resource = assignResourceToRegion(countryName, index);
@@ -131,7 +131,7 @@ export function createCityMarkers(regions, mapInstance) {
     });
 
     console.log(`Cities: ${Object.keys(cityDataByRegion).length} şehir verisi oluşturuldu.`);
-    console.log(`Unique Resources: ${uniqueResources.size} farklı kaynak kullanıldı:`, Array.from(uniqueResources));
+    console.log(`Unique Resources: ${uniqueResources.size} farklı kaynak kullanıldı: `, Array.from(uniqueResources));
 }
 
 // Zoom seviyesine göre görünürlük (artık kullanılmıyor ama uyumluluk için)
@@ -177,6 +177,12 @@ export function openCityPanel(cityData) {
         detailBtn.replaceWith(detailBtn.cloneNode(true));
         const newBtn = document.getElementById('city-detail-btn');
         newBtn.addEventListener('click', () => {
+            // Şehir verisini localStorage'a kaydet (sayfa geçişi için)
+            try {
+                localStorage.setItem('nomos_current_city', JSON.stringify(cityData));
+            } catch (e) {
+                console.warn('City save error:', e);
+            }
             // Şehir sayfasına yönlendir (cityId ile)
             window.location.hash = `city/${cityData.id}`;
             closeCityPanel();

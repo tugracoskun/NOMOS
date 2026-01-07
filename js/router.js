@@ -5,6 +5,7 @@ import { initMap, destroyMap } from './map/main.js';
 import { renderHome } from './home.js';
 import { renderPartiesPage } from './parties/main.js';
 import { renderParliamentPage } from './parliament/main.js';
+import { renderCityPage } from './city/main.js';
 
 const appContainer = document.getElementById('app-container');
 
@@ -13,10 +14,10 @@ const appContainer = document.getElementById('app-container');
 // ========================================================
 export function loadPage(pageName, subView = null, id = null) {
     // Harita temizliği (Bellek sızıntısını önlemek için)
-    if (pageName !== 'map') { 
-        destroyMap(); 
+    if (pageName !== 'map') {
+        destroyMap();
     }
-    
+
     // Menüdeki aktif ışığını güncelle
     updateActiveMenu(pageName);
 
@@ -27,20 +28,25 @@ export function loadPage(pageName, subView = null, id = null) {
             // Ana Sayfa ve Chat modülü
             renderHome(appContainer);
             break;
-            
+
         case 'map':
             // Harita Modülü
             renderMap();
             break;
-            
+
         case 'parties':
             // Partiler Modülü (Liste, Oluşturma veya Detay)
             renderPartiesPage(appContainer, subView, id);
             break;
-            
+
         case 'parliament':
             // Meclis Modülü
             renderParliamentPage(appContainer);
+            break;
+
+        case 'city':
+            // Şehir Detay Sayfası (subView = cityId)
+            renderCityPage(appContainer, subView);
             break;
 
         // Henüz yapılmamış sayfalar için Placeholder çağır
@@ -51,7 +57,7 @@ export function loadPage(pageName, subView = null, id = null) {
         case 'social':
             renderPlaceholder(pageName);
             break;
-            
+
         // Bilinmeyen bir sayfa gelirse Ana Sayfaya atma, Placeholder göster
         default:
             renderPlaceholder(pageName);
@@ -73,7 +79,7 @@ export function navigateTo(pageName, subView = null, id = null) {
 
     // URL'i güncelle ve geçmişe kaydet
     history.pushState({ page: pageName, view: subView, id: id }, null, `#${hash}`);
-    
+
     // Sayfayı yükle
     loadPage(pageName, subView, id);
 }
@@ -88,7 +94,7 @@ window.addEventListener('popstate', (event) => {
 // Sayfa ilk açıldığında veya F5 atıldığında URL'i analiz et
 export function handleInitialLoad() {
     const hash = window.location.hash.substring(1); // # işaretini at
-    
+
     // Hash yoksa ana sayfaya git
     if (!hash) {
         navigateTo('home');
@@ -120,10 +126,10 @@ function updateActiveMenu(pageName) {
 }
 
 // Harita için kapsayıcı oluşturup başlatma
-function renderMap() { 
-    appContainer.innerHTML = `<div id="game-map"></div>`; 
+function renderMap() {
+    appContainer.innerHTML = `<div id="game-map"></div>`;
     // DOM oluştuktan hemen sonra haritayı çiz
-    setTimeout(() => initMap('game-map'), 50); 
+    setTimeout(() => initMap('game-map'), 50);
 }
 
 // Henüz yapılmamış sayfalar için "Yapım Aşamasında" ekranı
@@ -136,7 +142,7 @@ function renderPlaceholder(title) {
         messages: 'Gelen Kutusu',
         social: 'Sosyal Medya Akışı'
     };
-    
+
     const displayTitle = titles[title] || title.toUpperCase();
 
     appContainer.innerHTML = `
