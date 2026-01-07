@@ -2,115 +2,139 @@
 // Altyapı, Vergi Verimliliği, Eyalet Değeri hesaplamaları
 
 // Bina Tipleri ve Etkileri
+// role: 'citizen' (Vatandaş inşa edebilir), 'president' (Yalnızca Başkan inşa edebilir)
 export const buildingTypes = {
     // Ekonomik/Yönetim Binaları
     municipality: {
         name: "Belediye Binası",
         icon: "fa-solid fa-building-flag",
         effects: { maintenanceCost: -0.15 },
-        cost: 5000,
-        description: "İl bakım ücreti %15 düşer"
+        cost: 40000,
+        description: "İl bakım ücreti %15 düşer",
+        role: 'president'
     },
     courthouse: {
         name: "Mahkeme Binası",
         icon: "fa-solid fa-scale-balanced",
         effects: { maintenanceCost: -0.10 },
-        cost: 4000,
-        description: "İl bakım ücreti %10 düşer"
+        cost: 35000,
+        description: "İl bakım ücreti %10 düşer",
+        role: 'president'
     },
     taxOffice: {
         name: "Vergi Dairesi",
         icon: "fa-solid fa-landmark",
         effects: { taxEfficiency: +0.10 },
-        cost: 6000,
-        description: "Vergi verimliliği %10 artar"
+        cost: 30000,
+        description: "Vergi verimliliği %10 artar",
+        role: 'president'
     },
     taxCollection: {
         name: "Vergi Toplama Dairesi",
         icon: "fa-solid fa-money-check-dollar",
         effects: { taxEfficiency: +0.05 },
         cost: 3500,
-        description: "Vergi verimliliği %5 artar"
+        description: "Vergi verimliliği %5 artar",
+        role: 'president'
     },
 
     // Üretim/Ticaret Binaları
     port: {
         name: "Liman",
-        icon: "fa-solid fa-anchor",
+        icon: "fa-solid fa-ship",
         effects: { tradeIncome: +0.20 },
-        cost: 8000,
+        cost: 75000,
         requiresCoast: true,
-        description: "Ticaret geliri %20 artar (Deniz kıyısı gerektirir)"
+        description: "Ticaret geliri %20 artar (Kıyı şeridi gerektirir)",
+        role: 'president'
+    },
+    airport: {
+        name: "Havalimanı",
+        icon: "fa-solid fa-plane",
+        effects: { tradeIncome: +0.30, tourismBonus: +0.15 },
+        cost: 150000,
+        description: "Uluslararası ticaret ve turizm geliri sağlar",
+        role: 'president'
     },
     manufactory: {
         name: "Manufactory",
         icon: "fa-solid fa-gears",
         effects: { productionBonus: +0.15 },
-        cost: 7000,
-        description: "Üretim bonusu %15 artar"
+        cost: 25000,
+        description: "Üretim bonusu %15 artar",
+        role: 'citizen'
     },
     warehouse: {
         name: "Ambar",
         icon: "fa-solid fa-warehouse",
         effects: { storageCapacity: +100 },
-        cost: 3000,
-        description: "Depolama kapasitesi +100"
+        cost: 15000,
+        description: "Depolama kapasitesi +100",
+        role: 'citizen'
     },
     farm: {
         name: "Çiftlik",
         icon: "fa-solid fa-tractor",
         effects: { foodProduction: +0.20 },
         cost: 2500,
-        description: "Gıda üretimi %20 artar"
+        description: "Gıda üretimi %20 artar",
+        role: 'citizen'
     },
     foodWorkshop: {
         name: "Gıda Atölyesi",
         icon: "fa-solid fa-utensils",
         effects: { foodProduction: +0.10, productionBonus: +0.05 },
         cost: 4000,
-        description: "Gıda üretimi %10, üretim bonusu %5 artar"
+        description: "Gıda üretimi %10, üretim bonusu %5 artar",
+        role: 'citizen'
     },
     workshop: {
         name: "Atölye",
         icon: "fa-solid fa-hammer",
         effects: { productionBonus: +0.10 },
         cost: 3500,
-        description: "Üretim bonusu %10 artar"
+        description: "Üretim bonusu %10 artar",
+        role: 'citizen'
     },
     tradeCenter: {
         name: "Ticaret Merkezi",
         icon: "fa-solid fa-store",
         effects: { tradeIncome: +0.15 },
-        cost: 6500,
-        description: "Ticaret geliri %15 artar"
+        cost: 60000,
+        description: "Ticaret geliri %15 artar",
+        role: 'citizen'
     },
     bank: {
         name: "Banka",
         icon: "fa-solid fa-building-columns",
         effects: { taxEfficiency: +0.08, tradeIncome: +0.05 },
-        cost: 10000,
-        description: "Vergi verimliliği %8, ticaret geliri %5 artar"
+        cost: 50000,
+        description: "Vergi verimliliği %8, ticaret geliri %5 artar",
+        role: 'citizen'
     },
     factory: {
         name: "Fabrika",
         icon: "fa-solid fa-industry",
         effects: { productionBonus: +0.25 },
-        cost: 12000,
-        description: "Üretim bonusu %25 artar"
+        cost: 85000,
+        description: "Üretim bonusu %25 artar",
+        role: 'citizen'
     },
     buildersGuild: {
         name: "İnşaatçılar Birliği",
         icon: "fa-solid fa-helmet-safety",
         effects: { constructionCost: -0.10 },
         cost: 5500,
-        description: "İnşaat maliyeti %10 düşer"
+        description: "İnşaat maliyeti %10 düşer",
+        role: 'citizen'
     },
     railway: {
         name: "Demiryolu",
         icon: "fa-solid fa-train",
         effects: { tradeIncome: +0.10, maintenanceCost: -0.05 },
         cost: 15000,
-        description: "Ticaret geliri %10 artar, bakım %5 düşer"
+        description: "Ticaret geliri %10 artar, bakım %5 düşer",
+        role: 'president'
     },
 
     // Eğitim/Teknoloji Binaları
@@ -118,29 +142,33 @@ export const buildingTypes = {
         name: "Kütüphane",
         icon: "fa-solid fa-book",
         effects: { techIndex: +0.05 },
-        cost: 2000,
-        description: "Teknoloji indeksi %5 artar"
+        cost: 10000,
+        description: "Teknoloji indeksi %5 artar",
+        role: 'citizen'
     },
     school: {
         name: "Okul",
         icon: "fa-solid fa-school",
         effects: { techIndex: +0.10 },
-        cost: 4000,
-        description: "Teknoloji indeksi %10 artar"
+        cost: 20000,
+        description: "Teknoloji indeksi %10 artar",
+        role: 'citizen'
     },
     university: {
         name: "Üniversite",
         icon: "fa-solid fa-graduation-cap",
         effects: { techIndex: +0.20, scientistChance: +0.05 },
-        cost: 15000,
-        description: "Teknoloji indeksi %20 artar, bilim adamı şansı %5"
+        cost: 100000,
+        description: "Teknoloji indeksi %20 artar, bilim adamı şansı %5",
+        role: 'president'
     },
     academy: {
         name: "Akademi",
         icon: "fa-solid fa-atom",
         effects: { techIndex: +0.30, scientistChance: +0.10 },
         cost: 25000,
-        description: "Teknoloji indeksi %30 artar, bilim adamı şansı %10"
+        description: "Teknoloji indeksi %30 artar, bilim adamı şansı %10",
+        role: 'president'
     }
 };
 
@@ -171,9 +199,10 @@ export function calculateCityValue(cityData) {
     const buildingScore = Math.min(buildingCount / 10, 1); // Max 10 bina = 1
     const taxEffScore = Math.min((cityData.taxEfficiency || 1) / 1.5, 1); // 1-1.5 arası normalize
     const popScore = Math.min((cityData.population || 0) / 5000000, 1); // 5M = max
+    const popDensity = popScore * 0.15;
     const prodScore = Math.min((cityData.economy || 0) / 100, 1); // 100 = max
 
-    const rawValue = (infraScore * 0.3) + (buildingScore * 0.2) + (taxEffScore * 0.2) + (popScore * 0.15) + (prodScore * 0.15);
+    const rawValue = (infraScore * 0.3) + (buildingScore * 0.2) + (taxEffScore * 0.2) + (popDensity) + (prodScore * 0.15);
 
     // 1-10 arası normalize et
     return Math.max(1, Math.ceil(rawValue * 10));

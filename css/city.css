@@ -520,3 +520,101 @@
     margin-bottom: 12px;
     opacity: 0.3;
 }
+
+/* Locked Buildings & Roles */
+.available-building.locked {
+    opacity: 0.6;
+    filter: grayscale(0.5);
+    cursor: not-allowed;
+}
+
+.lock-badge {
+    position: absolute;
+    top: -4px;
+    right: -4px;
+    width: 18px;
+    height: 18px;
+    background: #ef4444;
+    border-radius: 50%;
+    font-size: 0.6rem;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid #0f172a;
+}
+
+.name-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.role-tag {
+    font-size: 0.6rem;
+    padding: 2px 6px;
+    background: rgba(168, 85, 247, 0.2);
+    border: 1px solid rgba(168, 85, 247, 0.4);
+    color: #c084fc;
+    border-radius: 4px;
+    text-transform: uppercase;
+    font-weight: 700;
+}
+
+.build-btn:disabled {
+    background: #475569;
+    cursor: not-allowed;
+    transform: none !important;
+}
+
+/* Global Utilities */
+.text-gold {
+    color: #fbbf24 !important;
+}
+
+/* Game Notifications */
+.game-notification {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 24px;
+    background: rgba(15, 23, 42, 0.95);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+    z-index: 9999;
+    color: white;
+    font-weight: 600;
+    pointer-events: none;
+    animation: notifEntry 0.4s cubic-bezier(0.18, 0.89, 0.32, 1.28) forwards;
+}
+
+.game-notification.success {
+    border-left: 4px solid #22c55e;
+}
+
+.game-notification.error {
+    border-left: 4px solid #ef4444;
+}
+
+.game-notification.fade-out {
+    opacity: 0;
+    transform: translate(-50%, -20px);
+    transition: all 0.4s;
+}
+
+@keyframes notifEntry {
+    from {
+        opacity: 0;
+        transform: translate(-50%, -20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translate(-50%, 0);
+    }
+}

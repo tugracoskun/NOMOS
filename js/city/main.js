@@ -1,33 +1,39 @@
-// ŞEHİR SAYFASI MODÜLÜ
-import { buildingTypes, infrastructureLevels, calculateCityValue, calculateTaxEfficiency, generateCityStats } from '../data/city-stats.js';
+import { buildingTypes, infrastructureLevels, calculateCityValue, calculateTaxEfficiency, generateCityStats, getInfrastructureUpgradeCost } from '../data/city-stats.js';
+import { addBuildingToCity, upgradeCityInfrastructure, loadState } from '../data/state.js';
 
 // Bina kategorileri
 const buildingCategories = {
     economic: ['municipality', 'courthouse', 'taxOffice', 'taxCollection'],
-    production: ['port', 'manufactory', 'warehouse', 'farm', 'foodWorkshop', 'workshop', 'tradeCenter', 'bank', 'factory', 'buildersGuild', 'railway'],
+    production: ['port', 'airport', 'manufactory', 'warehouse', 'farm', 'foodWorkshop', 'workshop', 'tradeCenter', 'bank', 'factory', 'buildersGuild', 'railway'],
     education: ['library', 'school', 'university', 'academy']
 };
 
-let currentCityData = null;
+let currentCityId = null;
 
 // Kategori için bina kartları oluştur
 function generateBuildingCards(category, existingBuildings) {
     const buildingIds = buildingCategories[category] || [];
+    const state = loadState();
 
     return buildingIds.map(id => {
         const b = buildingTypes[id];
         if (!b) return '';
 
         const isBuilt = existingBuildings.includes(id);
+        const hasPermission = b.role === 'citizen' || state.role === 'president';
 
         return `
-            <div class="available-building ${isBuilt ? 'already-built' : ''}" data-building="${id}">
+            <div class="available-building ${isBuilt ? 'already-built' : ''} ${!hasPermission ? 'locked' : ''}" data-building="${id}">
                 <div class="building-icon-wrap">
                     <i class="${b.icon}"></i>
                     ${isBuilt ? '<span class="built-badge"><i class="fa-solid fa-check"></i></span>' : ''}
+                    ${!hasPermission ? '<span class="lock-badge"><i class="fa-solid fa-lock"></i></span>' : ''}
                 </div>
                 <div class="building-details">
-                    <span class="building-name">${b.name}</span>
+                    <div class="name-row">
+                        <span class="building-name">${b.name}</span>
+                        ${b.role === 'president' ? '<span class="role-tag">Başkan</span>' : ''}
+                    </div>
                     <span class="building-desc">${b.description}</span>
                     <div class="building-cost">
                         <i class="fa-solid fa-coins"></i>
@@ -35,8 +41,11 @@ function generateBuildingCards(category, existingBuildings) {
                     </div>
                 </div>
                 ${!isBuilt ? `
-                    <button class="build-btn" data-building="${id}">
-                        <i class="fa-solid fa-hammer"></i>
+                    <button class="build-btn" 
+                            data-building="${id}" 
+                            data-cost="${b.cost}" 
+                            ${!hasPermission ? 'disabled' : ''}>
+                        <i class="fa-solid ${!hasPermission ? 'fa-lock' : 'fa-hammer'}"></i>
                     </button>
                 ` : `
                     <span class="built-label"><i class="fa-solid fa-check"></i></span>
@@ -74,7 +83,6 @@ function generateOwnedBuildings(existingBuildings) {
 
 // Tab event listener'larını kur
 function setupTabs(buildings) {
-    // Ana Tablar (Mevcut vs Yeni)
     const mainTabs = document.querySelectorAll('.main-tab');
     const ownedView = document.getElementById('owned-buildings-view');
     const buildView = document.getElementById('build-new-view');
@@ -95,7 +103,6 @@ function setupTabs(buildings) {
         });
     });
 
-    // İnşa Kategorileri
     const buildTabs = document.querySelectorAll('.build-tab');
     const buildGrid = document.getElementById('available-buildings');
 
@@ -120,17 +127,72 @@ function setupBuildButtons() {
         btn.addEventListener('click', (e) => {
             e.stopPropagation();
             const buildingId = btn.dataset.building;
-            const building = buildingTypes[buildingId];
-            if (building) {
-                alert(`${building.name} inşa edilecek!\nMaliyet: ${building.cost.toLocaleString()} altın`);
+            const cost = parseInt(btn.dataset.cost);
+
+            const result = addBuildingToCity(currentCityId, buildingId, cost);
+
+            if (result.success) {
+                showNotification(`${buildingTypes[buildingId].name} başarıyla inşa edildi!`, 'success');
+                refreshCityView();
+            } else {
+                showNotification(result.error || 'İşlem başarısız.', 'error');
             }
         });
     });
 }
 
+function setupUpgradeButton(cityId, currentLevel) {
+    const btn = document.querySelector('.upgrade-btn');
+    if (!btn) return;
+
+    const cost = getInfrastructureUpgradeCost(currentLevel);
+    btn.textContent = `Geliştir (${cost.toLocaleString()} 💰)`;
+
+    if (currentLevel >= 10) {
+        btn.disabled = true;
+        btn.textContent = 'Maksimum Seviye';
+        return;
+    }
+
+    btn.addEventListener('click', () => {
+        const result = upgradeCityInfrastructure(cityId, cost);
+        if (result.success) {
+            showNotification(`Altyapı seviye ${result.newLevel}'e yükseltildi!`, 'success');
+            refreshCityView();
+        } else {
+            showNotification(result.error, 'error');
+        }
+    });
+}
+
+function showNotification(message, type = 'info') {
+    const existing = document.querySelector('.game-notification');
+    if (existing) existing.remove();
+
+    const notif = document.createElement('div');
+    notif.className = `game-notification ${type}`;
+    notif.innerHTML = `
+        <i class="fa-solid ${type === 'success' ? 'fa-circle-check' : 'fa-circle-xmark'}"></i>
+        <span>${message}</span>
+    `;
+    document.body.appendChild(notif);
+
+    setTimeout(() => {
+        notif.classList.add('fade-out');
+        setTimeout(() => notif.remove(), 500);
+    }, 3000);
+}
+
+function refreshCityView() {
+    const container = document.getElementById('app-container');
+    if (container) renderCityPage(container, currentCityId);
+}
+
 // Sayfa render
 export function renderCityPage(container, cityId) {
-    // CSS'i head'e ekle (eğer yoksa) - FOUC önlemek için
+    currentCityId = cityId || 'demo';
+
+    // CSS'i head'e ekle (eğer yoksa)
     if (!document.getElementById('city-page-style')) {
         const link = document.createElement('link');
         link.id = 'city-page-style';
@@ -151,13 +213,13 @@ export function renderCityPage(container, cityId) {
 
     if (!cityData) {
         cityData = {
-            id: cityId || 'demo',
+            id: currentCityId,
             name: 'Demo Şehir',
             country: 'Türkiye',
             population: 1250000,
             economy: 75,
-            infrastructure: 4,
-            buildings: ['municipality', 'taxOffice', 'workshop'],
+            infrastructure: 1,
+            buildings: [],
             resource: { name: 'Demir', icon: 'fa-solid fa-cube' }
         };
     }
@@ -187,7 +249,6 @@ export function renderCityPage(container, cityId) {
             </header>
 
             <main class="city-dashboard">
-                <!-- Sol Panel: İstatistikler ve Kaynaklar -->
                 <aside class="city-sidebar">
                     <section class="sidebar-section">
                         <h2><i class="fa-solid fa-chart-simple"></i> Şehir Verileri</h2>
@@ -244,7 +305,6 @@ export function renderCityPage(container, cityId) {
                     </section>
                 </aside>
 
-                <!-- Sağ Panel: Bina Yönetimi -->
                 <div class="city-main-content">
                     <div class="content-tabs-header">
                         <div class="main-tabs">
@@ -254,14 +314,12 @@ export function renderCityPage(container, cityId) {
                     </div>
 
                     <div class="scroll-content">
-                        <!-- Mevcut Binalar Görünümü -->
                         <div id="owned-buildings-view">
                             <div class="buildings-grid">
                                 ${generateOwnedBuildings(buildings)}
                             </div>
                         </div>
 
-                        <!-- Yeni İnşa Et Görünümü -->
                         <div id="build-new-view" style="display: none;">
                             <div class="build-tabs">
                                 <button class="build-tab active" data-category="economic">Yönetim</button>
@@ -279,4 +337,5 @@ export function renderCityPage(container, cityId) {
     `;
 
     setupTabs(buildings);
+    setupUpgradeButton(currentCityId, cityData.infrastructure || 1);
 }
