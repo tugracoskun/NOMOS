@@ -23,6 +23,11 @@ export function loadState() {
     return gameState;
 }
 
+// Mevcut durumu getir (Read-only)
+export function getGameState() {
+    return { ...gameState };
+}
+
 // Durumu kaydet
 export function saveState() {
     localStorage.setItem(STATE_KEY, JSON.stringify(gameState));
