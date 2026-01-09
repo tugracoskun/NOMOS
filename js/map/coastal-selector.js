@@ -1,13 +1,14 @@
 // KIYI EYALETİ SEÇİCİ
 // Haritada eyaletlere tıklayarak kıyı eyaletlerini manuel seçme aracı
+// NOT: Kıyı eyaletleri seçildi, buton artık gizli. Console'dan toggleCoastalSelector() ile açılabilir.
 
 let isCoastalSelectorActive = false;
 let selectedCoastalIds = [];
 
-// Harita yüklendiğinde butonu ekle
-document.addEventListener('DOMContentLoaded', () => {
-    setTimeout(createToggleButton, 2000); // Harita yüklendikten sonra
-});
+// Harita yüklendiğinde butonu ekle - DEVRE DIŞI (Kıyı eyaletleri zaten seçildi)
+// document.addEventListener('DOMContentLoaded', () => {
+//     setTimeout(createToggleButton, 2000);
+// });
 
 function createToggleButton() {
     const mapEl = document.getElementById('game-map');
