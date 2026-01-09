@@ -37,9 +37,23 @@ export function renderCityPage(container, cityId) {
                     </div>
                 </div>
                 <div class="city-header-right">
-                    <div class="city-value-badge">
-                        <i class="fa-solid fa-star"></i>
-                        <span>Eyalet Değeri: ${stats.cityValue}/10</span>
+                    <div class="city-value-badge-wrapper">
+                        <div class="city-value-badge">
+                            <i class="fa-solid fa-star"></i>
+                            <span>Eyalet Değeri: ${stats.cityValue.stars}/10</span>
+                            <i class="fa-solid fa-circle-info info-icon"></i>
+                        </div>
+                        <div class="rank-tooltip">
+                            <h4>Değerlendirme Puanı (${stats.cityValue.score}/100)</h4>
+                            <ul>
+                                ${Object.entries(stats.cityValue.details || {}).map(([key, val]) => `
+                                    <li>
+                                        <span>${key}</span>
+                                        <span class="score">+${val}</span>
+                                    </li>
+                                `).join('')}
+                            </ul>
+                        </div>
                     </div>
                 </div>
             </header>
@@ -178,15 +192,26 @@ function setupUpgradeButton(cityId) {
 }
 
 function setupInspectButton() {
-    const btn = document.querySelector('.js-inspect-country');
-    if (!btn) return;
+    // Event Delegation: Container üzerine dinleyici koyuyoruz
+    // Böylece butonun içeriği veya kendisi sonradan yüklense bile tıklama yakalanır.
+    setTimeout(() => {
+        const sidebar = document.querySelector('.city-sidebar');
+        if (!sidebar) return;
 
-    btn.addEventListener('click', () => {
-        const country = btn.dataset.country;
-        if (country) {
-            window.location.hash = `country/${encodeURIComponent(country)}`;
-        }
-    });
+        sidebar.addEventListener('click', (e) => {
+            // Tıklanan element veya ebeveynlerinden biri bizim buton mu?
+            const btn = e.target.closest('.js-inspect-country');
+
+            if (btn) {
+                e.stopPropagation(); // Diğer eventleri engelle
+                const country = btn.dataset.country;
+                if (country) {
+                    console.log('Navigating to country:', country);
+                    window.location.hash = `country/${encodeURIComponent(country)}`;
+                }
+            }
+        });
+    }, 100); // DOM render'ın tamamlanması için güvenli marj
 }
 
 function refreshCityView() {

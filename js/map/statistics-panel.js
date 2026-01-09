@@ -1,7 +1,7 @@
 // İSTATİSTİK MODU PANELİ
 // Kapsamlı oyun istatistiklerini gösterir
 
-import { buildingTypes } from '../data/city-stats.js';
+import { buildingTypes, getGlobalCityRankings } from '../data/city-stats.js';
 
 // İstatistik kategorileri
 export const statisticsCategories = {
@@ -112,16 +112,18 @@ function getAllianceStats() {
     };
 }
 
-// En gelişmiş şehirleri al
+// En gelişmiş şehirleri al (Canlı Veri)
 function getTopCitiesStats() {
+    const rankings = getGlobalCityRankings().slice(0, 20); // Top 20
+
     return {
-        cities: [
-            { name: 'İstanbul', country: 'Türkiye', value: 9, infra: 8 },
-            { name: 'Berlin', country: 'Almanya', value: 9, infra: 9 },
-            { name: 'Paris', country: 'Fransa', value: 8, infra: 8 },
-            { name: 'Londra', country: 'İngiltere', value: 8, infra: 7 },
-            { name: 'Tokyo', country: 'Japonya', value: 10, infra: 10 }
-        ]
+        cities: rankings.map(c => ({
+            id: c.id,
+            name: c.name,
+            country: c.country,
+            value: c.stars, // 1-10 Yıldız
+            score: c.score  // 0-100 Puan
+        }))
     };
 }
 

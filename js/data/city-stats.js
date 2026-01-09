@@ -219,20 +219,104 @@ function formatNumber(num) {
     return num;
 }
 
-// Eyalet Değeri Hesaplama (1-10 üzerinden)
+// Eyalet Değeri Hesaplama (Gelişmiş Algoritma)
+// Sonuç 1-100 arasında bir "Gelişmişlik Puanı" ve 1-10 arası "Yıldız Değeri" döner.
 export function calculateCityValue(cityData) {
-    const infraScore = (cityData.infrastructure || 1) / 10; // 0-1
-    const buildingCount = (cityData.buildings || []).length;
-    const buildingScore = Math.min(buildingCount / 10, 1); // Max 10 bina = 1
-    const taxEffScore = Math.min((cityData.taxEfficiency || 1) / 1.5, 1); // 1-1.5 arası normalize
-    const popScore = Math.min((cityData.population || 0) / 5000000, 1); // 5M = max
-    const popDensity = popScore * 0.15;
-    const prodScore = Math.min((cityData.economy || 0) / 100, 1); // 100 = max
+    // 1. Altyapı Skoru (Temel: 30 Puan)
+    const infraScore = (cityData.infrastructure || 1) * 3;
 
-    const rawValue = (infraScore * 0.3) + (buildingScore * 0.2) + (taxEffScore * 0.2) + (popDensity) + (prodScore * 0.15);
+    // 2. Bina Skoru (Max: 30 Puan)
+    // Her bina 2 puan, özel binalar (Havalimanı, Üniversite vb.) 4 puan
+    let buildingScore = 0;
+    (cityData.buildings || []).forEach(bId => {
+        const type = buildingTypes[bId];
+        // Pahalı binalar daha çok puan getirir
+        const bonus = (type?.cost > 50000) ? 4 : 2;
+        buildingScore += bonus;
+    });
+    buildingScore = Math.min(buildingScore, 30); // Cap
 
-    // 1-10 arası normalize et
-    return Math.max(1, Math.ceil(rawValue * 10));
+    // 3. Nüfus ve Ekonomi (Max: 20 Puan)
+    const popScore = Math.min((cityData.population || 0) / 5000000, 1) * 10;
+    const ecoScore = Math.min((cityData.economy || 0) / 100, 1) * 10;
+
+    // 4. Stratejik Kaynak (Max: 10 Puan)
+    let resourceScore = 2; // Baz
+    if (cityData.resource?.name) {
+        const res = resourcesEconomics[cityData.resource.name];
+        if (res) {
+            // Değerine göre 2-10 arası puan
+            resourceScore = Math.min(Math.ceil(res.baseValue / 150), 10);
+        }
+    }
+
+    // 5. Vergi Verimliliği (Max: 10 Puan)
+    // 1.0 -> 0 puan, 1.5 -> 10 puan
+    const taxEff = calculateTaxEfficiency(cityData);
+    const taxScore = Math.max(0, (taxEff - 1) * 20);
+
+    // Toplam Skor (0-100)
+    let totalScore = infraScore + buildingScore + popScore + ecoScore + resourceScore + taxScore;
+    totalScore = Math.min(Math.max(totalScore, 10), 100); // 10-100 arası
+
+    // 1-10 Skalasına Dönüştür
+    const starValue = Math.ceil(totalScore / 10);
+
+    return {
+        score: Math.round(totalScore),
+        stars: starValue,
+        details: {
+            "Altyapı": Math.round(infraScore),
+            "Binalar": Math.round(buildingScore),
+            "Nüfus": Math.round(popScore),
+            "Ekonomi": Math.round(ecoScore),
+            "Kaynak": Math.round(resourceScore),
+            "Vergi Verim.": Math.round(taxScore)
+        }
+    };
+}
+
+// Global Sıralamayı Getir (LocalStorage'daki tüm şehirleri tarar)
+export function getGlobalCityRankings() {
+    try {
+        const rawMap = localStorage.getItem('nomos_map_data');
+        if (!rawMap) return [];
+
+        const mapData = JSON.parse(rawMap);
+        const cityList = [];
+
+        Object.keys(mapData).forEach(key => {
+            const data = mapData[key];
+            // Sadece adı olan geçerli şehirleri al
+            if (data.name) {
+                // Eksik verileri varsayılanlarla doldur (Hesaplama için)
+                const fullData = {
+                    ...data,
+                    infrastructure: data.infrastructure || 1,
+                    buildings: data.buildings || [],
+                    population: data.population || 100000,
+                    economy: data.economy || 50
+                };
+
+                const val = calculateCityValue(fullData);
+                cityList.push({
+                    id: key,
+                    name: data.name,
+                    country: data.country || "Bilinmiyor",
+                    stars: val.stars,
+                    score: val.score,
+                    resource: data.resource?.name || "Yok"
+                });
+            }
+        });
+
+        // Puana göre azalan sırala
+        return cityList.sort((a, b) => b.score - a.score);
+
+    } catch (e) {
+        console.error("Rankings error:", e);
+        return [];
+    }
 }
 
 // Şehrin toplam vergi verimliliğini hesapla
