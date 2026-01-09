@@ -53,7 +53,8 @@ export function renderCityPage(container, cityId) {
 
     // Event Listener'ları Kur
     setupTabs(buildings);
-    setupUpgradeButton(currentCityId, cityData.infrastructure || 1);
+    setupUpgradeButton(currentCityId);
+    setupInspectButton();
 }
 
 // ------ YARDIMCI FONKSİYONLAR & EVENTLER ------
@@ -156,26 +157,34 @@ function setupBuildButtons() {
     });
 }
 
-function setupUpgradeButton(cityId, currentLevel) {
-    const btn = document.querySelector('.upgrade-btn');
-    if (!btn) return;
-
-    const cost = getInfrastructureUpgradeCost(currentLevel);
-    btn.textContent = `Geliştir (${cost.toLocaleString()} 💰)`;
-
-    if (currentLevel >= 10) {
-        btn.disabled = true;
-        btn.textContent = 'Maksimum Seviye';
-        return;
-    }
+function setupUpgradeButton(cityId) {
+    const btn = document.getElementById('btn-upgrade-infrastructure');
+    if (!btn || btn.disabled) return;
 
     btn.addEventListener('click', () => {
-        const result = upgradeCityInfrastructure(cityId, cost);
-        if (result.success) {
-            showNotification(`Altyapı seviye ${result.newLevel}'e yükseltildi!`, 'success');
-            refreshCityView();
-        } else {
-            showNotification(result.error, 'error');
+        const cost = parseInt(btn.dataset.cost);
+        const nextLevel = btn.dataset.level;
+
+        if (confirm(`Altyapıyı Seviye ${nextLevel} yapmak için ${cost.toLocaleString()} Altın harcanacak. Onaylıyor musunuz?`)) {
+            const result = upgradeCityInfrastructure(cityId, cost);
+            if (result.success) {
+                showNotification(`Altyapı seviye ${result.newLevel}'e yükseltildi!`, 'success');
+                refreshCityView();
+            } else {
+                showNotification(result.error, 'error');
+            }
+        }
+    });
+}
+
+function setupInspectButton() {
+    const btn = document.querySelector('.js-inspect-country');
+    if (!btn) return;
+
+    btn.addEventListener('click', () => {
+        const country = btn.dataset.country;
+        if (country) {
+            window.location.hash = `country/${encodeURIComponent(country)}`;
         }
     });
 }

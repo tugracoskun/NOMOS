@@ -48,31 +48,47 @@ export function updateGold(amount) {
     return true;
 }
 
-// Şehre bina ekle ve kalıcı olarak kaydet
-export function addBuildingToCity(cityId, buildingId, cost) {
-    if (gameState.gold < cost) return { success: false, error: 'Yetersiz altın!' };
-
-    // 1. Altın düş
-    gameState.gold -= cost;
-    saveState();
-
-    // 2. Şehir verisini güncelle
+// Şehre bina ekle ve kalıcı olarak kaydet (Altyapı İndirimi Dahil)
+export function addBuildingToCity(cityId, buildingId, baseCost) {
+    // 1. Şehir verisini çek (Altyapı seviyesi için)
     const cityDataRaw = localStorage.getItem('nomos_current_city');
-    if (cityDataRaw) {
-        const cityData = JSON.parse(cityDataRaw);
-        if (cityData.id === cityId) {
-            if (!cityData.buildings) cityData.buildings = [];
-            if (!cityData.buildings.includes(buildingId)) {
-                cityData.buildings.push(buildingId);
-                localStorage.setItem('nomos_current_city', JSON.stringify(cityData));
+    let infraLevel = 1;
+    let cityData = null;
 
-                // 3. Global harita verisine de işle (Kalıcılık için)
-                updateGlobalCityData(cityData.regionId, { buildings: cityData.buildings });
-                return { success: true };
-            }
+    if (cityDataRaw) {
+        cityData = JSON.parse(cityDataRaw);
+        if (cityData.id === cityId) {
+            infraLevel = cityData.infrastructure || 1;
         }
     }
-    return { success: false, error: 'Şehir verisi bulunamadı.' };
+
+    if (!cityData) return { success: false, error: 'Şehir verisi bulunamadı.' };
+
+    // 2. İndirimli Maliyeti Hesapla
+    const infraStats = infrastructureLevels[infraLevel];
+    const discountMultiplier = infraStats ? infraStats.constructionCost : 1.0;
+    const finalCost = Math.floor(baseCost * discountMultiplier);
+
+    // Bakiye kontrolü
+    if (gameState.gold < finalCost) return { success: false, error: `Yetersiz altın! (Gereken: ${finalCost.toLocaleString()})` };
+
+    // 3. Altın düş
+    gameState.gold -= finalCost;
+    saveState();
+
+    // 4. Şehir verisini güncelle
+    if (!cityData.buildings) cityData.buildings = [];
+    if (!cityData.buildings.includes(buildingId)) {
+        cityData.buildings.push(buildingId);
+        localStorage.setItem('nomos_current_city', JSON.stringify(cityData));
+
+        // 5. Global harita verisine de işle
+        updateGlobalCityData(cityData.regionId, { buildings: cityData.buildings });
+
+        return { success: true, actualCost: finalCost }; // UI için gerçek maliyeti dön
+    }
+
+    return { success: false, error: 'Bu bina zaten inşa edilmiş.' };
 }
 
 // Şehir altyapısını geliştir
@@ -113,7 +129,7 @@ function updateGlobalCityData(regionId, newData) {
 }
 
 // --- FAZ 4: GELİR DÖNGÜSÜ (TICKER) ---
-import { calculateResourceIncome, resourcesEconomics } from './city-stats.js';
+import { calculateResourceIncome, resourcesEconomics, infrastructureLevels } from './city-stats.js';
 
 let incomeInterval = null;
 

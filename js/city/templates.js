@@ -1,4 +1,4 @@
-import { buildingTypes } from '../data/city-stats.js';
+import { buildingTypes, infrastructureLevels, getNextLevelPreview } from '../data/city-stats.js';
 import { loadState } from '../data/state.js';
 
 const buildingCategories = {
@@ -10,57 +10,29 @@ const buildingCategories = {
 export function generateSidebarHTML(cityData, nation, stats, alliancesHtml) {
     return `
         <aside class="city-sidebar">
-            <div class="nation-panel">
-                <div class="nation-header-v2">
-                    <div class="nation-flag-v2">
-                        <img src="${nation.flag}" alt="${nation.name}">
+            <div class="sidebar-section nation-compact-card">
+                <div class="nation-compact-header">
+                    <img src="${nation.flag}" class="nation-flag-small" alt="${nation.name}">
+                    <div class="nation-info-compact">
+                        <span class="nation-sub">Bağlı Olduğu Ülke</span>
+                        <strong class="nation-name-lg">${nation.name}</strong>
                     </div>
-                    <div class="nation-title-v2">
-                        <span class="nation-name-v2">${nation.name}</span>
-                        <span class="nation-meta-v2">
-                            IDs: ${nation.id.split('_')[1] || '?'} | #${nation.ranking || '?'}
-                        </span>
-                    </div>
+                    <span class="rank-badge">#${nation.ranking || '?'}</span>
                 </div>
-
-                <div class="leader-row-v2" style="border-left-color: ${nation.color || '#3b82f6'};">
-                    <div class="leader-avatar-v2">
-                        <i class="fa-solid fa-user-tie"></i>
+                 
+                 <div class="nation-compact-stats">
+                    <div class="dict-stat">
+                        <span class="lbl"><i class="fa-solid fa-coins text-gold"></i> GSYİH</span>
+                        <span class="val">${nation.gdp}</span>
                     </div>
-                    <div class="leader-info-v2">
-                        <span class="l-role">${nation.leaderTitle}</span>
-                        <span class="l-name">${nation.leader}</span>
-                    </div>
-                </div>
-
-                <div class="stats-grid-v2">
-                    <div class="stat-box-v2">
-                        <span class="val text-gold">${nation.gdp}</span>
-                        <span class="lbl">GSYİH</span>
-                    </div>
-                    <div class="stat-box-v2">
-                        <span class="val text-green">${nation.population}</span>
-                        <span class="lbl">Nüfus</span>
-                    </div>
-                    <div class="stat-box-v2">
-                        <span class="val text-purple">${nation.tech || '0.50'}</span>
-                        <span class="lbl">Teknoloji</span>
-                    </div>
-                     <div class="stat-box-v2">
-                        <span class="val text-white" style="font-size:0.85rem;">${nation.capital || '-'}</span>
-                        <span class="lbl">Başkent</span>
-                    </div>
-                </div>
-
-                 <div class="alliance-section-v2" style="margin-top:12px;">
-                    <span class="lbl" style="display:block; margin-bottom:6px;">Üye Olunan Paktlar</span>
-                    <div class="alliance-list-v2">
-                        ${alliancesHtml || '<span class="tag-v2">Tarafsız</span>'}
+                    <div class="dict-stat">
+                        <span class="lbl"><i class="fa-solid fa-users text-green"></i> Nüfus</span>
+                        <span class="val">${nation.population}</span>
                     </div>
                  </div>
-                 
-                 <button class="nation-inspect-btn" onclick="window.location.hash = 'country/${encodeURIComponent(nation.name)}'">
-                    <i class="fa-solid fa-eye"></i> Detaylı İncele
+
+                 <button class="nation-inspect-btn-sm js-inspect-country" data-country="${nation.name}">
+                    İncele <i class="fa-solid fa-arrow-right"></i>
                  </button>
             </div>
 
@@ -88,16 +60,42 @@ export function generateSidebarHTML(cityData, nation, stats, alliancesHtml) {
             ` : ''}
 
             <section class="sidebar-section" style="margin-top: 16px;">
-                <h2><i class="fa-solid fa-wrench"></i> Şehir Altyapısı</h2>
-                <div class="infra-compact">
-                    <div class="infra-header">
-                        <span class="infra-level">Seviye ${stats.infrastructure}</span>
-                        <span class="infra-name">${stats.infrastructureName}</span>
+                <div class="infra-header-row">
+                    <h2><i class="fa-solid fa-wrench"></i> Altyapı</h2>
+                    <span class="infra-badge">Seviye ${stats.infrastructure}</span>
+                </div>
+                
+                <div class="infra-card">
+                    <div class="infra-progress-track">
+                        <div class="infra-progress-bar" style="width: ${stats.infrastructure * 10}%"></div>
                     </div>
-                    <div class="infra-bar">
-                        <div class="infra-fill" style="width: ${stats.infrastructure * 10}%"></div>
+                    <div class="infra-status">
+                        <span class="curr-infra">${stats.infrastructureName}</span>
+                        <span class="next-infra">${stats.infrastructure < 10 ? 'Sonraki: ' + (infrastructureLevels[stats.infrastructure + 1]?.name || '???') : 'Maksimum'}</span>
                     </div>
-                    <button class="upgrade-btn">Geliştir</button>
+
+                    ${(() => {
+            const next = getNextLevelPreview(stats.infrastructure);
+            if (!next) return `<button class="upgrade-btn maxed" disabled>Maksimum Seviye</button>`;
+
+            return `
+                            <div class="next-level-preview">
+                                <strong><i class="fa-solid fa-angles-up"></i> Yükseltme Etkileri:</strong>
+                                <ul>
+                                    ${next.effects.map(e => `<li>${e}</li>`).join('')}
+                                </ul>
+                            </div>
+                            <button class="upgrade-btn" 
+                                id="btn-upgrade-infrastructure"
+                                data-cost="${next.cost}"
+                                data-level="${next.level}">
+                                <div class="btn-content">
+                                    <span>GELİŞTİR</span>
+                                    <span class="cost"><i class="fa-solid fa-coins"></i> ${next.cost.toLocaleString()}</span>
+                                </div>
+                            </button>
+                        `;
+        })()}
                 </div>
             </section>
         </aside>

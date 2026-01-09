@@ -172,24 +172,51 @@ export const buildingTypes = {
     }
 };
 
-// Altyapı Seviyeleri (1-10)
+// Altyapı Seviyeleri (1-10) detaylandırıldı
 export const infrastructureLevels = {
-    1: { taxEfficiency: 1.00, constructionCost: 1.00, maintenanceCost: 1.00, name: "Çok Düşük" },
-    2: { taxEfficiency: 1.05, constructionCost: 0.95, maintenanceCost: 0.95, name: "Düşük" },
-    3: { taxEfficiency: 1.10, constructionCost: 0.90, maintenanceCost: 0.90, name: "Az Gelişmiş" },
-    4: { taxEfficiency: 1.15, constructionCost: 0.87, maintenanceCost: 0.85, name: "Orta-Alt" },
-    5: { taxEfficiency: 1.20, constructionCost: 0.85, maintenanceCost: 0.80, name: "Orta" },
-    6: { taxEfficiency: 1.25, constructionCost: 0.80, maintenanceCost: 0.75, name: "Orta-Üst" },
-    7: { taxEfficiency: 1.32, constructionCost: 0.75, maintenanceCost: 0.68, name: "Gelişmiş" },
-    8: { taxEfficiency: 1.40, constructionCost: 0.70, maintenanceCost: 0.60, name: "İleri" },
-    9: { taxEfficiency: 1.45, constructionCost: 0.65, maintenanceCost: 0.55, name: "Çok İleri" },
-    10: { taxEfficiency: 1.50, constructionCost: 0.60, maintenanceCost: 0.50, name: "Maksimum" }
+    1: { name: "Köy Yolu", taxEfficiency: 1.00, constructionCost: 1.00, popCap: 100000, desc: "Temel ulaşım ağı." },
+    2: { name: "Stabilize Yol", taxEfficiency: 1.05, constructionCost: 0.98, popCap: 250000, desc: "Daha iyi ticaret imkanı." },
+    3: { name: "Asfalt Yol", taxEfficiency: 1.10, constructionCost: 0.95, popCap: 500000, desc: "Şehirleşme başlangıcı." },
+    4: { name: "Karayolu Ağı", taxEfficiency: 1.15, constructionCost: 0.90, popCap: 1000000, desc: "Bölgesel bağlantı." },
+    5: { name: "Otoyol Sistemi", taxEfficiency: 1.25, constructionCost: 0.85, popCap: 2000000, desc: "Hızlı lojistik ve ticaret." },
+    6: { name: "Metro Hattı", taxEfficiency: 1.35, constructionCost: 0.80, popCap: 5000000, desc: "Yüksek yoğunluklu ulaşım." },
+    7: { name: "Entegre Ulaşım", taxEfficiency: 1.45, constructionCost: 0.75, popCap: 10000000, desc: "Maksimum verimlilik." },
+    8: { name: "Akıllı Şehir", taxEfficiency: 1.60, constructionCost: 0.70, popCap: 20000000, desc: "Teknolojik altyapı." },
+    9: { name: "Fütüristik Ağ", taxEfficiency: 1.80, constructionCost: 0.60, popCap: 50000000, desc: "Sınırların ötesinde." },
+    10: { name: "Ütopya", taxEfficiency: 2.00, constructionCost: 0.50, popCap: 100000000, desc: "Mükemmeliyet." }
 };
 
-// Altyapı geliştirme maliyeti
+// Altyapı geliştirme maliyeti (Daha dengeli eğri)
 export function getInfrastructureUpgradeCost(currentLevel) {
-    const baseCost = 5000;
-    return Math.floor(baseCost * Math.pow(1.8, currentLevel));
+    if (currentLevel >= 10) return 0; // Max seviye
+    const baseCost = 15000;
+    // Maliyet artış çarpanı: Her seviyede x2.2
+    return Math.floor(baseCost * Math.pow(2.2, currentLevel - 1));
+}
+
+// Bir sonraki seviyenin önizlemesini getir (UI için)
+export function getNextLevelPreview(currentLevel) {
+    if (currentLevel >= 10) return null;
+    const nextLvl = currentLevel + 1;
+    const stats = infrastructureLevels[nextLvl];
+    const cost = getInfrastructureUpgradeCost(currentLevel);
+
+    return {
+        level: nextLvl,
+        name: stats.name,
+        cost: cost,
+        effects: [
+            `Vergi Geliri: +%${Math.round((stats.taxEfficiency - 1) * 100)}`,
+            `İnşaat Maliyeti: -%${Math.round((1 - stats.constructionCost) * 100)}`,
+            `Nüfus Kapasitesi: ${formatNumber(stats.popCap)}`
+        ]
+    };
+}
+
+function formatNumber(num) {
+    if (num >= 1000000) return (num / 1000000).toFixed(1) + 'M';
+    if (num >= 1000) return (num / 1000).toFixed(1) + 'K';
+    return num;
 }
 
 // Eyalet Değeri Hesaplama (1-10 üzerinden)

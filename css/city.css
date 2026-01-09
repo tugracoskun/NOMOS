@@ -701,3 +701,232 @@
 .market-trend.down {
     color: #f87171;
 }
+
+/* FAZ 5: INFRASTRUCTURE STYLES */
+
+.infra-header-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.infra-header-row h2 {
+    margin: 0;
+}
+
+.infra-badge {
+    background: rgba(59, 130, 246, 0.2);
+    color: #60a5fa;
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    border: 1px solid rgba(59, 130, 246, 0.3);
+}
+
+.infra-card {
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 12px;
+    padding: 12px;
+}
+
+.infra-progress-track {
+    height: 8px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 8px;
+}
+
+.infra-progress-bar {
+    height: 100%;
+    background: linear-gradient(90deg, #3b82f6, #8b5cf6);
+    border-radius: 10px;
+    transition: width 0.5s ease;
+}
+
+.infra-status {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.75rem;
+    margin-bottom: 12px;
+}
+
+.curr-infra {
+    color: #e2e8f0;
+    font-weight: 600;
+}
+
+.next-infra {
+    color: #64748b;
+}
+
+.next-level-preview {
+    background: rgba(59, 130, 246, 0.1);
+    border: 1px dashed rgba(59, 130, 246, 0.3);
+    border-radius: 8px;
+    padding: 10px;
+    margin-bottom: 12px;
+}
+
+.next-level-preview strong {
+    display: block;
+    font-size: 0.75rem;
+    color: #60a5fa;
+    margin-bottom: 6px;
+}
+
+.next-level-preview ul {
+    margin: 0;
+    padding-left: 16px;
+    font-size: 0.7rem;
+    color: #cbd5e1;
+}
+
+.next-level-preview li {
+    margin-bottom: 2px;
+}
+
+#btn-upgrade-infrastructure {
+    width: 100%;
+    background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+    border: none;
+    padding: 10px;
+    border-radius: 8px;
+    color: white;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-family: inherit;
+    position: relative;
+    overflow: hidden;
+}
+
+#btn-upgrade-infrastructure:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4);
+}
+
+#btn-upgrade-infrastructure.maxed {
+    background: #334155;
+    color: #94a3b8;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+.btn-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-weight: 600;
+    font-size: 0.85rem;
+}
+
+.btn-content .cost {
+    background: rgba(0, 0, 0, 0.2);
+    padding: 2px 8px;
+    border-radius: 4px;
+    color: #fbbf24;
+}
+
+/* COMPACT NATION CARD STYLES */
+.nation-compact-card {
+    background: rgba(15, 23, 42, 0.6) !important;
+}
+
+.nation-compact-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.nation-flag-small {
+    width: 36px;
+    height: 24px;
+    object-fit: cover;
+    border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.nation-info-compact {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.nation-sub {
+    font-size: 0.6rem;
+    color: #64748b;
+    text-transform: uppercase;
+}
+
+.nation-name-lg {
+    font-size: 0.95rem;
+    color: white;
+}
+
+.rank-badge {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 0.7rem;
+    color: #94a3b8;
+}
+
+.nation-compact-stats {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 12px;
+}
+
+.dict-stat {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.dict-stat .lbl {
+    font-size: 0.65rem;
+    color: #64748b;
+}
+
+.dict-stat .val {
+    font-size: 0.8rem;
+    color: #e2e8f0;
+    font-weight: 600;
+}
+
+.nation-inspect-btn-sm {
+    width: 100%;
+    background: rgba(59, 130, 246, 0.1);
+    border: 1px solid rgba(59, 130, 246, 0.2);
+    padding: 10px;
+    border-radius: 8px;
+    color: #93c5fd;
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    position: relative;
+    overflow: hidden;
+}
+
+.nation-inspect-btn-sm:hover {
+    background: rgba(37, 99, 235, 0.2);
+    border-color: #3b82f6;
+    color: white;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.15);
+}
+
+.nation-inspect-btn-sm:active {
+    transform: translateY(0);
+}
