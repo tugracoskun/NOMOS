@@ -313,8 +313,10 @@ function createOverlayContent(cityData) {
         </div>
     `;
 
-    // Aktif yap
+    // Aktif yap - Double rAF ile animasyon düzeltmesi (ilk açılışta sert geçişi önler)
     requestAnimationFrame(() => {
-        overlay.classList.add('active');
+        requestAnimationFrame(() => {
+            overlay.classList.add('active');
+        });
     });
 }
