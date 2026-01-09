@@ -115,6 +115,18 @@ export function renderCountryPage(container, countryName) {
                         </div>
                     </div>
                 </div>
+
+                <!-- 4. Eylemler (Liman İnşa Et) -->
+                <div class="country-card-compact country-actions-card">
+                    <div class="card-header-small"><i class="fa-solid fa-hammer"></i> Eylemler</div>
+                    <div class="action-buttons">
+                        <button class="country-action-btn harbor-btn" onclick="openHarborPicker('${nation.name}')">
+                            <i class="fa-solid fa-anchor"></i>
+                            <span>Liman İnşa Et</span>
+                            <small>75.000 Altın</small>
+                        </button>
+                    </div>
+                </div>
             </div>
             
             <div style="margin-top:20px; text-align:center; font-size:0.8rem; color:rgba(255,255,255,0.2);">
@@ -122,4 +134,7 @@ export function renderCountryPage(container, countryName) {
             </div>
         </div>
     `;
+
+    // Harbor picker modülünü yükle
+    import('../map/harbor-picker.js').catch(e => console.log('Harbor picker yüklenemedi:', e));
 }

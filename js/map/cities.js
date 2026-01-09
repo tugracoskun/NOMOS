@@ -58,6 +58,28 @@ export function createCityMarkers(regions, mapInstance) {
 
     console.log(`Cities: ${Object.keys(cityDataByRegion).length} şehir verisi oluşturuldu.`);
     console.log(`Unique Resources: ${uniqueResources.size} farklı kaynak kullanıldı: `, Array.from(uniqueResources));
+
+    // ŞEHİR VERİLERİNİ LOCALSTORAGE'A KAYDET (Liman sistemi için)
+    saveCityDataToStorage();
+}
+
+// Şehir verilerini localStorage'a kaydet
+function saveCityDataToStorage() {
+    try {
+        const cityLookup = {};
+        Object.values(cityDataByRegion).forEach(city => {
+            cityLookup[city.regionId] = {
+                id: city.id,
+                name: city.name,
+                country: city.country,
+                regionId: city.regionId
+            };
+        });
+        localStorage.setItem('nomos_city_lookup', JSON.stringify(cityLookup));
+        console.log(`Cities: ${Object.keys(cityLookup).length} şehir localStorage'a kaydedildi.`);
+    } catch (e) {
+        console.error("Şehir verisi kaydedilemedi:", e);
+    }
 }
 
 // Zoom seviyesine göre görünürlük (artık kullanılmıyor ama uyumluluk için)

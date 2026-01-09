@@ -274,3 +274,81 @@
         transform: translateY(0);
     }
 }
+
+/* EYLEM BUTONLARI */
+.country-actions-card {
+    grid-column: span 3;
+}
+
+@media (max-width: 900px) {
+    .country-actions-card {
+        grid-column: span 1;
+    }
+}
+
+.action-buttons {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.country-action-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    padding: 16px 24px;
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.03);
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    min-width: 140px;
+}
+
+.country-action-btn i {
+    font-size: 1.5rem;
+    color: #0ea5e9;
+}
+
+.country-action-btn span {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: white;
+}
+
+.country-action-btn small {
+    font-size: 0.7rem;
+    color: #fbbf24;
+}
+
+.country-action-btn:hover {
+    background: rgba(14, 165, 233, 0.1);
+    border-color: rgba(14, 165, 233, 0.3);
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(14, 165, 233, 0.2);
+}
+
+.country-action-btn:active {
+    transform: translateY(0);
+}
+
+.harbor-btn i {
+    color: #0ea5e9;
+}
+
+.harbor-btn:hover i {
+    animation: float 1s ease-in-out infinite;
+}
+
+@keyframes float {
+
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-3px);
+    }
+}

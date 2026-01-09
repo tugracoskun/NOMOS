@@ -2,6 +2,7 @@
 import { getProvinceStyle, getBaseCountryStyle } from './styles.js';
 import { isEditorActive, openEditor, getSavedData, toggleRegionSelection } from './editor.js';
 import { getCityDataByRegion, openCityPanel } from './cities.js';
+import { isCoastalSelectorMode, addCoastalId } from './coastal-selector.js';
 
 // 1. DETAYLI EYALETLER İÇİN ETKİLEŞİM
 export function onProvinceInteraction(feature, layer, mapInstance) {
@@ -27,6 +28,12 @@ export function onProvinceInteraction(feature, layer, mapInstance) {
         },
         click: (e) => {
             L.DomEvent.stopPropagation(e);
+
+            // KIYI SEÇİCİ MODU AKTİFSE
+            if (isCoastalSelectorMode()) {
+                addCoastalId(regionId, `${regionName} (${countryName})`);
+                return; // Başka işlem yapma
+            }
 
             if (isEditorActive()) {
                 // Ctrl tuşu ile çoklu seçim
