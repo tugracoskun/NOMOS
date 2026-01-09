@@ -2,6 +2,7 @@ import { buildingTypes, generateCityStats, getInfrastructureUpgradeCost } from '
 import { addBuildingToCity, upgradeCityInfrastructure } from '../data/state.js';
 import { getNationData } from '../data/nations.js';
 import { generateSidebarHTML, generateMainContentHTML, generateBuildingCards } from './templates.js';
+import { isCoastalRegion } from '../data/coastal-regions.js';
 
 let currentCityId = null;
 
@@ -23,6 +24,9 @@ export function renderCityPage(container, cityId) {
         `<span class="tag-v2"><i class="fa-solid ${a.icon || 'fa-shield-halved'}"></i> ${a.name}</span>`
     ).join('');
 
+    // Kıyı Şehri mi kontrol et
+    const isCoastal = isCoastalRegion(cityData.regionId);
+
     // HTML Birleştirme (Templates.js'den gelen parçalarla)
     container.innerHTML = `
         <div class="city-page">
@@ -33,7 +37,10 @@ export function renderCityPage(container, cityId) {
                     </button>
                     <div class="city-title">
                         <h1>${cityData.name}</h1>
-                        <span class="city-country-badge"><i class="fa-solid fa-location-dot"></i> ${nation.name}</span>
+                        <div class="city-tags">
+                            <span class="city-country-badge"><i class="fa-solid fa-location-dot"></i> ${nation.name}</span>
+                            ${isCoastal ? '<span class="coastal-tag"><i class="fa-solid fa-anchor"></i> Kıyı Şehri</span>' : ''}
+                        </div>
                     </div>
                 </div>
                 <div class="city-header-right">
