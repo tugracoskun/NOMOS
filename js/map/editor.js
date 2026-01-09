@@ -166,7 +166,8 @@ function renderSingleEditTab() {
 
     const key = getUniqueKey(currentFeature);
     const data = savedData[key] || {};
-    const currentName = data.name || guessName(currentFeature);
+    const currentName = data.name || ""; // Varsayılan boş bırak (Oyun içi ID kullanılır)
+    const currentCountry = data.country || guessCountry(currentFeature);
     const currentColor = data.color || "#000000";
     const currentResource = data.resource || null;
 
@@ -180,7 +181,13 @@ function renderSingleEditTab() {
             <!-- İSİM -->
             <div class="editor-field">
                 <label class="editor-label">Şehir İsmi (Oyunculara Görünecek)</label>
-                <input type="text" id="single-name" value="${currentName}" class="editor-input">
+                <input type="text" id="single-name" value="${currentName}" placeholder="Varsayılan: Otomatik ID" class="editor-input">
+            </div>
+
+            <!-- ÜLKE -->
+            <div class="editor-field">
+                <label class="editor-label">Bağlı Olduğu Ülke</label>
+                <input type="text" id="single-country" value="${currentCountry}" class="editor-input">
             </div>
 
             <!-- RENK -->
@@ -458,15 +465,18 @@ export function openEditor(feature, layer) {
 }
 
 // --- 5. KAYDETME FONKSİYONLARI ---
+// --- 5. KAYDETME FONKSİYONLARI ---
 function saveSingleEdit() {
     const key = getUniqueKey(currentFeature);
     const newName = document.getElementById('single-name').value;
+    const newCountry = document.getElementById('single-country').value;
     const newColor = document.getElementById('single-color').value;
     const newResource = document.getElementById('single-resource').value;
 
     if (!savedData[key]) savedData[key] = {};
 
     savedData[key].name = newName;
+    savedData[key].country = newCountry;
 
     if (newColor !== "#000000") {
         savedData[key].color = newColor;
@@ -483,7 +493,7 @@ function saveSingleEdit() {
     localStorage.setItem('nomos_map_data', JSON.stringify(savedData));
 
     // Geçmişe ekle
-    addToHistory('edit', `"${newName}" bölgesi düzenlendi`);
+    addToHistory('edit', `"${newName}" (${newCountry}) düzenlendi`);
 
     // Görsel geri bildirim
     if (currentLayer) {
@@ -707,6 +717,11 @@ function guessName(feature) {
     const p = feature.properties;
     return p.name || p.NAME || p.Name || p.NAME_1 || p.VARNAME_1 || p.lektur ||
         p.bulgarian_name || p.NUTS3_NAME || p.province || "Bölge";
+}
+
+function guessCountry(feature) {
+    const p = feature.properties;
+    return p.ADMIN || p.admin || p.NAME || p.name || p.NAME_TR || p.sovereignt || p.SOVEREIGNT || "Bilinmeyen Ülke";
 }
 
 function injectEditorPanel() {

@@ -8,66 +8,6 @@ let currentOpenCity = null;
 let cityDataByRegion = {}; // Bölge ID'sine göre şehir verisi
 
 // Türkiye için örnek şehir isimleri (diğer ülkeler için de genişletilebilir)
-const cityNamesByCountry = {
-    "Turkey": ["İstanbul", "Ankara", "İzmir", "Bursa", "Antalya"],
-    "France": ["Paris", "Lyon", "Marseille", "Toulouse", "Nice"],
-    "Germany": ["Berlin", "Hamburg", "Munich", "Cologne", "Frankfurt"],
-    "United Kingdom": ["London", "Manchester", "Birmingham", "Leeds", "Glasgow"],
-    "Italy": ["Rome", "Milan", "Naples", "Turin", "Palermo"],
-    "Spain": ["Madrid", "Barcelona", "Valencia", "Seville", "Zaragoza"],
-    "Russia": ["Moscow", "St. Petersburg", "Novosibirsk", "Yekaterinburg", "Kazan"],
-    "United States of America": ["Washington", "New York", "Los Angeles", "Chicago", "Houston"],
-    "China": ["Beijing", "Shanghai", "Guangzhou", "Shenzhen", "Chengdu"],
-    "Japan": ["Tokyo", "Osaka", "Yokohama", "Nagoya", "Sapporo"],
-    "India": ["New Delhi", "Mumbai", "Bangalore", "Kolkata", "Chennai"],
-    "Brazil": ["Brasília", "São Paulo", "Rio de Janeiro", "Salvador", "Fortaleza"],
-    "Canada": ["Ottawa", "Toronto", "Montreal", "Vancouver", "Calgary"],
-    "Australia": ["Canberra", "Sydney", "Melbourne", "Brisbane", "Perth"],
-    "Mexico": ["Mexico City", "Guadalajara", "Monterrey", "Puebla", "Tijuana"],
-    "Argentina": ["Buenos Aires", "Córdoba", "Rosario", "Mendoza", "La Plata"],
-    "South Africa": ["Pretoria", "Johannesburg", "Cape Town", "Durban", "Port Elizabeth"],
-    "Egypt": ["Cairo", "Alexandria", "Giza", "Shubra El-Kheima", "Port Said"],
-    "Nigeria": ["Abuja", "Lagos", "Kano", "Ibadan", "Port Harcourt"],
-    "Indonesia": ["Jakarta", "Surabaya", "Bandung", "Medan", "Semarang"],
-    "Poland": ["Warsaw", "Kraków", "Łódź", "Wrocław", "Poznań"],
-    "Ukraine": ["Kyiv", "Kharkiv", "Odesa", "Dnipro", "Lviv"],
-    "Netherlands": ["Amsterdam", "Rotterdam", "The Hague", "Utrecht", "Eindhoven"],
-    "Belgium": ["Brussels", "Antwerp", "Ghent", "Charleroi", "Liège"],
-    "Greece": ["Athens", "Thessaloniki", "Patras", "Heraklion", "Larissa"],
-    "Portugal": ["Lisbon", "Porto", "Braga", "Coimbra", "Funchal"],
-    "Sweden": ["Stockholm", "Gothenburg", "Malmö", "Uppsala", "Västerås"],
-    "Norway": ["Oslo", "Bergen", "Trondheim", "Stavanger", "Drammen"],
-    "Finland": ["Helsinki", "Espoo", "Tampere", "Vantaa", "Oulu"],
-    "Denmark": ["Copenhagen", "Aarhus", "Odense", "Aalborg", "Frederiksberg"],
-    "Austria": ["Vienna", "Graz", "Linz", "Salzburg", "Innsbruck"],
-    "Switzerland": ["Bern", "Zürich", "Geneva", "Basel", "Lausanne"],
-    "Czech Republic": ["Prague", "Brno", "Ostrava", "Plzeň", "Liberec"],
-    "Czechia": ["Prague", "Brno", "Ostrava", "Plzeň", "Liberec"],
-    "Hungary": ["Budapest", "Debrecen", "Szeged", "Miskolc", "Pécs"],
-    "Romania": ["Bucharest", "Cluj-Napoca", "Timișoara", "Iași", "Constanța"],
-    "Bulgaria": ["Sofia", "Plovdiv", "Varna", "Burgas", "Ruse"],
-    "Serbia": ["Belgrade", "Novi Sad", "Niš", "Kragujevac", "Subotica"],
-    "Croatia": ["Zagreb", "Split", "Rijeka", "Osijek", "Zadar"],
-    "Slovakia": ["Bratislava", "Košice", "Prešov", "Žilina", "Nitra"],
-    "Iran": ["Tehran", "Mashhad", "Isfahan", "Karaj", "Shiraz"],
-    "Iraq": ["Baghdad", "Basra", "Mosul", "Erbil", "Kirkuk"],
-    "Saudi Arabia": ["Riyadh", "Jeddah", "Mecca", "Medina", "Dammam"],
-    "Thailand": ["Bangkok", "Chiang Mai", "Phuket", "Pattaya", "Nakhon Ratchasima"],
-    "Vietnam": ["Hanoi", "Ho Chi Minh City", "Da Nang", "Hai Phong", "Can Tho"],
-    "Malaysia": ["Kuala Lumpur", "George Town", "Ipoh", "Johor Bahru", "Malacca"],
-    "Philippines": ["Manila", "Quezon City", "Davao", "Cebu", "Zamboanga"],
-    "South Korea": ["Seoul", "Busan", "Incheon", "Daegu", "Daejeon"],
-    "Pakistan": ["Islamabad", "Karachi", "Lahore", "Faisalabad", "Rawalpindi"],
-    "Bangladesh": ["Dhaka", "Chittagong", "Khulna", "Rajshahi", "Sylhet"],
-    "Colombia": ["Bogotá", "Medellín", "Cali", "Barranquilla", "Cartagena"],
-    "Venezuela": ["Caracas", "Maracaibo", "Valencia", "Barquisimeto", "Maracay"],
-    "Peru": ["Lima", "Arequipa", "Trujillo", "Chiclayo", "Cusco"],
-    "Chile": ["Santiago", "Valparaíso", "Concepción", "La Serena", "Antofagasta"],
-};
-
-// Varsayılan şehir isimleri (ülke tanımlı değilse)
-const defaultCityNames = ["City A", "City B", "City C", "City D", "City E"];
-
 // Şehir verilerini oluştur (marker olmadan, sadece veri)
 export function createCityMarkers(regions, mapInstance) {
     console.log(`DEBUG: createCityMarkers fonksiyonuna ${regions.length} bölge geldi`);
@@ -81,26 +21,12 @@ export function createCityMarkers(regions, mapInstance) {
 
     // Her bölge için bir şehir verisi oluştur
     regions.forEach((region, index) => {
-        const countryName = region.properties.ADMIN || region.properties.NAME || "";
+        const p = region.properties;
+        const countryName = p.ADMIN || p.admin || p.NAME || p.name || p.NAME_TR || p.sovereignt || p.SOVEREIGNT || "Bilinmeyen Ülke";
         const regionId = region.properties.regionId || `region_${index} `;
 
-        // Ülke sayacını başlat
-        if (!countryCityCounters[countryName]) countryCityCounters[countryName] = 0;
-
-        // İsim listesinden isim seç
-        let assignedName;
-        const nameList = cityNamesByCountry[countryName] || defaultCityNames;
-
-        if (countryCityCounters[countryName] < nameList.length) {
-            assignedName = nameList[countryCityCounters[countryName]];
-        } else {
-            // Liste bittiyse türet
-            assignedName = `${countryName} City ${countryCityCounters[countryName] + 1} `;
-        }
-        countryCityCounters[countryName]++;
-
         // Benzersiz şehir ID'si oluştur (SABİT KALMALI)
-        const cityId = `CITY_${String(index).padStart(4, '0')} `;
+        const cityId = `CITY_${String(index).padStart(4, '0')}`;
 
         // Bölgeye özel kaynak ata
         const resource = assignResourceToRegion(countryName, index);
@@ -108,8 +34,8 @@ export function createCityMarkers(regions, mapInstance) {
         // Şehir verisi
         const cityData = {
             id: cityId,
-            name: assignedName, // Artık gerçek isim
-            originalName: assignedName,
+            name: cityId, // İsim varsayılan olarak ID ile aynı
+            originalName: cityId,
             country: countryName,
             regionId: regionId,
             population: Math.floor(Math.random() * 5000000) + 100000,
@@ -140,8 +66,22 @@ export function updateCityMarkersVisibility(zoom) {
 }
 
 // Şehir detay panelini aç
+// Şehir detay panelini aç
+import { getNationData } from '../data/nations.js';
+
 export function openCityPanel(cityData) {
     currentOpenCity = cityData;
+
+    // --- YENİ EKLENTİ: ÜLKE DETAY OVERLAYİ ---
+    if (!document.getElementById('nation-panel-style')) {
+        const link = document.createElement('link');
+        link.id = 'nation-panel-style';
+        link.rel = 'stylesheet';
+        link.href = 'css/nation-panel.css';
+        document.head.appendChild(link);
+    }
+    openCountryOverlay(cityData);
+    // ----------------------------------------
 
     const panel = document.getElementById('city-detail-panel');
     if (!panel) return;
@@ -199,6 +139,10 @@ export function closeCityPanel() {
     if (panel) {
         panel.classList.remove('open');
     }
+    const overlay = document.getElementById('nation-overlay');
+    if (overlay) {
+        overlay.classList.remove('active');
+    }
     currentOpenCity = null;
 }
 
@@ -230,6 +174,9 @@ export function getCityDataByRegion(lookupKey) {
                     // İsim değişmiş mi?
                     if (savedItem.name) data.name = savedItem.name;
 
+                    // Ülke değişmiş mi?
+                    if (savedItem.country) data.country = savedItem.country;
+
                     // Kaynak değişmiş mi?
                     if (savedItem.resource) {
                         // savedItem.resource STRING (örn: "Demir")
@@ -245,4 +192,96 @@ export function getCityDataByRegion(lookupKey) {
     }
 
     return data || null;
+}
+
+// Ülke Overlayi Açma Fonksiyonu
+function openCountryOverlay(cityData) {
+    let overlay = document.getElementById('nation-overlay');
+
+    // Daha önce varsa kapat (yeni veri ile açılması için)
+    if (overlay) {
+        overlay.classList.remove('active');
+        setTimeout(() => createOverlayContent(cityData), 200);
+    } else {
+        createOverlayContent(cityData);
+    }
+}
+
+function createOverlayContent(cityData) {
+    let overlay = document.getElementById('nation-overlay');
+
+    // Ülke verisini al (Dynamic Data)
+    const nation = getNationData(cityData.country);
+
+    // İttifak etiketlerini oluştur
+    const alliancesHtml = (nation.alliances || []).map(a =>
+        `<span class="alliance-tag"><i class="fa-solid ${a.icon || 'fa-shield-halved'}"></i> ${a.name}</span>`
+    ).join('');
+
+    if (!overlay) {
+        overlay = document.createElement('div');
+        overlay.id = 'nation-overlay';
+        overlay.className = 'nation-overlay';
+        document.body.appendChild(overlay);
+    }
+
+    overlay.innerHTML = `
+        <button class="nation-overlay-close" onclick="document.getElementById('nation-overlay').classList.remove('active')">
+            <i class="fa-solid fa-xmark"></i>
+        </button>
+        <div class="nation-panel">
+            <div class="nation-header">
+                <div class="nation-flag-container">
+                    <img src="${nation.flag}" class="nation-flag" alt="${nation.name}">
+                </div>
+                <div class="nation-title">
+                    <span class="nation-name">${nation.name}</span>
+                    <span class="government-type">
+                        <i class="fa-solid fa-landmark"></i> ${nation.government}
+                    </span>
+                </div>
+            </div>
+
+            <div class="leader-section" style="border-left-color: ${nation.color || '#3b82f6'};">
+                <div class="leader-avatar" style="border-color: ${nation.color || '#3b82f6'}40;">
+                    <i class="fa-solid fa-user-tie"></i>
+                </div>
+                <div class="leader-info">
+                    <span class="leader-role">${nation.leaderTitle}</span>
+                    <span class="leader-name">${nation.leader}</span>
+                </div>
+            </div>
+
+            <div class="nation-stats-grid">
+                <div class="nation-stat-item">
+                    <div class="stat-icon text-yellow"><i class="fa-solid fa-coins"></i></div>
+                    <div class="stat-content"><span class="stat-label">GSYİH</span><span class="stat-val">${nation.gdp}</span></div>
+                </div>
+                <div class="nation-stat-item">
+                    <div class="stat-icon text-green"><i class="fa-solid fa-users"></i></div>
+                    <div class="stat-content"><span class="stat-label">Nüfus</span><span class="stat-val">${nation.population}</span></div>
+                </div>
+                <div class="nation-stat-item">
+                    <div class="stat-icon text-blue"><i class="fa-solid fa-hand-fist"></i></div>
+                    <div class="stat-content"><span class="stat-label">Otorite</span><span class="stat-val">%${Math.floor(Math.random() * 40 + 50)}</span></div>
+                </div>
+                <div class="nation-stat-item">
+                    <div class="stat-icon text-purple"><i class="fa-solid fa-flask"></i></div>
+                    <div class="stat-content"><span class="stat-label">Teknoloji</span><span class="stat-val">0.65</span></div>
+                </div>
+            </div>
+            
+             <div class="alliance-section">
+                <span class="stat-label" style="display:block; margin-bottom:6px;">İttifaklar & Paktlar</span>
+                <div class="alliance-list">
+                    ${alliancesHtml || '<span class="alliance-tag" style="opacity:0.5">Tarafsız</span>'}
+                </div>
+             </div>
+        </div>
+    `;
+
+    // Aktif yap
+    requestAnimationFrame(() => {
+        overlay.classList.add('active');
+    });
 }

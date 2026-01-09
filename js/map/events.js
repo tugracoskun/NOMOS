@@ -87,14 +87,36 @@ export function onBaseInteraction(feature, layer, mapInstance) {
     });
 }
 
-// Popup HTML Oluşturucu (Kod tekrarını önlemek için)
-function createPopupContent(topLabel, mainLabel, isProvince) {
-    const btnText = isProvince ? "Bölgeyi Yönet" : "Ülkeyi Yönet";
+// Popup HTML Oluşturucu (Kod tekrarını önlemek için) - YENİ TASARIM
+function createPopupContent(topLabel, mainLabel, isProvince, extraData = null) {
+    const btnText = isProvince ? "Şehri Yönet" : "Ülkeyi Yönet";
+
+    // Varsayılan bayrak ve lider (gelecekte dinamik olacak)
+    const flagUrl = "https://flagcdn.com/w80/tr.png";
+    const allianceHtml = `
+        <div style="display:flex; gap:4px; justify-content:center; margin-top:8px;">
+            <span style="font-size:0.6rem; background:rgba(255,255,255,0.1); padding:2px 6px; border-radius:4px; color:#cbd5e1;">NATO</span>
+            <span style="font-size:0.6rem; background:rgba(255,255,255,0.1); padding:2px 6px; border-radius:4px; color:#cbd5e1;">AB</span>
+        </div>
+    `;
+
     return `
-        <div style="text-align:center; min-width:120px;">
-            <div style="font-size:0.7rem; color:#94a3b8; font-weight:700; text-transform:uppercase;">${topLabel}</div>
-            <div style="font-size:1.1rem; color:#0f172a; font-weight:700; margin:5px 0;">${mainLabel}</div>
-            <button style="background:#1e293b; color:white; border:none; padding:6px 12px; border-radius:4px; font-size:0.8rem; cursor:pointer;">
+        <div style="text-align:center; min-width:180px; font-family:'Inter', sans-serif;">
+            <!-- Ülke Özeti -->
+            <div style="display:flex; align-items:center; gap:8px; background:rgba(255,255,255,0.05); padding:6px; border-radius:8px; margin-bottom:8px;">
+                <img src="${flagUrl}" style="width:24px; height:16px; border-radius:2px; object-fit:cover;">
+                <div style="text-align:left;">
+                   <div style="font-size:0.65rem; color:#94a3b8; line-height:1;">Cumhuriyet</div>
+                   <div style="font-size:0.75rem; color:#e2e8f0; font-weight:700;">${topLabel === 'Ülke' ? mainLabel : topLabel}</div>
+                </div>
+            </div>
+
+            <div style="font-size:0.7rem; color:#94a3b8; font-weight:700; text-transform:uppercase; margin-top:4px;">${isProvince ? 'ŞEHİR' : 'ÜLKE'}</div>
+            <div style="font-size:1.25rem; color:#f8fafc; font-weight:800; margin:2px 0 8px 0;">${mainLabel}</div>
+            
+            ${allianceHtml}
+
+            <button style="background:#3b82f6; color:white; border:none; padding:8px 16px; border-radius:6px; font-size:0.85rem; font-weight:600; cursor:pointer; width:100%; margin-top:12px; transition:all 0.2s;" onmouseover="this.style.background='#2563eb'" onmouseout="this.style.background='#3b82f6'">
                 ${btnText}
             </button>
         </div>

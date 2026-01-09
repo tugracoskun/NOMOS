@@ -201,6 +201,14 @@ export function renderCityPage(container, cityId) {
         document.head.appendChild(link);
     }
 
+    if (!document.getElementById('nation-panel-style')) {
+        const link = document.createElement('link');
+        link.id = 'nation-panel-style';
+        link.rel = 'stylesheet';
+        link.href = 'css/nation-panel.css';
+        document.head.appendChild(link);
+    }
+
     let cityData = null;
     try {
         const savedCity = localStorage.getItem('nomos_current_city');
@@ -249,49 +257,90 @@ export function renderCityPage(container, cityId) {
             </header>
 
             <main class="city-dashboard">
+                <!-- Sol Panel: Ülke ve Şehir Özeti -->
                 <aside class="city-sidebar">
-                    <section class="sidebar-section">
-                        <h2><i class="fa-solid fa-chart-simple"></i> Şehir Verileri</h2>
-                        <div class="stats-column">
-                            <div class="stat-card green">
-                                <i class="fa-solid fa-people-group"></i>
-                                <div class="stat-info">
-                                    <span class="stat-value">${cityData.population.toLocaleString()}</span>
-                                    <span class="stat-label">Nüfus</span>
+                    
+                    <!-- ÜLKE PANELİ (YENİ KOMPAKT TASARIM) -->
+                    <div class="nation-panel">
+                        <!-- Header: Bayrak ve İsim -->
+                        <div class="nation-header">
+                            <div class="nation-flag-container">
+                                <!-- Örnek Türkiye Bayrağı (Gelecekte dinamik olacak) -->
+                                <img src="https://flagcdn.com/w160/tr.png" class="nation-flag" alt="Flag">
+                            </div>
+                            <div class="nation-title">
+                                <span class="nation-name">${cityData.country}</span>
+                                <span class="government-type">
+                                    <i class="fa-solid fa-landmark"></i> Cumhuriyet
+                                </span>
+                            </div>
+                        </div>
+
+                        <!-- Lider Bilgisi -->
+                        <div class="leader-section">
+                            <div class="leader-avatar">
+                                <i class="fa-solid fa-user-tie"></i>
+                            </div>
+                            <div class="leader-info">
+                                <span class="leader-role">Cumhurbaşkanı</span>
+                                <span class="leader-name">Başkan [TR]</span>
+                            </div>
+                        </div>
+
+                        <!-- İstatistikler -->
+                        <div class="nation-stats-grid">
+                            <div class="nation-stat-item">
+                                <div class="stat-icon text-yellow"><i class="fa-solid fa-coins"></i></div>
+                                <div class="stat-content">
+                                    <span class="stat-label">GSYİH (Tahmini)</span>
+                                    <span class="stat-val">$840 Mr</span>
                                 </div>
                             </div>
-                            <div class="stat-card yellow">
-                                <i class="fa-solid fa-chart-line"></i>
-                                <div class="stat-info">
-                                    <span class="stat-value">%${cityData.economy}</span>
-                                    <span class="stat-label">Ekonomi Gücü</span>
+                            <div class="nation-stat-item">
+                                <div class="stat-icon text-green"><i class="fa-solid fa-users"></i></div>
+                                <div class="stat-content">
+                                    <span class="stat-label">Toplam Nüfus</span>
+                                    <span class="stat-val">85.4 M</span>
                                 </div>
                             </div>
-                            <div class="stat-card purple">
-                                <i class="fa-solid fa-percent"></i>
-                                <div class="stat-info">
-                                    <span class="stat-value">${stats.taxEfficiency}%</span>
-                                    <span class="stat-label">Vergi Verimliliği</span>
+                            <div class="nation-stat-item">
+                                <div class="stat-icon text-blue"><i class="fa-solid fa-microchip"></i></div>
+                                <div class="stat-content">
+                                    <span class="stat-label">Teknoloji</span>
+                                    <span class="stat-val">Seviye 4</span>
+                                </div>
+                            </div>
+                            <div class="nation-stat-item">
+                                <div class="stat-icon text-purple"><i class="fa-solid fa-crown"></i></div>
+                                <div class="stat-content">
+                                    <span class="stat-label">Otorite</span>
+                                    <span class="stat-val">%75</span>
                                 </div>
                             </div>
                         </div>
-                    </section>
 
-                    <section class="sidebar-section">
-                        <h2><i class="fa-solid fa-gem"></i> Ana Kaynak</h2>
-                        <div class="resource-card">
-                            <div class="resource-icon">
-                                <i class="${cityData.resource?.icon || 'fa-solid fa-box'}"></i>
-                            </div>
-                            <div class="resource-info">
-                                <span class="resource-name">${cityData.resource?.name || 'Yok'}</span>
-                                <span class="resource-desc">Şehrin üretim temeli</span>
+                        <!-- Ana Kaynak -->
+                        <div class="top-resource">
+                            <span class="resource-badge">💎</span>
+                            <div class="stat-content">
+                                <span class="stat-label">En Büyük İhraç</span>
+                                <span class="stat-val">Bor Madeni</span>
                             </div>
                         </div>
-                    </section>
 
-                    <section class="sidebar-section">
-                        <h2><i class="fa-solid fa-wrench"></i> Altyapı</h2>
+                         <!-- İttifaklar -->
+                         <div style="margin-top:auto;">
+                            <span class="stat-label" style="display:block; margin-bottom:6px;">İttifaklar & Paktlar</span>
+                            <div class="alliance-list">
+                                <span class="alliance-tag"><i class="fa-solid fa-shield-halved"></i> NATO</span>
+                                <span class="alliance-tag"><i class="fa-solid fa-handshake"></i> AB Gümrük</span>
+                            </div>
+                         </div>
+                    </div>
+
+                    <!-- Şehir Altyapısı (Mobil Altyapı Paneli) -->
+                    <section class="sidebar-section" style="margin-top: 16px;">
+                        <h2><i class="fa-solid fa-wrench"></i> Şehir Altyapısı</h2>
                         <div class="infra-compact">
                             <div class="infra-header">
                                 <span class="infra-level">Seviye ${stats.infrastructure}</span>
