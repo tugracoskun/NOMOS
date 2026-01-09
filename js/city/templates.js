@@ -64,6 +64,29 @@ export function generateSidebarHTML(cityData, nation, stats, alliancesHtml) {
                  </button>
             </div>
 
+            <!-- FAZ 4: KAYNAK GELİRİ KARTI -->
+            ${cityData.resource ? `
+            <div class="sidebar-section highlight-card">
+                <div class="resource-header">
+                    <i class="fa-solid fa-gem text-gold"></i>
+                    <span>Bölgesel Kaynak</span>
+                </div>
+                <div class="resource-body">
+                    <div class="res-icon-large"><i class="${cityData.resource.icon || 'fa-solid fa-box'}"></i></div>
+                    <div class="res-details">
+                        <strong class="res-name">${cityData.resource.name}</strong>
+                        <div class="res-income">
+                            <i class="fa-solid fa-coins text-yellow"></i>
+                            <span class="income-val">+${stats.resourceIncome ? stats.resourceIncome.toLocaleString() : '0'}</span> / Gün
+                        </div>
+                    </div>
+                </div>
+                <div class="market-trend up">
+                    <i class="fa-solid fa-arrow-trend-up"></i> Pazar Değeri Yüksek
+                </div>
+            </div>
+            ` : ''}
+
             <section class="sidebar-section" style="margin-top: 16px;">
                 <h2><i class="fa-solid fa-wrench"></i> Şehir Altyapısı</h2>
                 <div class="infra-compact">

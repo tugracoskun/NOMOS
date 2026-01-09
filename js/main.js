@@ -2,11 +2,12 @@
 // Uygulamanın giriş noktası ve global olay dinleyicisi
 
 import { navigateTo, handleInitialLoad } from './router.js';
-import { loadState } from './data/state.js';
+import { loadState, startIncomeTicker } from './data/state.js';
 
 document.addEventListener('DOMContentLoaded', () => {
     console.log("NOMOS System Initialized.");
     loadState(); // Oyun durumunu yükle (Altın, Enerji vb.)
+    startIncomeTicker(); // Gelir döngüsünü başlat (Faz 4)
 
     // --- GLOBAL EVENT DELEGATION ---
     // Sayfadaki herhangi bir tıklamayı dinler

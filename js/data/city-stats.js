@@ -231,12 +231,66 @@ export function generateCityStats(cityData) {
     const cityValue = calculateCityValue({ ...cityData, taxEfficiency, infrastructure });
     const buildings = cityData.buildings || [];
 
+    // Kaynak Geliri Hesabı
+    const resourceName = cityData.resource?.name || null;
+    let resourceIncome = 0;
+    if (resourceName && resourcesEconomics[resourceName]) {
+        // Pazar Çarpanı (Market Multiplier) ileride global state'ten gelecek. Şimdilik 1.0
+        resourceIncome = calculateResourceIncome(resourceName, 1.0);
+    }
+
     return {
         infrastructure,
         infrastructureName: infrastructureLevels[infrastructure]?.name || "Bilinmiyor",
         taxEfficiency: Math.round(taxEfficiency * 100), // Yüzde olarak
         cityValue,
         buildingCount: buildings.length,
-        buildings
+        buildings,
+        resourceIncome // Yeni Alan: Tahmini Kaynak Geliri
     };
+}
+
+// --- FAZ 4: KAYNAK EKONOMİSİ SİSTEMİ ---
+
+export const resourcesEconomics = {
+    // Stratejik Kaynaklar (Yüksek Değer, Yüksek Oynaklık)
+    "Petrol": { baseValue: 1200, volatility: 0.8 }, // Çok değerli ama savaşta düşebilir/artabilir
+    "Doğalgaz": { baseValue: 1100, volatility: 0.7 },
+    "Uranyum": { baseValue: 1500, volatility: 0.9 },
+    "Altın": { baseValue: 1000, volatility: 0.4 }, // Güvenli liman
+    "Pırlanta": { baseValue: 1300, volatility: 0.5 },
+    "Lityum": { baseValue: 900, volatility: 0.6 },
+    "Titanyum": { baseValue: 950, volatility: 0.5 },
+
+    // Endüstriyel Hammaddeler (Orta Değer, Kararlı)
+    "Demir": { baseValue: 600, volatility: 0.2 },
+    "Çelik": { baseValue: 700, volatility: 0.3 }, // İşlenmiş olduğu için biraz daha değerli
+    "Bakır": { baseValue: 550, volatility: 0.2 },
+    "Alüminyum": { baseValue: 580, volatility: 0.2 },
+    "Kömür": { baseValue: 400, volatility: 0.3 },
+    "Kauçuk": { baseValue: 500, volatility: 0.4 },
+    "Kereste": { baseValue: 350, volatility: 0.1 },
+
+    // Tarım ve Gıda (Düşük Değer, Mevsimsel Oynaklık)
+    "Buğday": { baseValue: 200, volatility: 0.3 },
+    "Mısır": { baseValue: 220, volatility: 0.3 },
+    "Pamuk": { baseValue: 450, volatility: 0.4 }, // Tekstil için önemli
+    "Zeytin": { baseValue: 380, volatility: 0.2 },
+    "Şarap": { baseValue: 500, volatility: 0.2 }, // Lüks tüketim
+    "Balık": { baseValue: 250, volatility: 0.3 },
+    "Tütün": { baseValue: 600, volatility: 0.2 }, // Yüksek vergi geliri potansiyeli
+
+    // Diğer (Varsayılan)
+    "Bilinmiyor": { baseValue: 100, volatility: 0.0 }
+};
+
+// Kaynak Geliri Hesaplama Fonksiyonu
+// Formül: (BaseValue * MarketMultiplier) + (InfrastructureBonus)
+export function calculateResourceIncome(resourceName, marketMultiplier = 1.0, infraLevel = 1) {
+    const stats = resourcesEconomics[resourceName] || resourcesEconomics["Bilinmiyor"];
+
+    // Altyapı bonusu: Her seviye %5 ek gelir sağlar
+    const infraBonusMultiplier = 1 + ((infraLevel - 1) * 0.05);
+
+    return Math.floor(stats.baseValue * marketMultiplier * infraBonusMultiplier);
 }
