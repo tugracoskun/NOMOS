@@ -1,6 +1,8 @@
 // HARİTA MODLARI SİSTEMİ
 // Haritayı farklı perspektiflerden görüntüleme
 
+import { toggleStatisticsPanel } from './statistics-panel.js';
+
 export const mapModes = {
     default: {
         id: 'default',
@@ -99,6 +101,9 @@ export function setMapMode(modeId) {
     currentMode = modeId;
     updateModePanel();
     applyModeVisualization();
+
+    // İstatistik modundaysa paneli aç, değilse kapat
+    toggleStatisticsPanel(modeId === 'statistics');
 
     console.log(`Harita modu değiştirildi: ${modeId}`);
 }
