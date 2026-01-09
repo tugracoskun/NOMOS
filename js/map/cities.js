@@ -230,53 +230,64 @@ function createOverlayContent(cityData) {
             <i class="fa-solid fa-xmark"></i>
         </button>
         <div class="nation-panel">
-            <div class="nation-header">
-                <div class="nation-flag-container">
-                    <img src="${nation.flag}" class="nation-flag" alt="${nation.name}">
+            <!-- Header: Bayrak ve İsim -->
+            <div class="nation-header-v2">
+                <div class="nation-flag-v2">
+                    <img src="${nation.flag}" alt="${nation.name}">
                 </div>
-                <div class="nation-title">
-                    <span class="nation-name">${nation.name}</span>
-                    <span class="government-type">
-                        <i class="fa-solid fa-landmark"></i> ${nation.government}
+                <div class="nation-title-v2">
+                    <span class="nation-name-v2">${nation.name}</span>
+                    <span class="nation-meta-v2">
+                        <i class="fa-solid fa-landmark"></i> ${nation.government} | 
+                        <i class="fa-solid fa-ranking-star"></i> #${nation.ranking || '?'}
                     </span>
                 </div>
             </div>
 
-            <div class="leader-section" style="border-left-color: ${nation.color || '#3b82f6'};">
-                <div class="leader-avatar" style="border-color: ${nation.color || '#3b82f6'}40;">
-                    <i class="fa-solid fa-user-tie"></i>
-                </div>
-                <div class="leader-info">
-                    <span class="leader-role">${nation.leaderTitle}</span>
-                    <span class="leader-name">${nation.leader}</span>
+            <!-- Lider (Compact) -->
+            <div class="leader-row-v2" style="border-left: 3px solid ${nation.color || '#3b82f6'};">
+                <div class="leader-avatar-v2"><i class="fa-solid fa-user-tie"></i></div>
+                <div class="leader-info-v2">
+                    <span class="l-role">${nation.leaderTitle}</span>
+                    <span class="l-name">${nation.leader}</span>
                 </div>
             </div>
 
-            <div class="nation-stats-grid">
-                <div class="nation-stat-item">
-                    <div class="stat-icon text-yellow"><i class="fa-solid fa-coins"></i></div>
-                    <div class="stat-content"><span class="stat-label">GSYİH</span><span class="stat-val">${nation.gdp}</span></div>
+            <!-- İstatistik Grid 3x2 -->
+            <div class="stats-grid-v2">
+                <div class="stat-box-v2">
+                    <span class="val text-gold">${nation.gdp}</span>
+                    <span class="lbl">GSYİH</span>
                 </div>
-                <div class="nation-stat-item">
-                    <div class="stat-icon text-green"><i class="fa-solid fa-users"></i></div>
-                    <div class="stat-content"><span class="stat-label">Nüfus</span><span class="stat-val">${nation.population}</span></div>
+                <div class="stat-box-v2">
+                    <span class="val text-green">${nation.population}</span>
+                    <span class="lbl">Nüfus</span>
                 </div>
-                <div class="nation-stat-item">
-                    <div class="stat-icon text-blue"><i class="fa-solid fa-hand-fist"></i></div>
-                    <div class="stat-content"><span class="stat-label">Otorite</span><span class="stat-val">%${Math.floor(Math.random() * 40 + 50)}</span></div>
+                <div class="stat-box-v2">
+                    <span class="val text-blue">${nation.mainResource || 'Bilinmiyor'}</span>
+                    <span class="lbl">Ana Kaynak</span>
                 </div>
-                <div class="nation-stat-item">
-                    <div class="stat-icon text-purple"><i class="fa-solid fa-flask"></i></div>
-                    <div class="stat-content"><span class="stat-label">Teknoloji</span><span class="stat-val">0.65</span></div>
+                <div class="stat-box-v2">
+                    <span class="val text-purple">${nation.tech || '0.50'}</span>
+                    <span class="lbl">Teknoloji</span>
+                </div>
+                <!-- Başkent Eklendi -->
+                 <div class="stat-box-v2" style="grid-column: span 2;">
+                    <span class="val text-white" style="font-size:0.9rem;">${nation.capital || 'Bilinmiyor'}</span>
+                    <span class="lbl">Başkent</span>
                 </div>
             </div>
             
-             <div class="alliance-section">
-                <span class="stat-label" style="display:block; margin-bottom:6px;">İttifaklar & Paktlar</span>
-                <div class="alliance-list">
-                    ${alliancesHtml || '<span class="alliance-tag" style="opacity:0.5">Tarafsız</span>'}
+             <div class="alliance-section-v2">
+                <span class="lbl" style="margin-bottom:4px; display:block;">İttifaklar</span>
+                <div class="alliance-list-v2">
+                    ${alliancesHtml || '<span class="tag-v2">Tarafsız</span>'}
                 </div>
              </div>
+
+             <button class="nation-inspect-btn" onclick="window.location.hash = 'country/${encodeURIComponent(nation.name)}'">
+                <i class="fa-solid fa-eye"></i> Detaylı İncele
+             </button>
         </div>
     `;
 

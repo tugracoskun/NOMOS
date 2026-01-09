@@ -1,6 +1,6 @@
-/* ÜLKE DETAYLARI PANELİ - MODERN TASARIM (v2) */
+/* ÜLKE DETAYLARI PANELİ - PREMIUM LAYOUT */
 
-/* Overlay Container (Harita Üzerinde Sabit Panel) */
+/* Container */
 .nation-overlay {
     position: fixed;
     top: 130px;
@@ -9,222 +9,190 @@
     z-index: 1000;
     pointer-events: auto;
 
-    background: rgba(15, 23, 42, 0.90);
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    border-radius: 20px;
-    padding: 20px;
-    backdrop-filter: blur(12px);
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+    background: rgba(15, 23, 42, 0.95);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 24px;
+    padding: 24px;
+    backdrop-filter: blur(20px);
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8);
+    font-family: 'Inter', sans-serif;
+    color: #e2e8f0;
 
     display: flex;
     flex-direction: column;
-    gap: 16px;
+    gap: 20px;
 
-    /* Animasyon */
     opacity: 0;
-    transform: translateX(-40px);
-    transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+    transform: translateX(-40px) scale(0.95);
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .nation-overlay.active {
     opacity: 1;
-    transform: translateX(0);
+    transform: translateX(0) scale(1);
 }
 
-/* Close Button */
+/* Close Butonu */
 .nation-overlay-close {
     position: absolute;
-    top: 12px;
-    right: 12px;
-    width: 24px;
-    height: 24px;
-    background: rgba(255, 255, 255, 0.1);
+    top: 14px;
+    right: 14px;
+    width: 28px;
+    height: 28px;
+    background: rgba(255, 255, 255, 0.05);
     border: none;
     border-radius: 50%;
-    color: #cbd5e1;
+    color: #94a3b8;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 0.8rem;
-    transition: all 0.2s;
+    font-size: 0.9rem;
+    transition: 0.2s;
+    z-index: 10;
 }
 
 .nation-overlay-close:hover {
     background: #ef4444;
     color: white;
-    transform: rotate(90deg);
 }
 
-/* Common Panel Styles */
-.nation-panel {
-    background: transparent;
-    padding: 0;
-    font-family: 'Inter', sans-serif;
-    color: #e2e8f0;
-}
-
-/* Header Section */
-.nation-header {
+/* 1. ÜST KISIM: BAYRAK VE BAŞLIK */
+.nation-header-v2 {
     display: flex;
+    flex-direction: row;
     align-items: center;
     gap: 16px;
-    padding-bottom: 12px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-.nation-flag-container {
-    width: 90px;
-    height: 56px;
+.nation-flag-v2 {
+    width: 80px;
+    height: 54px;
     border-radius: 8px;
     overflow: hidden;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
     border: 1px solid rgba(255, 255, 255, 0.1);
     flex-shrink: 0;
 }
 
-.nation-flag {
+.nation-flag-v2 img {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    animation: flagWave 4s ease-in-out infinite alternate;
 }
 
-@keyframes flagWave {
-    from {
-        transform: scale(1.05) skewX(0deg);
-    }
-
-    to {
-        transform: scale(1.05) skewX(2deg);
-    }
-}
-
-.nation-title {
+.nation-title-v2 {
     display: flex;
     flex-direction: column;
-    justify-content: center;
-    overflow: hidden;
 }
 
-.nation-name {
-    font-size: 1.2rem;
-    font-weight: 700;
+.nation-name-v2 {
+    font-size: 1.4rem;
+    font-weight: 800;
     color: white;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    letter-spacing: -0.5px;
+    line-height: 1.1;
+    margin-bottom: 4px;
 }
 
-.government-type {
-    font-size: 0.7rem;
+.nation-meta-v2 {
+    font-size: 0.75rem;
     color: #94a3b8;
-    background: rgba(255, 255, 255, 0.05);
-    padding: 2px 8px;
-    border-radius: 12px;
-    align-self: flex-start;
-    margin-top: 4px;
-    display: inline-flex;
+    display: flex;
     align-items: center;
-    gap: 5px;
+    flex-wrap: wrap;
+    gap: 8px;
 }
 
-/* Leader Section */
-.leader-section {
+.nation-meta-v2 i {
+    color: #64748b;
+}
+
+/* 2. LİDER KARTI (PREMIUM) */
+.leader-row-v2 {
     display: flex;
     align-items: center;
     gap: 12px;
-    background: linear-gradient(to right, rgba(255, 255, 255, 0.03), transparent);
-    padding: 10px;
+    background: linear-gradient(90deg, rgba(255, 255, 255, 0.03), transparent);
+    padding: 12px 16px;
     border-radius: 12px;
-    border-left: 3px solid #3b82f6;
+    border-left-width: 4px;
+    /* Renk cities.js'den gelecek */
 }
 
-.leader-avatar {
-    width: 44px;
-    height: 44px;
+.leader-avatar-v2 {
+    width: 38px;
+    height: 38px;
     border-radius: 50%;
-    background: #1e293b;
+    background: rgba(15, 23, 42, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.15);
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1.2rem;
     color: #cbd5e1;
-    border: 2px solid rgba(59, 130, 246, 0.3);
+    font-size: 1rem;
 }
 
-.leader-info {
+.leader-info-v2 {
     display: flex;
     flex-direction: column;
 }
 
-.leader-role {
+.l-role {
     font-size: 0.65rem;
     text-transform: uppercase;
     color: #64748b;
     letter-spacing: 0.5px;
+    font-weight: 600;
 }
 
-.leader-name {
-    display: block;
+.l-name {
     font-size: 0.95rem;
-    font-weight: 600;
+    font-weight: 700;
     color: white;
 }
 
-/* Stats Grid - 2x2 Symmetry */
-.nation-stats-grid {
+/* 3. İSTATİSTİK IZGARASI (GRID) */
+.stats-grid-v2 {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 10px;
-    margin-top: 4px;
 }
 
-.nation-stat-item {
-    background: rgba(255, 255, 255, 0.03);
-    border-radius: 10px;
-    padding: 10px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
+.stat-box-v2 {
+    background: rgba(255, 255, 255, 0.02);
     border: 1px solid rgba(255, 255, 255, 0.05);
-    transition: background 0.2s;
-}
-
-.nation-stat-item:hover {
-    background: rgba(255, 255, 255, 0.05);
-}
-
-.stat-icon {
-    width: 32px;
-    height: 32px;
-    border-radius: 8px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: rgba(255, 255, 255, 0.05);
-    font-size: 0.9rem;
-}
-
-.stat-content {
+    border-radius: 12px;
+    padding: 12px;
     display: flex;
     flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    transition: all 0.2s;
 }
 
-.stat-label {
-    font-size: 0.65rem;
-    color: #94a3b8;
+.stat-box-v2:hover {
+    background: rgba(255, 255, 255, 0.05);
+    transform: translateY(-2px);
 }
 
-.stat-val {
-    font-size: 0.9rem;
+.stat-box-v2 .val {
+    font-size: 1.1rem;
     font-weight: 700;
-    color: #f1f5f9;
+    margin-bottom: 2px;
+    font-feature-settings: "tnum";
 }
 
-/* Colors */
-.text-yellow {
+.stat-box-v2 .lbl {
+    font-size: 0.65rem;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-weight: 600;
+}
+
+/* Renkler */
+.text-gold {
     color: #fbbf24;
 }
 
@@ -237,30 +205,73 @@
 }
 
 .text-purple {
-    color: #a78bfa;
+    color: #c084fc;
 }
 
-/* Alliances */
-.alliance-section {
-    margin-top: auto;
-    padding-top: 8px;
+.text-white {
+    color: #f8fafc;
 }
 
-.alliance-list {
+/* 4. İTTİFAKLAR */
+.alliance-section-v2 {
     display: flex;
+    flex-direction: column;
     gap: 6px;
-    flex-wrap: wrap;
-    margin-top: 6px;
+    margin-top: 4px;
 }
 
-.alliance-tag {
+.alliance-section-v2 .lbl {
     font-size: 0.7rem;
+    color: #64748b;
+    font-weight: 600;
+}
+
+.alliance-list-v2 {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.tag-v2 {
+    font-size: 0.75rem;
     padding: 4px 10px;
-    background: rgba(15, 23, 42, 0.6);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(59, 130, 246, 0.1);
+    border: 1px solid rgba(59, 130, 246, 0.2);
     border-radius: 6px;
-    color: #cbd5e1;
+    color: #93c5fd;
+    font-weight: 500;
     display: flex;
     align-items: center;
-    gap: 5px;
+    gap: 6px;
+}
+
+/* 5. AKSİYON BUTONU */
+.nation-inspect-btn {
+    width: 100%;
+    padding: 14px;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 12px;
+    color: white;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 4px;
+}
+
+.nation-inspect-btn:hover {
+    background: linear-gradient(135deg, #3b82f6, #2563eb);
+    border-color: #60a5fa;
+    box-shadow: 0 4px 20px rgba(37, 99, 235, 0.4);
+    transform: translateY(-2px);
+}
+
+.nation-inspect-btn:active {
+    transform: translateY(0);
 }

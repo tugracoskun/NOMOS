@@ -6,11 +6,20 @@ export const nations = {
         id: "tr",
         name: "Türkiye",
         flag: "https://flagcdn.com/w320/tr.png",
+        capital: "Ankara",
         leader: "Başkan [TR]",
         leaderTitle: "Cumhurbaşkanı",
         government: "Cumhuriyet",
         gdp: "900 Mr $",
         population: "85 M",
+        ranking: 18,
+        tech: "0.75",
+        mainResource: "Tekstil",
+        ministers: [
+            { title: "Ekonomi Bakanı", name: "Mehmet Şimşek" },
+            { title: "Savunma Bakanı", name: "Yaşar Güler" },
+            { title: "Dışişleri Bakanı", name: "Hakan Fidan" }
+        ],
         color: "#E30A17",
         alliances: [
             { name: "NATO", icon: "fa-shield-halved" },
@@ -21,11 +30,20 @@ export const nations = {
         id: "us",
         name: "Amerika Birleşik Devletleri",
         flag: "https://flagcdn.com/w320/us.png",
+        capital: "Washington, D.C.",
         leader: "J. Biden",
         leaderTitle: "Başkan",
         government: "Federal Cumhuriyet",
         gdp: "23 Tn $",
         population: "331 M",
+        ranking: 1,
+        tech: "0.98",
+        mainResource: "Teknoloji",
+        ministers: [
+            { title: "Hazine Bakanı", name: "Janet Yellen" },
+            { title: "Savunma Bakanı", name: "Lloyd Austin" },
+            { title: "Dışişleri Bakanı", name: "Antony Blinken" }
+        ],
         color: "#3C3B6E",
         alliances: [
             { name: "NATO", icon: "fa-shield-halved" }
@@ -35,11 +53,20 @@ export const nations = {
         id: "ru",
         name: "Rusya Federasyonu",
         flag: "https://flagcdn.com/w320/ru.png",
+        capital: "Moskova",
         leader: "V. Putin",
         leaderTitle: "Devlet Başkanı",
         government: "Federasyon",
         gdp: "1.7 Tn $",
         population: "144 M",
+        ranking: 11,
+        tech: "0.85",
+        mainResource: "Doğalgaz",
+        ministers: [
+            { title: "Maliye Bakanı", name: "Anton Siluanov" },
+            { title: "Savunma Bakanı", name: "Sergey Şoygu" },
+            { title: "Dışişleri Bakanı", name: "Sergey Lavrov" }
+        ],
         color: "#0039A6",
         alliances: [
             { name: "CSTO", icon: "fa-shield-halved" }
@@ -49,11 +76,19 @@ export const nations = {
         id: "ma",
         name: "Fas Krallığı",
         flag: "https://flagcdn.com/w320/ma.png",
+        capital: "Rabat",
         leader: "VI. Muhammed",
         leaderTitle: "Kral",
         government: "Anayasal Monarşi",
         gdp: "142 Mr $",
         population: "37 M",
+        ranking: 58,
+        tech: "0.45",
+        mainResource: "Fosfat",
+        ministers: [
+            { title: "Başbakan", name: "Aziz Akhannouch" },
+            { title: "Dışişleri Bakanı", name: "Nasser Bourita" }
+        ],
         color: "#c1272d",
         alliances: [
             { name: "AB Gümrük", icon: "fa-euro-sign" }
@@ -63,26 +98,42 @@ export const nations = {
         id: "de",
         name: "Almanya",
         flag: "https://flagcdn.com/w320/de.png",
+        capital: "Berlin",
         leader: "O. Scholz",
         leaderTitle: "Şansölye",
         government: "Federal Cumhuriyet",
         gdp: "4.2 Tn $",
         population: "83 M",
+        ranking: 4,
+        tech: "0.92",
+        mainResource: "Otomotiv",
+        ministers: [
+            { title: "Maliye Bakanı", name: "Christian Lindner" },
+            { title: "Dışişleri Bakanı", name: "Annalena Baerbock" }
+        ],
         color: "#DD0000",
         alliances: [
             { name: "NATO", icon: "fa-shield-halved" },
-            { name: "AB", icon: "fa-flag-usa" } // AB icon placeholder
+            { name: "AB", icon: "fa-flag-usa" }
         ]
     },
     "France": {
         id: "fr",
         name: "Fransa",
         flag: "https://flagcdn.com/w320/fr.png",
+        capital: "Paris",
         leader: "E. Macron",
         leaderTitle: "Cumhurbaşkanı",
         government: "Cumhuriyet",
         gdp: "2.9 Tn $",
         population: "67 M",
+        ranking: 7,
+        tech: "0.88",
+        mainResource: "Havacılık",
+        ministers: [
+            { title: "Başbakan", name: "Gabriel Attal" },
+            { title: "Ekonomi Bakanı", name: "Bruno Le Maire" }
+        ],
         color: "#0055A4",
         alliances: [
             { name: "NATO", icon: "fa-shield-halved" },
@@ -93,11 +144,19 @@ export const nations = {
         id: "cn",
         name: "Çin Halk Cumhuriyeti",
         flag: "https://flagcdn.com/w320/cn.png",
+        capital: "Pekin",
         leader: "Xi Jinping",
         leaderTitle: "Devlet Başkanı",
         government: "Sosyalist Cumhuriyet",
         gdp: "17.7 Tn $",
         population: "1.4 Mr",
+        ranking: 2,
+        tech: "0.90",
+        mainResource: "Elektronik",
+        ministers: [
+            { title: "Başbakan", name: "Li Qiang" },
+            { title: "Dışişleri Bakanı", name: "Wang Yi" }
+        ],
         color: "#EE1C25",
         alliances: []
     }
@@ -116,16 +175,26 @@ export function getNationData(countryName) {
         return nations[key];
     }
 
+    const isoCode = getMethodIdFromName(countryName);
+
     // 2. Bulunamazsa jenerik veri döndür
     return {
-        id: "unknown",
+        id: isoCode, // ISO kodu ID olarak kullan
         name: countryName,
-        flag: `https://flagcdn.com/w320/${getMethodIdFromName(countryName)}.png`, // Tahmini kod
+        flag: `https://flagcdn.com/w320/${isoCode}.png`, // Tahmini kod
+        capital: "Bilinmiyor",
         leader: "Bilinmiyor",
         leaderTitle: "Devlet Başkanı",
         government: "Cumhuriyet",
         gdp: (Math.random() * 500 + 10).toFixed(0) + " Mr $",
         population: (Math.random() * 50 + 1).toFixed(1) + " M",
+        ranking: Math.floor(Math.random() * 100) + 20,
+        tech: (Math.random() * 0.8).toFixed(2),
+        mainResource: ["Tarım", "Sanayi", "Turizm", "Maden"][Math.floor(Math.random() * 4)],
+        ministers: [
+            { title: "Ekonomi Bakanı", name: "Bilinmiyor" },
+            { title: "Dışişleri Bakanı", name: "Bilinmiyor" }
+        ],
         color: "#555555",
         alliances: []
     };

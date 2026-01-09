@@ -6,6 +6,7 @@ import { renderHome } from './home.js';
 import { renderPartiesPage } from './parties/main.js';
 import { renderParliamentPage } from './parliament/main.js';
 import { renderCityPage } from './city/main.js';
+import { renderCountryPage } from './country/main.js';
 
 const appContainer = document.getElementById('app-container');
 
@@ -101,6 +102,11 @@ export function loadPage(pageName, subView = null, id = null) {
 
             case 'city':
                 renderCityPage(appContainer, subView);
+                finishLoading();
+                break;
+
+            case 'country':
+                renderCountryPage(appContainer, subView ? decodeURIComponent(subView) : null);
                 finishLoading();
                 break;
 
