@@ -30,14 +30,62 @@ export function saveState() {
 }
 
 // UI Güncelle (Altın ve Enerji)
+let lastGoldValue = 0;
+
 export function updateHeaderUI() {
     const goldEl = document.getElementById('global-gold');
     const energyBar = document.getElementById('energy-bar');
     const energyText = document.getElementById('energy-text');
 
-    if (goldEl) goldEl.textContent = gameState.gold.toLocaleString();
+    if (goldEl) {
+        const newValue = gameState.gold;
+        const oldValue = lastGoldValue;
+
+        // Eğer değer değiştiyse animasyonlu geçiş yap
+        if (oldValue !== newValue && oldValue > 0) {
+            animateGoldChange(goldEl, oldValue, newValue);
+        } else {
+            goldEl.textContent = newValue.toLocaleString();
+        }
+
+        lastGoldValue = newValue;
+    }
+
     if (energyBar) energyBar.style.width = `${(gameState.energy / gameState.maxEnergy) * 100}%`;
     if (energyText) energyText.textContent = `${gameState.energy} / ${gameState.maxEnergy}`;
+}
+
+// Altın değişim animasyonu
+function animateGoldChange(element, from, to) {
+    const duration = 600; // ms
+    const startTime = performance.now();
+    const diff = to - from;
+
+    // Renk efekti
+    const wrapper = element.closest('.gold-display') || element.parentElement;
+    if (wrapper) {
+        wrapper.classList.remove('gold-increase', 'gold-decrease');
+        wrapper.classList.add(diff > 0 ? 'gold-increase' : 'gold-decrease');
+        setTimeout(() => wrapper.classList.remove('gold-increase', 'gold-decrease'), 800);
+    }
+
+    // Sayı animasyonu
+    function tick(currentTime) {
+        const elapsed = currentTime - startTime;
+        const progress = Math.min(elapsed / duration, 1);
+
+        // Easing (ease-out)
+        const eased = 1 - Math.pow(1 - progress, 3);
+        const currentValue = Math.round(from + diff * eased);
+
+        element.textContent = currentValue.toLocaleString();
+
+        if (progress < 1) {
+            requestAnimationFrame(tick);
+        }
+    }
+
+    requestAnimationFrame(tick);
 }
 
 // Altın harca / ekle

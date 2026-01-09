@@ -225,3 +225,38 @@
     background-color: rgba(59, 130, 246, 0.1);
     font-weight: 600;
 }
+
+/* GOLD ANIMATION EFFECTS */
+.gold-increase {
+    animation: goldFadeGreen 1s ease;
+}
+
+.gold-decrease {
+    animation: goldFadeRed 1s ease;
+}
+
+@keyframes goldFadeGreen {
+
+    0%,
+    100% {
+        color: inherit;
+    }
+
+    30%,
+    60% {
+        color: #4ade80;
+    }
+}
+
+@keyframes goldFadeRed {
+
+    0%,
+    100% {
+        color: inherit;
+    }
+
+    30%,
+    60% {
+        color: #f87171;
+    }
+}
