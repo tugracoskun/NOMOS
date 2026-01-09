@@ -156,6 +156,12 @@ export function initMap(containerId) {
     // İkisi de bitince loader'ı kaldır
     Promise.all([dataLoading, minWait]).then(() => {
         const loader = document.getElementById('map-loader');
+
+        // Router Loading Bar'ı bitir
+        import('../router.js').then(module => {
+            if (module.finishLoading) module.finishLoading();
+        });
+
         if (loader) {
             // Yazıyı değiştir (Son dokunuş)
             loader.querySelector('.loading-title').innerText = "BAĞLANTI KURULDU";

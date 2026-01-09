@@ -12,7 +12,58 @@ const appContainer = document.getElementById('app-container');
 // ========================================================
 // 1. SAYFA YÜKLEME (View Render)
 // ========================================================
+// ========================================================
+// 5. YÜKLEME ÇUBUĞU YÖNETİMİ
+// ========================================================
+let loadingInterval = null;
+
+export function startLoading() {
+    const bar = document.getElementById('global-progress-bar');
+    if (!bar) return;
+
+    // Önceki animasyonu temizle ve çubuğu sıfırla
+    bar.style.transition = 'none';
+    bar.style.width = '0%';
+    bar.style.opacity = '1';
+
+    // Reflow tetikle (Browser'ın değişikliği algılaması için)
+    bar.offsetHeight;
+
+    // Yavaşça %90'a kadar ilerle (CSS transition ile akıcı)
+    // 10 saniyede %90'a varacak şekilde ayarla (Yükleme bitince hızlanacak)
+    requestAnimationFrame(() => {
+        bar.style.transition = 'width 10s cubic-bezier(0.2, 0.5, 0.3, 1)';
+        bar.style.width = '90%';
+    });
+}
+
+export function finishLoading() {
+    const bar = document.getElementById('global-progress-bar');
+    if (!bar) return;
+
+    // Mevcut konumdan %100'e hızlıca tamamla
+    bar.style.transition = 'width 0.4s ease-out';
+    bar.style.width = '100%';
+
+    // İşlem bitince gizle
+    setTimeout(() => {
+        bar.style.opacity = '0';
+        setTimeout(() => {
+            // Gelecek yükleme için sıfırla
+            bar.style.transition = 'none';
+            bar.style.width = '0%';
+        }, 400); // Opacity transition süresi
+    }, 400); // Width tamamlanma süresi
+}
+
+// ========================================================
+// 1. SAYFA YÜKLEME (View Render)
+// ========================================================
 export function loadPage(pageName, subView = null, id = null) {
+    // Yükleme Animasyonunu Başlat (Sadece Map dışı veya ilk yükleme için görsel güzellik)
+    // Map kendi yüklemesini yönetebilir ama router geçişinde de tetikleyelim.
+    startLoading();
+
     // Harita temizliği (Bellek sızıntısını önlemek için)
     if (pageName !== 'map') {
         destroyMap();
@@ -23,45 +74,50 @@ export function loadPage(pageName, subView = null, id = null) {
 
     console.log(`Router: ${pageName} (View: ${subView}, ID: ${id})`);
 
-    switch (pageName) {
-        case 'home':
-            // Ana Sayfa ve Chat modülü
-            renderHome(appContainer);
-            break;
+    // Kısa bir gecikme ile içeriği render et (UI thread'i bloklamamak için)
+    setTimeout(() => {
+        switch (pageName) {
+            case 'home':
+                renderHome(appContainer);
+                finishLoading();
+                break;
 
-        case 'map':
-            // Harita Modülü
-            renderMap();
-            break;
+            case 'map':
+                renderMap();
+                // Map modülü kendi finishLoading'ini çağırabilir, ama şimdilik burada bitirelim
+                // Gerçek map yüklemesi veri çekince bitmeli, oraya bağlayacağız.
+                // finishLoading(); // Map içinde çağrılacak
+                break;
 
-        case 'parties':
-            // Partiler Modülü (Liste, Oluşturma veya Detay)
-            renderPartiesPage(appContainer, subView, id);
-            break;
+            case 'parties':
+                renderPartiesPage(appContainer, subView, id);
+                finishLoading();
+                break;
 
-        case 'parliament':
-            // Meclis Modülü
-            renderParliamentPage(appContainer);
-            break;
+            case 'parliament':
+                renderParliamentPage(appContainer);
+                finishLoading();
+                break;
 
-        case 'city':
-            // Şehir Detay Sayfası (subView = cityId)
-            renderCityPage(appContainer, subView);
-            break;
+            case 'city':
+                renderCityPage(appContainer, subView);
+                finishLoading();
+                break;
 
-        // Henüz yapılmamış sayfalar için Placeholder çağır
-        case 'profile':
-        case 'trade':
-        case 'hangar':
-        case 'messages':
-        case 'social':
-            renderPlaceholder(pageName);
-            break;
+            case 'profile':
+            case 'trade':
+            case 'hangar':
+            case 'messages':
+            case 'social':
+                renderPlaceholder(pageName);
+                finishLoading();
+                break;
 
-        // Bilinmeyen bir sayfa gelirse Ana Sayfaya atma, Placeholder göster
-        default:
-            renderPlaceholder(pageName);
-    }
+            default:
+                renderPlaceholder(pageName);
+                finishLoading();
+        }
+    }, 50); // Minik render gecikmesi
 }
 
 // ========================================================
