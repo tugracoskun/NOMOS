@@ -1,8 +1,9 @@
+import { getCountryCode } from './iso_codes.js';
 
 // Ülke Verileri ve Yardımcı Fonksiyonlar
 
 export const nations = {
-    "Turkey": {
+    "tr": {
         id: "tr",
         name: "Türkiye",
         flag: "https://flagcdn.com/w320/tr.png",
@@ -26,7 +27,7 @@ export const nations = {
             { name: "TDT", icon: "fa-handshake" }
         ]
     },
-    "United States": {
+    "us": {
         id: "us",
         name: "Amerika Birleşik Devletleri",
         flag: "https://flagcdn.com/w320/us.png",
@@ -49,7 +50,7 @@ export const nations = {
             { name: "NATO", icon: "fa-shield-halved" }
         ]
     },
-    "Russia": {
+    "ru": {
         id: "ru",
         name: "Rusya Federasyonu",
         flag: "https://flagcdn.com/w320/ru.png",
@@ -72,7 +73,7 @@ export const nations = {
             { name: "CSTO", icon: "fa-shield-halved" }
         ]
     },
-    "Morocco": {
+    "ma": {
         id: "ma",
         name: "Fas Krallığı",
         flag: "https://flagcdn.com/w320/ma.png",
@@ -94,7 +95,7 @@ export const nations = {
             { name: "AB Gümrük", icon: "fa-euro-sign" }
         ]
     },
-    "Germany": {
+    "de": {
         id: "de",
         name: "Almanya",
         flag: "https://flagcdn.com/w320/de.png",
@@ -117,7 +118,7 @@ export const nations = {
             { name: "AB", icon: "fa-flag-usa" }
         ]
     },
-    "France": {
+    "fr": {
         id: "fr",
         name: "Fransa",
         flag: "https://flagcdn.com/w320/fr.png",
@@ -140,7 +141,7 @@ export const nations = {
             { name: "AB", icon: "fa-flag" }
         ]
     },
-    "China": {
+    "cn": {
         id: "cn",
         name: "Çin Halk Cumhuriyeti",
         flag: "https://flagcdn.com/w320/cn.png",
@@ -162,26 +163,55 @@ export const nations = {
     }
 };
 
-// Bilinmeyen ülkeler için varsayılan veri oluşturucu
+// Ana Fonksiyon: İsmi alır, ID'yi bulur, veriyi döner
 export function getNationData(countryName) {
-    // 1. Tanımlı listeyi kontrol et
-    // İsimden birebir eşleşme veya Türkçe/İngilizce mapping denenebilir.
-    // Şimdilik basitçe listede var mı diye bakıyoruz.
+    if (!countryName) return generateFallback("Bilinmiyor", "un_000");
 
-    // Basit eşleşme (Case insensitive)
-    const key = Object.keys(nations).find(k => k.toLowerCase() === countryName.toLowerCase());
+    // 1. Önce Temel ISO Kodunu Bul (tr, us, de)
+    const isoCode = getCountryCode(countryName);
 
-    if (key) {
-        return nations[key];
+    // 2. Bu kod için özel tanımlanmış veri var mı?
+    let data = nations[isoCode];
+
+    // 3. Sağlam ID Oluştur (Örn: TR_101)
+    // Eğer veri tanımlıysa ve sabit bir ID'si varsa onu kullan, yoksa ISO üzerinden üret
+    let robustId = data?.id;
+    if (!robustId || robustId.length < 4) {
+        robustId = generateRobustId(isoCode);
     }
 
-    const isoCode = getMethodIdFromName(countryName);
+    if (data) {
+        return { ...data, id: robustId };
+    }
 
-    // 2. Bulunamazsa jenerik veri döndür
+    // 4. Yoksa jenerik oluştur
+    return generateFallback(countryName, robustId, isoCode);
+}
+
+// ID oluşturucu: TR -> TR_592 gibi
+function generateRobustId(code) {
+    if (code === "un") return "un_999";
+
+    // Basit bir hash mantığıyla her ülke kodu için sabit bir numara üretmeye çalışalım
+    // Böylece "Turkey" her zaman aynı ID'yi alır (server restart olmadıkça veya logic değişmedikçe)
+    let hash = 0;
+    for (let i = 0; i < code.length; i++) {
+        hash = code.charCodeAt(i) + ((hash << 5) - hash);
+    }
+    const num = Math.abs(hash % 900) + 100; // 100-999 arası sayı
+
+    return `${code.toUpperCase()}_${num}`;
+}
+
+function generateFallback(name, id, originalDetailsCode = "un") {
+    // FlagCDN için temiz 2 harfli koda ihtiyacımız var, ID'den parse edelim veya parametre alalım
+    const flagCode = originalDetailsCode !== "un" ? originalDetailsCode : (id.split('_')[0].toLowerCase() || "un");
+
     return {
-        id: isoCode, // ISO kodu ID olarak kullan
-        name: countryName,
-        flag: `https://flagcdn.com/w320/${isoCode}.png`, // Tahmini kod
+        id: id,
+        name: name,
+        flag: `https://flagcdn.com/w320/${flagCode}.png`,
+        // ... (Kalanlar aynı)
         capital: "Bilinmiyor",
         leader: "Bilinmiyor",
         leaderTitle: "Devlet Başkanı",
@@ -198,60 +228,4 @@ export function getNationData(countryName) {
         color: "#555555",
         alliances: []
     };
-}
-
-// İsimden ülke kodu tahmin etmeye çalışan yardımcı (FlagCDN için)
-function getMethodIdFromName(name) {
-    if (!name) return "un";
-
-    // Normalize input
-    const cleanName = name.trim();
-
-    // Expanded Mapping Name -> ISO 2 Code
-    const map = {
-        // Europe
-        "Italy": "it", "Spain": "es", "Greece": "gr", "Bulgaria": "bg",
-        "Germany": "de", "France": "fr", "United Kingdom": "gb", "Great Britain": "gb",
-        "Russia": "ru", "Ukraine": "ua", "Poland": "pl", "Romania": "ro",
-        "Netherlands": "nl", "Belgium": "be", "Czech Republic": "cz", "Czechia": "cz",
-        "Sweden": "se", "Norway": "no", "Finland": "fi", "Denmark": "dk",
-        "Switzerland": "ch", "Austria": "at", "Portugal": "pt", "Ireland": "ie",
-        "Hungary": "hu", "Slovakia": "sk", "Belarus": "by", "Moldova": "md",
-        "Serbia": "rs", "Croatia": "hr", "Bosnia and Herzegovina": "ba", "Albania": "al",
-        "North Macedonia": "mk", "Slovenia": "si", "Montenegro": "me", "Iceland": "is",
-        "Estonia": "ee", "Latvia": "lv", "Lithuania": "lt", "Malta": "mt", "Cyprus": "cy",
-
-        // Middle East & North Africa
-        "Turkey": "tr", "Syria": "sy", "Iraq": "iq", "Iran": "ir", "Egypt": "eg",
-        "Saudi Arabia": "sa", "Yemen": "ye", "Oman": "om", "UAE": "ae", "United Arab Emirates": "ae",
-        "Qatar": "qa", "Bahrain": "bh", "Kuwait": "kw", "Jordan": "jo", "Lebanon": "lb",
-        "Israel": "il", "Palestine": "ps",
-        "Algeria": "dz", "Tunisia": "tn", "Libya": "ly", "Morocco": "ma", "Sudan": "sd",
-
-        // Asia
-        "China": "cn", "Japan": "jp", "South Korea": "kr", "North Korea": "kp",
-        "India": "in", "Pakistan": "pk", "Bangladesh": "bd", "Sri Lanka": "lk",
-        "Indonesia": "id", "Malaysia": "my", "Vietnam": "vn", "Thailand": "th",
-        "Philippines": "ph", "Singapore": "sg", "Myanmar": "mm", "Cambodia": "kh",
-        "Laos": "la", "Mongolia": "mn", "Kazakhstan": "kz", "Uzbekistan": "uz",
-        "Turkmenistan": "tm", "Kyrgyzstan": "kg", "Tajikistan": "tj", "Afghanistan": "af",
-        "Azerbaijan": "az", "Armenia": "am", "Georgia": "ge",
-
-        // Americas
-        "United States": "us", "United States of America": "us", "USA": "us", "Canada": "ca",
-        "Mexico": "mx", "Brazil": "br", "Argentina": "ar", "Chile": "cl",
-        "Colombia": "co", "Peru": "pe", "Venezuela": "ve", "Bolivia": "bo",
-        "Paraguay": "py", "Uruguay": "uy", "Ecuador": "ec", "Cuba": "cu",
-
-        // Africa (Sub-Saharan)
-        "Nigeria": "ng", "South Africa": "za", "Ethiopia": "et", "Kenya": "ke",
-        "Tanzania": "tz", "Uganda": "ug", "Ghana": "gh", "Ivory Coast": "ci",
-        "Cameroon": "cm", "Senegal": "sn", "Mali": "ml", "Niger": "ne",
-        "Chad": "td", "Somalia": "so", "DR Congo": "cd", "Angola": "ao",
-
-        // Oceania
-        "Australia": "au", "New Zealand": "nz"
-    };
-
-    return map[cleanName] || "un"; // Bilinmiyorsa "un" (United Nations) veya "xx" dönebilir
 }
