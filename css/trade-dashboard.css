@@ -3684,38 +3684,89 @@
     }
 }
 
-/* Buy/Sell Trade Buttons */
+/* Buy/Sell Trade Buttons - Futuristic Warframe Style */
 .btn-trade {
-    padding: 6px 12px;
-    border: none;
-    border-radius: var(--radius-sm);
-    font-size: 0.65rem;
+    padding: 6px 14px;
+    font-size: 0.7rem;
     font-weight: 700;
-    cursor: pointer;
-    transition: all var(--transition-fast);
     text-transform: uppercase;
+    letter-spacing: 0.8px;
+    border: 1px solid transparent;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    background: rgba(0, 0, 0, 0.4);
 }
 
 .btn-trade.buy {
-    background: rgba(34, 197, 94, 0.15);
-    color: var(--accent-green);
-    border: 1px solid rgba(34, 197, 94, 0.3);
+    color: #22d3ee;
+    border: 1px solid rgba(6, 182, 212, 0.3);
+    box-shadow: inset 0 0 10px rgba(6, 182, 212, 0.05);
 }
 
 .btn-trade.buy:hover {
-    background: var(--accent-green);
-    color: white;
+    background: rgba(6, 182, 212, 0.15);
+    border-color: #22d3ee;
+    color: #ffffff;
+    box-shadow: 0 0 15px rgba(6, 182, 212, 0.4), inset 0 0 10px rgba(6, 182, 212, 0.1);
+    transform: translateY(-1px);
 }
 
 .btn-trade.sell {
-    background: rgba(239, 68, 68, 0.15);
-    color: var(--accent-red);
+    color: #f87171;
     border: 1px solid rgba(239, 68, 68, 0.3);
+    box-shadow: inset 0 0 10px rgba(239, 68, 68, 0.05);
 }
 
 .btn-trade.sell:hover {
-    background: var(--accent-red);
-    color: white;
+    background: rgba(239, 68, 68, 0.15);
+    border-color: #f87171;
+    color: #ffffff;
+    box-shadow: 0 0 15px rgba(239, 68, 68, 0.4);
+    transform: translateY(-1px);
+}
+
+/* Category & Filter Tabs - Futuristic Style */
+.category-tab,
+.filter-tab {
+    padding: 6px 16px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    letter-spacing: 0.5px;
+}
+
+.category-tab:hover,
+.filter-tab:hover {
+    color: var(--text-primary);
+    border-color: rgba(255, 255, 255, 0.2);
+    background: rgba(255, 255, 255, 0.03);
+}
+
+.category-tab.active,
+.filter-tab.active {
+    color: #22d3ee;
+    background: rgba(6, 182, 212, 0.1);
+    border-color: #06b6d4;
+    box-shadow: 0 0 12px rgba(6, 182, 212, 0.2);
+}
+
+.category-tab.active::after,
+.filter-tab.active::after {
+    display: none;
+    /* Replaced with glow and border */
 }
 
 /* Search Box in Commodity */
@@ -3854,26 +3905,29 @@
 }
 
 .tf-btn {
-    padding: 6px 12px;
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid var(--card-border);
-    border-radius: var(--radius-sm);
+    padding: 4px 10px;
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
     color: var(--text-muted);
-    font-size: 0.7rem;
+    font-size: 0.65rem;
     font-weight: 600;
     cursor: pointer;
-    transition: all var(--transition-fast);
+    transition: all 0.2s ease;
+    text-transform: uppercase;
 }
 
 .tf-btn:hover {
-    background: rgba(255, 255, 255, 0.1);
-    color: var(--text-primary);
+    background: rgba(255, 255, 255, 0.05);
+    color: #22d3ee;
+    border-color: rgba(34, 211, 238, 0.3);
 }
 
 .tf-btn.active {
-    background: var(--accent-blue);
-    border-color: transparent;
-    color: white;
+    background: rgba(6, 182, 212, 0.15);
+    border-color: #06b6d4;
+    color: #22d3ee;
+    box-shadow: 0 0 10px rgba(6, 182, 212, 0.2);
 }
 
 .chart-area {
@@ -4406,18 +4460,24 @@
 }
 
 .btn-widget-action {
-    background: none;
-    border: none;
-    color: var(--accent-blue);
+    background: rgba(6, 182, 212, 0.05);
+    border: 1px solid rgba(6, 182, 212, 0.2);
+    border-radius: 4px;
+    color: #22d3ee;
     font-size: 0.6rem;
-    font-weight: 500;
+    font-weight: 600;
     cursor: pointer;
-    padding: 3px 6px;
-    transition: all var(--transition-fast);
+    padding: 3px 10px;
+    transition: all 0.2s ease;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
 
 .btn-widget-action:hover {
-    text-decoration: underline;
+    background: rgba(6, 182, 212, 0.15);
+    border-color: #22d3ee;
+    box-shadow: 0 0 8px rgba(6, 182, 212, 0.3);
+    text-decoration: none;
 }
 
 .widget-body {
@@ -4678,4 +4738,300 @@
     .widget-card {
         max-height: 300px;
     }
+}
+
+/* === FUTURISTIC TAB BUTTONS (Warframe Style) === */
+.header-tabs.futuristic {
+    display: flex;
+    gap: 4px;
+    background: rgba(0, 0, 0, 0.4);
+    padding: 4px;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.header-tabs.futuristic .tab-btn {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    padding: 10px 16px 8px;
+    background: transparent;
+    border: 1px solid transparent;
+    border-radius: 6px;
+    color: rgba(148, 163, 184, 0.7);
+    cursor: pointer;
+    transition: all 0.25s ease;
+    overflow: hidden;
+}
+
+.header-tabs.futuristic .tab-btn::before {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, #06b6d4, transparent);
+    transition: width 0.3s ease;
+}
+
+.header-tabs.futuristic .tab-btn::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, rgba(6, 182, 212, 0.1) 0%, transparent 50%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.header-tabs.futuristic .tab-btn:hover {
+    color: rgba(255, 255, 255, 0.9);
+    border-color: rgba(6, 182, 212, 0.3);
+}
+
+.header-tabs.futuristic .tab-btn:hover::before {
+    width: 60%;
+}
+
+.header-tabs.futuristic .tab-btn:hover::after {
+    opacity: 1;
+}
+
+/* Active State - Cyan Glow */
+.header-tabs.futuristic .tab-btn.active {
+    color: #ffffff;
+    background: rgba(6, 182, 212, 0.08);
+    border-color: rgba(6, 182, 212, 0.5);
+    box-shadow:
+        0 0 15px rgba(6, 182, 212, 0.2),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+.header-tabs.futuristic .tab-btn.active::before {
+    width: 80%;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, #06b6d4, #22d3ee, #06b6d4, transparent);
+    box-shadow: 0 0 8px #06b6d4;
+}
+
+.header-tabs.futuristic .tab-btn.active::after {
+    opacity: 1;
+}
+
+/* Tab Icon */
+.header-tabs.futuristic .tab-icon {
+    position: relative;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1;
+}
+
+.header-tabs.futuristic .tab-icon i {
+    font-size: 1rem;
+    transition: all 0.3s ease;
+}
+
+.header-tabs.futuristic .tab-btn:hover .tab-icon i {
+    transform: scale(1.1);
+}
+
+.header-tabs.futuristic .tab-btn.active .tab-icon i {
+    color: #22d3ee;
+    filter: drop-shadow(0 0 6px rgba(34, 211, 238, 0.6));
+}
+
+/* Tab Label */
+.header-tabs.futuristic .tab-label {
+    font-size: 0.6rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    z-index: 1;
+    transition: all 0.3s ease;
+}
+
+.header-tabs.futuristic .tab-btn.active .tab-label {
+    color: #22d3ee;
+}
+
+/* Corner Accents for Active Tab */
+.header-tabs.futuristic .tab-btn.active::before {
+    animation: glowPulse 2s ease-in-out infinite;
+}
+
+@keyframes glowPulse {
+
+    0%,
+    100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.6;
+    }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .header-tabs.futuristic {
+        gap: 2px;
+        padding: 3px;
+    }
+
+    .header-tabs.futuristic .tab-btn {
+        padding: 8px 10px 6px;
+    }
+
+    .header-tabs.futuristic .tab-icon {
+        width: 26px;
+        height: 26px;
+    }
+
+    .header-tabs.futuristic .tab-icon i {
+        font-size: 0.85rem;
+    }
+
+    .header-tabs.futuristic .tab-label {
+        font-size: 0.5rem;
+    }
+}
+
+/* === COMPREHENSIVE FUTURISTIC BUTTONS (Warframe Style) === */
+
+/* Widget Footer Buttons */
+.widget-footer .btn-widget {
+    flex: 1;
+    padding: 8px 12px;
+    font-size: 0.65rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border: 1px solid rgba(6, 182, 212, 0.2);
+    border-radius: 4px;
+    background: rgba(6, 182, 212, 0.05);
+    color: #22d3ee;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.widget-footer .btn-widget:hover {
+    background: rgba(6, 182, 212, 0.15);
+    border-color: #22d3ee;
+    box-shadow: 0 0 15px rgba(6, 182, 212, 0.3);
+    color: #ffffff;
+    transform: translateY(-1px);
+}
+
+.widget-footer .btn-widget.secondary {
+    border-color: rgba(255, 255, 255, 0.1);
+    background: rgba(0, 0, 0, 0.3);
+    color: var(--text-muted);
+}
+
+.widget-footer .btn-widget.secondary:hover {
+    border-color: rgba(255, 255, 255, 0.3);
+    color: var(--text-primary);
+    background: rgba(255, 255, 255, 0.05);
+    box-shadow: none;
+}
+
+/* Header & Full View Action Buttons */
+.btn-action {
+    padding: 8px 18px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: rgba(0, 0, 0, 0.4);
+    color: var(--text-primary);
+}
+
+.btn-action.primary {
+    background: rgba(6, 182, 212, 0.1);
+    border-color: rgba(6, 182, 212, 0.4);
+    color: #22d3ee;
+    box-shadow: inset 0 0 10px rgba(6, 182, 212, 0.05);
+}
+
+.btn-action.primary:hover {
+    background: rgba(6, 182, 212, 0.25);
+    border-color: #22d3ee;
+    box-shadow: 0 0 20px rgba(6, 182, 212, 0.4);
+    color: #ffffff;
+}
+
+/* Transport & Section Tabs */
+.transport-tab,
+.section-tab {
+    padding: 8px 16px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    background: rgba(0, 0, 0, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.transport-tab:hover,
+.section-tab:hover {
+    border-color: rgba(34, 211, 238, 0.3);
+    background: rgba(34, 211, 238, 0.05);
+    color: var(--text-primary);
+}
+
+.transport-tab.active,
+.section-tab.active {
+    color: #22d3ee;
+    background: rgba(6, 182, 212, 0.1);
+    border-color: #06b6d4;
+    box-shadow: 0 0 15px rgba(6, 182, 212, 0.2);
+}
+
+/* Global Glow Utility */
+.glow-cyan {
+    box-shadow: 0 0 15px rgba(6, 182, 212, 0.3);
+}
+
+/* Scrollbar Styling for Futuristic Look */
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+
+::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.2);
+}
+
+::-webkit-scrollbar-thumb {
+    background: rgba(6, 182, 212, 0.2);
+    border-radius: 3px;
+    transition: background 0.3s;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: rgba(6, 182, 212, 0.5);
+    box-shadow: 0 0 10px rgba(6, 182, 212, 0.3);
 }

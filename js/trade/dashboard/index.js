@@ -80,7 +80,6 @@ function loadDashboardStyles(callback) {
 
 // === GENERATE DASHBOARD HTML ===
 function generateDashboardHTML() {
-    const gameState = getGameState();
     const company = dashboardState.companyData;
 
     return `
@@ -92,29 +91,30 @@ function generateDashboardHTML() {
                         <i class="fa-solid fa-building-columns"></i>
                         Ticaret Merkezi
                     </h1>
-                    <div class="header-tabs">
-                        <button class="tab-btn active" data-tab="overview">
-                            <i class="fa-solid fa-gauge-high"></i>
-                            Genel Bakış
+                    <div class="header-tabs futuristic">
+                        <button class="tab-btn ${dashboardState.activeTab === 'overview' ? 'active' : ''}" data-tab="overview" title="Genel Bakış">
+                            <div class="tab-icon"><i class="fa-solid fa-gauge-high"></i></div>
+                            <span class="tab-label">Genel</span>
                         </button>
-                        <button class="tab-btn" data-tab="company">
-                            <i class="fa-solid fa-building"></i>
-                            Şirketim
+                        <button class="tab-btn ${dashboardState.activeTab === 'company' ? 'active' : ''}" data-tab="company" title="Şirketim">
+                            <div class="tab-icon"><i class="fa-solid fa-building"></i></div>
+                            <span class="tab-label">Şirket</span>
                         </button>
-                        <button class="tab-btn" data-tab="exchange">
-                            <i class="fa-solid fa-chart-line"></i>
-                            Borsa
+                        <button class="tab-btn ${dashboardState.activeTab === 'exchange' ? 'active' : ''}" data-tab="exchange" title="Borsa">
+                            <div class="tab-icon"><i class="fa-solid fa-chart-line"></i></div>
+                            <span class="tab-label">Borsa</span>
                         </button>
-                        <button class="tab-btn" data-tab="commodity">
-                            <i class="fa-solid fa-scale-balanced"></i>
-                            Emtia
+                        <button class="tab-btn ${dashboardState.activeTab === 'commodity' ? 'active' : ''}" data-tab="commodity" title="Emtia Ticareti">
+                            <div class="tab-icon"><i class="fa-solid fa-scale-balanced"></i></div>
+                            <span class="tab-label">Emtia</span>
                         </button>
-                        <button class="tab-btn" data-tab="logistics">
-                            <i class="fa-solid fa-truck-fast"></i>
-                            Lojistik
+                        <button class="tab-btn ${dashboardState.activeTab === 'logistics' ? 'active' : ''}" data-tab="logistics" title="Lojistik">
+                            <div class="tab-icon"><i class="fa-solid fa-truck-fast"></i></div>
+                            <span class="tab-label">Lojistik</span>
                         </button>
                     </div>
                 </div>
+                
                 <div class="header-right">
                     <div class="quick-stat">
                         <span class="stat-label">Şirket Değeri</span>
@@ -133,7 +133,7 @@ function generateDashboardHTML() {
 
             <!-- Main Dashboard Content -->
             <div class="dashboard-content" id="dashboard-content">
-                ${renderOverviewTab()}
+                ${renderTabContent(dashboardState.activeTab)}
             </div>
         </div>
     `;
@@ -291,14 +291,29 @@ function setupDashboardEvents(container) {
     });
 
     // Initial tab-specific events
-    setupTabSpecificEvents(container, 'overview');
+    setupTabSpecificEvents(container, dashboardState.activeTab);
 }
 
 // Tab-specific event handlers
 function setupTabSpecificEvents(container, tabId) {
+    // Haber ve yatırım butonlarına tıklama dinleyicileri (Global yetki)
+    const contentArea = container.id === 'dashboard-content' ? container : container.querySelector('#dashboard-content');
+    if (!contentArea) return;
+
     // Delegate to appropriate module based on tab
     switch (tabId) {
+        case 'overview':
+            // Overview specific actions
+            contentArea.querySelectorAll('[data-action="view-news"]').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const exchangeTab = document.querySelector('[data-tab="exchange"]');
+                    if (exchangeTab) exchangeTab.click();
+                });
+            });
+            break;
         case 'company':
+            // Company module handles its own events
+            break;
             // Company module handles its own events
             break;
         case 'exchange':
