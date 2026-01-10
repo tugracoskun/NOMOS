@@ -3683,3 +3683,96 @@
         min-width: 250px;
     }
 }
+
+/* Buy/Sell Trade Buttons */
+.btn-trade {
+    padding: 6px 12px;
+    border: none;
+    border-radius: var(--radius-sm);
+    font-size: 0.65rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    text-transform: uppercase;
+}
+
+.btn-trade.buy {
+    background: rgba(34, 197, 94, 0.15);
+    color: var(--accent-green);
+    border: 1px solid rgba(34, 197, 94, 0.3);
+}
+
+.btn-trade.buy:hover {
+    background: var(--accent-green);
+    color: white;
+}
+
+.btn-trade.sell {
+    background: rgba(239, 68, 68, 0.15);
+    color: var(--accent-red);
+    border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.btn-trade.sell:hover {
+    background: var(--accent-red);
+    color: white;
+}
+
+/* Search Box in Commodity */
+.commodity-list-section .search-box {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.commodity-list-section .search-box i {
+    position: absolute;
+    left: 12px;
+    color: var(--text-muted);
+    font-size: 0.8rem;
+}
+
+.commodity-list-section .search-box input {
+    width: 100%;
+    padding: 10px 12px 10px 36px;
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid var(--card-border);
+    border-radius: var(--radius-sm);
+    color: var(--text-primary);
+    font-size: 0.8rem;
+}
+
+.commodity-list-section .search-box input:focus {
+    outline: none;
+    border-color: var(--accent-gold);
+}
+
+.commodity-list-section .search-box input::placeholder {
+    color: var(--text-muted);
+}
+
+/* No Results Message */
+.no-results {
+    padding: 40px 20px;
+    text-align: center;
+}
+
+.no-results p {
+    margin: 0;
+    color: var(--text-muted);
+    font-size: 0.85rem;
+}
+
+/* Category Tab Active Effect */
+.category-tab.active {
+    background: var(--gradient-primary);
+    border-color: transparent;
+    color: white;
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+.category-tab:hover:not(.active) {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: var(--cat-color, var(--text-muted));
+    color: var(--cat-color, var(--text-primary));
+}

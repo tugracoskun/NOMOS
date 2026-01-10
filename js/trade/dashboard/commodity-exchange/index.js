@@ -274,7 +274,7 @@ export function renderCommodityExchangeSection() {
 
 function renderCommodityRow(commodity) {
     return `
-        <div class="commodity-row" data-commodity-id="${commodity.id}">
+        <div class="commodity-row" data-commodity-id="${commodity.id}" data-category="${commodity.category}">
             <div class="col-name">
                 <div class="commodity-badge">
                     <i class="${commodity.icon}"></i>
@@ -299,5 +299,127 @@ function renderCommodityRow(commodity) {
     `;
 }
 
+// === EVENT SETUP FOR COMMODITY EXCHANGE ===
+export function setupCommodityExchangeEvents(container) {
+    // Kategori tab filtreleme
+    container.querySelectorAll('.category-tab').forEach(tab => {
+        tab.addEventListener('click', () => {
+            const category = tab.dataset.category;
+
+            // Active state güncelle
+            container.querySelectorAll('.category-tab').forEach(t => t.classList.remove('active'));
+            tab.classList.add('active');
+
+            // Emtiaları filtrele
+            filterCommodities(container, category);
+        });
+    });
+
+    // Arama
+    const searchInput = container.querySelector('#commodity-search');
+    if (searchInput) {
+        searchInput.addEventListener('input', (e) => {
+            const query = e.target.value.toLowerCase();
+            const activeCategory = container.querySelector('.category-tab.active')?.dataset.category || 'all';
+            filterCommodities(container, activeCategory, query);
+        });
+    }
+
+    // Sıralama
+    const sortSelect = container.querySelector('#commodity-sort');
+    if (sortSelect) {
+        sortSelect.addEventListener('change', (e) => {
+            const sortBy = e.target.value;
+            sortCommodities(container, sortBy);
+        });
+    }
+
+    // AL/SAT butonları
+    container.querySelectorAll('.btn-trade').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const action = btn.dataset.action;
+            const commodityId = btn.dataset.commodity;
+            handleTradeAction(action, commodityId);
+        });
+    });
+}
+
+// Kategori ve arama filtreleme
+function filterCommodities(container, category, searchQuery = '') {
+    const rows = container.querySelectorAll('.commodity-row');
+    let visibleCount = 0;
+
+    rows.forEach(row => {
+        const rowCategory = row.dataset.category;
+        const name = row.querySelector('.col-name span').textContent.toLowerCase();
+
+        const categoryMatch = category === 'all' || rowCategory === category;
+        const searchMatch = searchQuery === '' || name.includes(searchQuery);
+
+        if (categoryMatch && searchMatch) {
+            row.style.display = '';
+            visibleCount++;
+        } else {
+            row.style.display = 'none';
+        }
+    });
+
+    // Sonuç sayısını göster (opsiyonel)
+    const tableBody = container.querySelector('#commodity-table-body');
+    const existingNotice = tableBody.querySelector('.no-results');
+    if (existingNotice) existingNotice.remove();
+
+    if (visibleCount === 0) {
+        const notice = document.createElement('div');
+        notice.className = 'no-results';
+        notice.innerHTML = '<p>Bu kategoride emtia bulunamadı.</p>';
+        tableBody.appendChild(notice);
+    }
+}
+
+// Sıralama
+function sortCommodities(container, sortBy) {
+    const tableBody = container.querySelector('#commodity-table-body');
+    const rows = Array.from(tableBody.querySelectorAll('.commodity-row'));
+
+    rows.sort((a, b) => {
+        switch (sortBy) {
+            case 'name':
+                return a.querySelector('.col-name span').textContent.localeCompare(
+                    b.querySelector('.col-name span').textContent, 'tr'
+                );
+            case 'price':
+                const priceA = parseInt(a.querySelector('.col-price').textContent.replace(/\D/g, ''));
+                const priceB = parseInt(b.querySelector('.col-price').textContent.replace(/\D/g, ''));
+                return priceB - priceA;
+            case 'change':
+                const changeA = parseFloat(a.querySelector('.col-change').textContent.replace(/[^-\d.]/g, ''));
+                const changeB = parseFloat(b.querySelector('.col-change').textContent.replace(/[^-\d.]/g, ''));
+                return changeB - changeA;
+            case 'volume':
+                const volA = parseInt(a.querySelector('.col-volume').textContent.replace(/\D/g, ''));
+                const volB = parseInt(b.querySelector('.col-volume').textContent.replace(/\D/g, ''));
+                return volB - volA;
+            default:
+                return 0;
+        }
+    });
+
+    // DOM'u yeniden sırala
+    rows.forEach(row => tableBody.appendChild(row));
+}
+
+// Alım/Satım işlemi
+function handleTradeAction(action, commodityId) {
+    // TODO: Gerçek alım/satım modal'ı aç
+    const commodities = generateCommodityData();
+    const commodity = commodities.find(c => c.id === commodityId);
+
+    if (commodity) {
+        alert(`${action === 'buy' ? 'ALIM' : 'SATIM'} İşlemi\n\nEmtia: ${commodity.name}\nFiyat: ${commodity.price.toLocaleString()} ₳\n\nBu özellik yakında aktif olacak!`);
+    }
+}
+
 // Export for use in dashboard
 export { COMMODITY_CATEGORIES, generateCommodityData };
+

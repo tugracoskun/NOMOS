@@ -7,7 +7,7 @@ import { renderMyCompanySection } from './my-company/index.js';
 import { renderStockExchangeSection } from './stock-exchange/index.js';
 import { renderMarketNews } from './news/index.js';
 import { renderShipmentTracker } from './logistics/index.js';
-import { renderCommodityExchangeWidget, renderCommodityExchangeSection } from './commodity-exchange/index.js';
+import { renderCommodityExchangeWidget, renderCommodityExchangeSection, setupCommodityExchangeEvents } from './commodity-exchange/index.js';
 import { loadPlayerCompany, getPlayerCompany } from './data/company-data.js';
 import { loadShipments } from './data/shipment-data.js';
 
@@ -22,33 +22,60 @@ let dashboardState = {
 
 // === MAIN RENDER ===
 export function renderTradeDashboard(container) {
-    // Load CSS
-    loadDashboardStyles();
+    // Show loading state first
+    container.innerHTML = `
+        <div class="trade-dashboard" style="min-height: 400px; display: flex; align-items: center; justify-content: center;">
+            <div style="text-align: center; color: #64748b;">
+                <i class="fa-solid fa-spinner fa-spin" style="font-size: 2rem; margin-bottom: 10px;"></i>
+                <p>Yükleniyor...</p>
+            </div>
+        </div>
+    `;
 
-    // Initialize data
-    initMarket();
-    dashboardState.companyData = loadPlayerCompany();
-    dashboardState.shipments = loadShipments();
+    // Load CSS and wait for it
+    loadDashboardStyles(() => {
+        // Initialize data
+        initMarket();
+        dashboardState.companyData = loadPlayerCompany();
+        dashboardState.shipments = loadShipments();
 
-    // Render main structure
-    container.innerHTML = generateDashboardHTML();
+        // Render main structure
+        container.innerHTML = generateDashboardHTML();
 
-    // Setup event listeners
-    setupDashboardEvents(container);
+        // Setup event listeners
+        setupDashboardEvents(container);
 
-    // Start real-time updates
-    startDashboardTicker();
+        // Start real-time updates
+        startDashboardTicker();
+    });
 }
 
 // === LOAD STYLES ===
-function loadDashboardStyles() {
-    if (!document.getElementById('trade-dashboard-style')) {
-        const link = document.createElement('link');
-        link.id = 'trade-dashboard-style';
-        link.rel = 'stylesheet';
-        link.href = 'css/trade-dashboard.css';
-        document.head.appendChild(link);
+function loadDashboardStyles(callback) {
+    const existingLink = document.getElementById('trade-dashboard-style');
+
+    if (existingLink) {
+        // CSS already loaded
+        if (callback) callback();
+        return;
     }
+
+    const link = document.createElement('link');
+    link.id = 'trade-dashboard-style';
+    link.rel = 'stylesheet';
+    link.href = 'css/trade-dashboard.css';
+
+    // Wait for CSS to load
+    link.onload = () => {
+        if (callback) callback();
+    };
+
+    // Fallback: if onload doesn't fire, continue after a short delay
+    setTimeout(() => {
+        if (callback) callback();
+    }, 100);
+
+    document.head.appendChild(link);
 }
 
 // === GENERATE DASHBOARD HTML ===
@@ -199,6 +226,10 @@ function setupTabSpecificEvents(container, tabId) {
             break;
         case 'exchange':
             // Exchange module handles its own events
+            break;
+        case 'commodity':
+            // Commodity exchange event listeners
+            setupCommodityExchangeEvents(container);
             break;
         case 'logistics':
             // Logistics module handles its own events
