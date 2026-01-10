@@ -119,7 +119,7 @@ function renderFullExchangeView() {
             <!-- Exchange Header -->
             <header class="exchange-page-header">
                 <div class="header-left">
-                    <h1><i class="fa-solid fa-building-columns"></i> NOMOS Borsa</h1>
+                    <h1><i class="fa-solid fa-chart-line"></i> NOMOS Borsa</h1>
                     <div class="market-status open">
                         <span class="status-dot"></span>
                         Piyasa Açık
@@ -134,68 +134,410 @@ function renderFullExchangeView() {
                 </div>
             </header>
 
-            <!-- Index Bar -->
-            <div class="index-bar">
-                ${STOCK_DATA.indices.map(index => `
-                    <div class="index-card">
-                        <div class="index-name">${index.name}</div>
-                        <div class="index-value">${index.value.toLocaleString()}</div>
-                        <div class="index-change ${index.change >= 0 ? 'positive' : 'negative'}">
-                            <i class="fa-solid fa-${index.change >= 0 ? 'arrow-up' : 'arrow-down'}"></i>
-                            ${index.change >= 0 ? '+' : ''}${index.change}%
-                        </div>
-                        ${renderMiniChart(index.change >= 0)}
-                    </div>
-                `).join('')}
-            </div>
-
-            <!-- Main Content -->
-            <div class="exchange-content">
-                <!-- Stocks Table -->
-                <section class="stocks-section">
-                    <div class="section-header">
-                        <h2>Şirketler</h2>
-                        <div class="section-controls">
-                            <div class="search-box">
-                                <i class="fa-solid fa-search"></i>
-                                <input type="text" placeholder="Şirket ara..." id="stock-search">
+            <!-- TradingView Style Main Layout -->
+            <div class="exchange-main-layout">
+                <!-- Sol Panel: Grafik ve Şirketler -->
+                <div class="exchange-left-panel">
+                    <!-- Index Bar -->
+                    <div class="index-bar">
+                        ${STOCK_DATA.indices.map(index => `
+                            <div class="index-card">
+                                <div class="index-name">${index.name}</div>
+                                <div class="index-value">${index.value.toLocaleString()}</div>
+                                <div class="index-change ${index.change >= 0 ? 'positive' : 'negative'}">
+                                    <i class="fa-solid fa-${index.change >= 0 ? 'arrow-up' : 'arrow-down'}"></i>
+                                    ${index.change >= 0 ? '+' : ''}${index.change}%
+                                </div>
                             </div>
-                            <div class="filter-tabs">
-                                <button class="filter-tab active" data-filter="all">Tümü</button>
-                                <button class="filter-tab" data-filter="gainers">Yükselenler</button>
-                                <button class="filter-tab" data-filter="losers">Düşenler</button>
+                        `).join('')}
+                    </div>
+
+                    <!-- TradingView Style Chart -->
+                    <div class="tv-chart-container">
+                        <div class="chart-header">
+                            <div class="chart-symbol">
+                                <span class="symbol">NOMOS 100</span>
+                                <span class="price">12,458.32</span>
+                                <span class="change positive">+1.34%</span>
+                            </div>
+                            <div class="chart-timeframes">
+                                <button class="tf-btn">1S</button>
+                                <button class="tf-btn">1G</button>
+                                <button class="tf-btn active">1H</button>
+                                <button class="tf-btn">1A</button>
+                                <button class="tf-btn">Tümü</button>
+                            </div>
+                        </div>
+                        <div class="chart-area">
+                            ${renderAdvancedChart()}
+                        </div>
+                        <div class="chart-footer">
+                            <div class="chart-stats">
+                                <div class="stat"><span class="label">Açılış</span><span class="val">12,280</span></div>
+                                <div class="stat"><span class="label">Yüksek</span><span class="val text-green">12,520</span></div>
+                                <div class="stat"><span class="label">Düşük</span><span class="val text-red">12,195</span></div>
+                                <div class="stat"><span class="label">Hacim</span><span class="val">2.4M</span></div>
                             </div>
                         </div>
                     </div>
-                    <div class="stocks-table">
-                        <div class="table-header">
-                            <div class="col-ticker">Sembol</div>
-                            <div class="col-name">Şirket</div>
-                            <div class="col-price">Fiyat</div>
-                            <div class="col-change">Değişim</div>
-                            <div class="col-volume">Hacim</div>
-                            <div class="col-mcap">Piyasa Değeri</div>
-                            <div class="col-actions">İşlem</div>
-                        </div>
-                        <div class="table-body">
-                            ${STOCK_DATA.companies.map(stock => renderStockRow(stock)).join('')}
-                        </div>
-                    </div>
-                </section>
 
-                <!-- Funds Section -->
-                <section class="funds-section">
-                    <div class="section-header">
-                        <h2><i class="fa-solid fa-landmark"></i> Yatırım Fonları</h2>
-                    </div>
-                    <div class="funds-grid">
-                        ${STOCK_DATA.funds.map(fund => renderFundCard(fund)).join('')}
-                    </div>
-                </section>
+                    <!-- Stocks Table -->
+                    <section class="stocks-section">
+                        <div class="section-header">
+                            <h2>Şirketler</h2>
+                            <div class="section-controls">
+                                <div class="filter-tabs">
+                                    <button class="filter-tab active" data-filter="all">Tümü</button>
+                                    <button class="filter-tab" data-filter="gainers">Yükselenler</button>
+                                    <button class="filter-tab" data-filter="losers">Düşenler</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="stocks-table">
+                            <div class="table-header">
+                                <div class="col-ticker">Sembol</div>
+                                <div class="col-name">Şirket</div>
+                                <div class="col-price">Fiyat</div>
+                                <div class="col-change">Değişim</div>
+                                <div class="col-chart">Grafik</div>
+                                <div class="col-actions">İşlem</div>
+                            </div>
+                            <div class="table-body">
+                                ${STOCK_DATA.companies.map(stock => renderStockRow(stock)).join('')}
+                            </div>
+                        </div>
+                    </section>
+                </div>
+
+                <!-- Sağ Panel: Ekonomiler, Yatırımlar, Haberler -->
+                <aside class="exchange-right-panel">
+                    <!-- Ülke Ekonomileri -->
+                    ${renderCountryEconomies()}
+
+                    <!-- Son Yatırımlar -->
+                    ${renderRecentInvestments()}
+
+                    <!-- Ticari Antlaşmalar -->
+                    ${renderTradeAgreements()}
+                </aside>
             </div>
         </div>
     `;
 }
+
+// === ADVANCED CHART (TradingView Style) ===
+function renderAdvancedChart() {
+    // SVG based candlestick-like chart
+    const width = 800;
+    const height = 250;
+    const candles = generateCandleData(40);
+    const maxHigh = Math.max(...candles.map(c => c.high));
+    const minLow = Math.min(...candles.map(c => c.low));
+    const range = maxHigh - minLow;
+
+    const candleWidth = 16;
+    const gap = 4;
+
+    let candleSVG = candles.map((c, i) => {
+        const x = i * (candleWidth + gap) + 20;
+        const yHigh = height - 30 - ((c.high - minLow) / range) * (height - 60);
+        const yLow = height - 30 - ((c.low - minLow) / range) * (height - 60);
+        const yOpen = height - 30 - ((c.open - minLow) / range) * (height - 60);
+        const yClose = height - 30 - ((c.close - minLow) / range) * (height - 60);
+        const color = c.close >= c.open ? '#22c55e' : '#ef4444';
+        const bodyTop = Math.min(yOpen, yClose);
+        const bodyHeight = Math.abs(yClose - yOpen) || 2;
+
+        return `
+            <line x1="${x + candleWidth / 2}" y1="${yHigh}" x2="${x + candleWidth / 2}" y2="${yLow}" stroke="${color}" stroke-width="1.5"/>
+            <rect x="${x}" y="${bodyTop}" width="${candleWidth}" height="${bodyHeight}" fill="${color}" rx="1"/>
+        `;
+    }).join('');
+
+    return `
+        <svg viewBox="0 0 ${width} ${height}" class="tv-chart-svg">
+            <defs>
+                <linearGradient id="chartBg" x1="0%" y1="0%" x2="0%" y2="100%">
+                    <stop offset="0%" style="stop-color:#1e293b;stop-opacity:0.5"/>
+                    <stop offset="100%" style="stop-color:#0f172a;stop-opacity:1"/>
+                </linearGradient>
+            </defs>
+            <rect width="${width}" height="${height}" fill="url(#chartBg)"/>
+            <!-- Grid Lines -->
+            ${[0.25, 0.5, 0.75].map(pct => `
+                <line x1="0" y1="${height * pct}" x2="${width}" y2="${height * pct}" stroke="rgba(255,255,255,0.05)" stroke-dasharray="4"/>
+            `).join('')}
+            <!-- Candles -->
+            ${candleSVG}
+            <!-- Volume bars at bottom -->
+            ${candles.map((c, i) => {
+        const x = i * (candleWidth + gap) + 20;
+        const volHeight = (c.volume / 100) * 30;
+        const color = c.close >= c.open ? 'rgba(34,197,94,0.3)' : 'rgba(239,68,68,0.3)';
+        return `<rect x="${x}" y="${height - volHeight - 5}" width="${candleWidth}" height="${volHeight}" fill="${color}"/>`;
+    }).join('')}
+        </svg>
+    `;
+}
+
+function generateCandleData(count) {
+    let price = 12000 + Math.random() * 500;
+    return Array.from({ length: count }, () => {
+        const open = price;
+        const change = (Math.random() - 0.48) * 100;
+        const close = price + change;
+        const high = Math.max(open, close) + Math.random() * 30;
+        const low = Math.min(open, close) - Math.random() * 30;
+        price = close;
+        return { open, close, high, low, volume: 30 + Math.random() * 70 };
+    });
+}
+
+// === COUNTRY ECONOMIES ===
+function renderCountryEconomies() {
+    const countries = [
+        { code: 'TR', name: 'Türkiye', gdp: '1.2T', growth: 4.2, flag: '🇹🇷', trend: 'up' },
+        { code: 'DE', name: 'Almanya', gdp: '4.2T', growth: 1.8, flag: '🇩🇪', trend: 'up' },
+        { code: 'US', name: 'ABD', gdp: '25.5T', growth: 2.1, flag: '🇺🇸', trend: 'up' },
+        { code: 'CN', name: 'Çin', gdp: '18.3T', growth: 5.2, flag: '🇨🇳', trend: 'up' },
+        { code: 'JP', name: 'Japonya', gdp: '4.9T', growth: -0.3, flag: '🇯🇵', trend: 'down' }
+    ];
+
+    return `
+        <div class="sidebar-card economies-card">
+            <div class="card-header">
+                <h3><i class="fa-solid fa-globe"></i> Ülke Ekonomileri</h3>
+            </div>
+            <div class="economies-list">
+                ${countries.map(c => `
+                    <div class="economy-row" data-country="${c.code}">
+                        <div class="country-flag">${c.flag}</div>
+                        <div class="country-info">
+                            <span class="country-name">${c.name}</span>
+                            <span class="country-gdp">GSYİH: ${c.gdp}</span>
+                        </div>
+                        <div class="country-growth ${c.growth >= 0 ? 'positive' : 'negative'}">
+                            <i class="fa-solid fa-arrow-${c.trend}"></i>
+                            ${c.growth >= 0 ? '+' : ''}${c.growth}%
+                        </div>
+                    </div>
+                `).join('')}
+            </div>
+        </div>
+    `;
+}
+
+// === RECENT INVESTMENTS ===
+function renderRecentInvestments() {
+    const investments = [
+        { type: 'buy', asset: 'TKN', amount: 500, price: 142.50, time: '2 dk önce', profit: null },
+        { type: 'sell', asset: 'ENP', amount: 200, price: 89.20, time: '15 dk önce', profit: 1250 },
+        { type: 'buy', asset: 'NOMOS 100 Fonu', amount: 1, price: 5000, time: '1 saat önce', profit: null },
+        { type: 'dividend', asset: 'MNC', amount: null, price: 450, time: '3 saat önce', profit: 450 }
+    ];
+
+    return `
+        <div class="sidebar-card investments-card">
+            <div class="card-header">
+                <h3><i class="fa-solid fa-clock-rotate-left"></i> Son Yatırımlar</h3>
+                <button class="btn-see-all">Tümü</button>
+            </div>
+            <div class="investments-list">
+                ${investments.map(inv => `
+                    <div class="investment-row ${inv.type}">
+                        <div class="inv-icon">
+                            <i class="fa-solid fa-${inv.type === 'buy' ? 'arrow-down' : inv.type === 'sell' ? 'arrow-up' : 'coins'}"></i>
+                        </div>
+                        <div class="inv-info">
+                            <span class="inv-asset">${inv.asset}</span>
+                            <span class="inv-detail">
+                                ${inv.type === 'buy' ? `${inv.amount} adet alındı` :
+            inv.type === 'sell' ? `${inv.amount} adet satıldı` :
+                'Temettü geliri'}
+                            </span>
+                        </div>
+                        <div class="inv-value">
+                            <span class="inv-price">${inv.price.toLocaleString()} ₳</span>
+                            <span class="inv-time">${inv.time}</span>
+                        </div>
+                    </div>
+                `).join('')}
+            </div>
+        </div>
+    `;
+}
+
+// === TRADE AGREEMENTS (Ticari Antlaşmalar) ===
+function renderTradeAgreements() {
+    const agreements = [
+        {
+            id: 'ag1',
+            title: 'Türkiye-Almanya Ticaret Anlaşması',
+            countries: ['🇹🇷', '🇩🇪'],
+            type: 'Serbest Ticaret',
+            date: '2 saat önce',
+            impact: 'positive',
+            summary: 'İki ülke arasında otomotiv ve makine sektöründe gümrük vergilerinin kaldırılması...'
+        },
+        {
+            id: 'ag2',
+            title: 'Asya-Pasifik Enerji Ortaklığı',
+            countries: ['🇨🇳', '🇯🇵', '🇰🇷'],
+            type: 'Enerji İşbirliği',
+            date: '5 saat önce',
+            impact: 'positive',
+            summary: 'Yenilenebilir enerji teknolojilerinin paylaşımı ve ortak yatırım planı...'
+        },
+        {
+            id: 'ag3',
+            title: 'AB Tarım Kotası Değişikliği',
+            countries: ['🇪🇺'],
+            type: 'Düzenleme',
+            date: '1 gün önce',
+            impact: 'negative',
+            summary: 'Tarım ürünleri ithalat kotalarının %15 düşürülmesi kararı...'
+        }
+    ];
+
+    return `
+        <div class="sidebar-card agreements-card">
+            <div class="card-header">
+                <h3><i class="fa-solid fa-handshake"></i> Ticari Antlaşmalar</h3>
+            </div>
+            <div class="agreements-list">
+                ${agreements.map(ag => `
+                    <div class="agreement-row" data-agreement-id="${ag.id}" onclick="showAgreementModal('${ag.id}')">
+                        <div class="agreement-countries">
+                            ${ag.countries.join(' ')}
+                        </div>
+                        <div class="agreement-info">
+                            <span class="agreement-title">${ag.title}</span>
+                            <span class="agreement-type">${ag.type}</span>
+                        </div>
+                        <div class="agreement-meta">
+                            <span class="agreement-impact ${ag.impact}">
+                                <i class="fa-solid fa-${ag.impact === 'positive' ? 'arrow-up' : 'arrow-down'}"></i>
+                            </span>
+                            <span class="agreement-date">${ag.date}</span>
+                        </div>
+                    </div>
+                `).join('')}
+            </div>
+        </div>
+
+        <!-- Agreement Modal Template -->
+        <div id="agreement-modal" class="modal-overlay" style="display: none;">
+            <div class="modal-content agreement-modal">
+                <div class="modal-header">
+                    <h2 id="modal-agreement-title"></h2>
+                    <button class="modal-close" onclick="closeAgreementModal()">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </div>
+                <div class="modal-body" id="modal-agreement-body">
+                </div>
+            </div>
+        </div>
+    `;
+}
+
+// Global modal functions
+window.agreementsData = [
+    {
+        id: 'ag1',
+        title: 'Türkiye-Almanya Ticaret Anlaşması',
+        countries: ['🇹🇷', '🇩🇪'],
+        type: 'Serbest Ticaret',
+        date: '2 saat önce',
+        impact: 'positive',
+        fullContent: `
+            <p><strong>Anlaşma Detayları:</strong></p>
+            <p>Türkiye ve Almanya arasında imzalanan bu kapsamlı serbest ticaret anlaşması, iki ülke arasındaki ticaret hacmini önemli ölçüde artırmayı hedeflemektedir.</p>
+            <h4>Ana Maddeler:</h4>
+            <ul>
+                <li>Otomotiv sektöründe gümrük vergilerinin %80 azaltılması</li>
+                <li>Makine ve ekipman ithalatında kota kaldırılması</li>
+                <li>Tekstil ürünlerinde karşılıklı muafiyet</li>
+                <li>Teknoloji transferi kolaylıkları</li>
+            </ul>
+            <h4>Ekonomik Etki:</h4>
+            <p>Anlaşmanın yıllık 5 milyar Euro'luk ek ticaret hacmi yaratması beklenmektedir.</p>
+        `
+    },
+    {
+        id: 'ag2',
+        title: 'Asya-Pasifik Enerji Ortaklığı',
+        countries: ['🇨🇳', '🇯🇵', '🇰🇷'],
+        type: 'Enerji İşbirliği',
+        date: '5 saat önce',
+        impact: 'positive',
+        fullContent: `
+            <p><strong>Ortaklık Detayları:</strong></p>
+            <p>Çin, Japonya ve Güney Kore arasında kurulan bu stratejik enerji ortaklığı, bölgesel enerji güvenliğini güçlendirmeyi amaçlamaktadır.</p>
+            <h4>İşbirliği Alanları:</h4>
+            <ul>
+                <li>Güneş enerjisi panel üretiminde ortak yatırımlar</li>
+                <li>Hidrojen yakıt teknolojisi geliştirme</li>
+                <li>Nükleer enerji güvenliği standartları</li>
+                <li>Elektrik şebekesi entegrasyonu</li>
+            </ul>
+        `
+    },
+    {
+        id: 'ag3',
+        title: 'AB Tarım Kotası Değişikliği',
+        countries: ['🇪🇺'],
+        type: 'Düzenleme',
+        date: '1 gün önce',
+        impact: 'negative',
+        fullContent: `
+            <p><strong>Düzenleme Detayları:</strong></p>
+            <p>Avrupa Birliği, tarım ürünleri ithalat kotalarında önemli değişiklikler yapma kararı aldı.</p>
+            <h4>Değişiklikler:</h4>
+            <ul>
+                <li>Tahıl ithalat kotası %15 düşürüldü</li>
+                <li>Et ürünleri kotası %10 azaltıldı</li>
+                <li>Süt ürünlerinde yeni kalite standartları</li>
+            </ul>
+            <h4>Piyasa Etkisi:</h4>
+            <p>Bu düzenleme, AB dışı ülkelerden yapılan tarım ithalatını olumsuz etkileyebilir.</p>
+        `
+    }
+];
+
+window.showAgreementModal = function (agreementId) {
+    const agreement = window.agreementsData.find(a => a.id === agreementId);
+    if (!agreement) return;
+
+    const modal = document.getElementById('agreement-modal');
+    const title = document.getElementById('modal-agreement-title');
+    const body = document.getElementById('modal-agreement-body');
+
+    title.innerHTML = `
+        <span class="modal-countries">${agreement.countries.join(' ')}</span>
+        ${agreement.title}
+    `;
+
+    body.innerHTML = `
+        <div class="agreement-meta-full">
+            <span class="type-badge">${agreement.type}</span>
+            <span class="impact-badge ${agreement.impact}">
+                <i class="fa-solid fa-${agreement.impact === 'positive' ? 'arrow-trend-up' : 'arrow-trend-down'}"></i>
+                ${agreement.impact === 'positive' ? 'Olumlu Etki' : 'Olumsuz Etki'}
+            </span>
+            <span class="date-badge"><i class="fa-solid fa-clock"></i> ${agreement.date}</span>
+        </div>
+        <div class="agreement-content">
+            ${agreement.fullContent}
+        </div>
+    `;
+
+    modal.style.display = 'flex';
+};
+
+window.closeAgreementModal = function () {
+    document.getElementById('agreement-modal').style.display = 'none';
+};
 
 // === STOCK ROW ===
 function renderStockRow(stock) {
