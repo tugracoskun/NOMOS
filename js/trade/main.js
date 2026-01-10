@@ -1,9 +1,14 @@
 // TRADE MODULE - MAIN CONTROLLER
 // Handles page rendering, state management, and trade operations
+// Now includes Dashboard mode as default view
 
 import { generateTradePage, getResourcePrice, calculatePortfolioValue } from './templates.js';
 import { marketState, getMarketMultiplier, initMarket } from '../data/market.js';
 import { updateGold, getGameState } from '../data/state.js';
+import { renderTradeDashboard, destroyDashboard } from './dashboard/index.js';
+
+// === VIEW MODES ===
+let currentViewMode = 'dashboard'; // 'dashboard' or 'marketplace'
 
 // === TRADE STATE ===
 let tradeState = {
@@ -46,7 +51,21 @@ function saveTradeHistory(history) {
 }
 
 // === MAIN RENDER FUNCTION ===
-export function renderTradePage(container) {
+export function renderTradePage(container, viewMode = 'dashboard') {
+    currentViewMode = viewMode;
+
+    // Dashboard Mode (Default - New)
+    if (currentViewMode === 'dashboard') {
+        renderTradeDashboard(container);
+        return;
+    }
+
+    // Classic Marketplace Mode
+    renderMarketplace(container);
+}
+
+// === RENDER MARKETPLACE (Classic View) ===
+function renderMarketplace(container) {
     // Load CSS
     loadTradeStyles();
 
