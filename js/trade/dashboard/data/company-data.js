@@ -5,77 +5,165 @@ const COMPANY_STORAGE_KEY = 'nomos_player_company';
 
 // === MESLEK TÜRLERİ ===
 export const PROFESSION_TYPES = {
-    CLOTHING: {
-        id: 'clothing',
-        name: 'Tekstil & Moda',
-        icon: 'fa-solid fa-shirt',
-        color: '#e879f9',
-        description: 'Giyim, aksesuar ve moda ürünleri üretimi/satışı',
-        metrics: ['collections', 'sales', 'inventory', 'trends'],
-        defaultProducts: ['T-Shirt', 'Pantolon', 'Elbise', 'Ceket', 'Aksesuar']
-    },
-    FOOD: {
-        id: 'food',
-        name: 'Gıda & Tarım',
-        icon: 'fa-solid fa-wheat-awn',
-        color: '#22c55e',
-        description: 'Gıda üretimi, işleme ve dağıtımı',
-        metrics: ['harvest', 'processing', 'freshness', 'demand'],
-        defaultProducts: ['Buğday', 'Meyve', 'Sebze', 'Süt Ürünleri', 'Et']
-    },
-    TECH: {
-        id: 'tech',
-        name: 'Teknoloji',
-        icon: 'fa-solid fa-microchip',
-        color: '#3b82f6',
-        description: 'Elektronik, yazılım ve teknoloji ürünleri',
-        metrics: ['innovation', 'production', 'patents', 'market_share'],
-        defaultProducts: ['Telefon', 'Bilgisayar', 'Yazılım', 'Çip', 'Sensör']
-    },
+    // === ÜRETİM SEKTÖRÜ ===
     MINING: {
         id: 'mining',
         name: 'Madencilik',
         icon: 'fa-solid fa-gem',
         color: '#f59e0b',
-        description: 'Maden çıkarımı ve işleme',
+        category: 'production',
+        description: 'Maden çıkarımı ve işleme. Hammadde tedarikçisi.',
         metrics: ['extraction', 'reserves', 'processing', 'export'],
-        defaultProducts: ['Demir', 'Bakır', 'Altın', 'Kömür', 'Lityum']
+        defaultProducts: ['Demir', 'Bakır', 'Altın', 'Kömür', 'Lityum', 'Elmas']
     },
-    ENERGY: {
-        id: 'energy',
-        name: 'Enerji',
-        icon: 'fa-solid fa-bolt',
-        color: '#eab308',
-        description: 'Enerji üretimi ve dağıtımı',
-        metrics: ['production_mw', 'efficiency', 'grid_coverage', 'green_ratio'],
-        defaultProducts: ['Elektrik', 'Doğalgaz', 'Petrol', 'Güneş Enerjisi', 'Rüzgar']
+    AGRICULTURE: {
+        id: 'agriculture',
+        name: 'Tarım & Gıda',
+        icon: 'fa-solid fa-wheat-awn',
+        color: '#22c55e',
+        category: 'production',
+        description: 'Gıda üretimi, hasat ve işleme.',
+        metrics: ['harvest', 'processing', 'freshness', 'demand'],
+        defaultProducts: ['Buğday', 'Meyve', 'Sebze', 'Süt Ürünleri', 'Et', 'Şarap']
+    },
+    RAW_MATERIALS: {
+        id: 'raw_materials',
+        name: 'Hammadde İşleme',
+        icon: 'fa-solid fa-cubes',
+        color: '#78716c',
+        category: 'production',
+        description: 'Demir, taş ve ahşap işleme. Sanayiye yarı mamul tedarik.',
+        metrics: ['processing_rate', 'quality', 'capacity', 'contracts'],
+        defaultProducts: ['Çelik', 'Kereste', 'Mermer', 'Cam', 'Plastik', 'Kimyasal']
     },
     MANUFACTURING: {
         id: 'manufacturing',
         name: 'İmalat',
         icon: 'fa-solid fa-industry',
         color: '#64748b',
-        description: 'Endüstriyel üretim ve imalat',
+        category: 'production',
+        description: 'Endüstriyel üretim ve imalat.',
         metrics: ['output', 'quality', 'efficiency', 'orders'],
-        defaultProducts: ['Makine', 'Araç Parçası', 'Mobilya', 'Kimyasal', 'Plastik']
+        defaultProducts: ['Makine', 'Araç Parçası', 'Mobilya', 'Elektronik', 'Tekstil']
+    },
+    ENERGY: {
+        id: 'energy',
+        name: 'Enerji',
+        icon: 'fa-solid fa-bolt',
+        color: '#eab308',
+        category: 'production',
+        description: 'Enerji üretimi ve dağıtımı.',
+        metrics: ['production_mw', 'efficiency', 'grid_coverage', 'green_ratio'],
+        defaultProducts: ['Elektrik', 'Doğalgaz', 'Petrol', 'Güneş Enerjisi', 'Nükleer']
+    },
+
+    // === HİZMET SEKTÖRÜ ===
+    PORT_COMPANY: {
+        id: 'port_company',
+        name: 'Liman Şirketi',
+        icon: 'fa-solid fa-anchor',
+        color: '#0ea5e9',
+        category: 'services',
+        description: 'Liman operasyonları, deniz ticareti ve konteyner yönetimi.',
+        metrics: ['throughput', 'berth_capacity', 'turnaround_time', 'clients'],
+        defaultProducts: ['Konteyner', 'Bulk Kargo', 'Yakıt İkmali', 'Gemi Servisi', 'Depolama']
+    },
+    LOGISTICS: {
+        id: 'logistics',
+        name: 'Lojistik & Ulaşım',
+        icon: 'fa-solid fa-truck-fast',
+        color: '#06b6d4',
+        category: 'services',
+        description: 'Tren, uçak, otobüs üretimi ve taşımacılık.',
+        metrics: ['deliveries', 'fleet_size', 'coverage', 'on_time_rate'],
+        defaultProducts: ['Karayolu', 'Denizyolu', 'Havayolu', 'Demiryolu', 'Otobüs']
+    },
+    BANKING: {
+        id: 'banking',
+        name: 'Bankacılık',
+        icon: 'fa-solid fa-building-columns',
+        color: '#059669',
+        category: 'finance',
+        description: 'Banka ve finansal hizmetler. Kredi, mevduat, yatırım.',
+        metrics: ['assets', 'loans', 'deposits', 'interest_margin'],
+        defaultProducts: ['Kredi', 'Mevduat', 'Yatırım', 'Sigorta', 'Döviz']
+    },
+    TRADING: {
+        id: 'trading',
+        name: 'Trader',
+        icon: 'fa-solid fa-chart-line',
+        color: '#8b5cf6',
+        category: 'finance',
+        description: 'Borsa ve emtia ticareti. Sosyal medya etkisi, ün kazanımı.',
+        metrics: ['portfolio_value', 'win_rate', 'followers', 'reputation'],
+        defaultProducts: ['Hisse', 'Emtia', 'Türev', 'Kripto', 'Tahvil'],
+        special: ['social_influence', 'portfolio_showcase'] // Warren Buffet tarzı "X'in Portföyü"
+    },
+
+    // === STRATEJİK SEKTÖR ===
+    DEFENSE: {
+        id: 'defense',
+        name: 'Savunma Sanayi',
+        icon: 'fa-solid fa-shield-halved',
+        color: '#dc2626',
+        category: 'strategic',
+        description: 'Silah geliştirme, hükümet ihaleleri. Ülkeye katma değer.',
+        metrics: ['contracts', 'r_and_d', 'security_level', 'government_rating'],
+        defaultProducts: ['Hafif Silah', 'Zırhlı Araç', 'Drone', 'Radar', 'Füze Sistemi'],
+        governmentTied: true
+    },
+    CONSTRUCTION: {
+        id: 'construction',
+        name: 'İnşaat',
+        icon: 'fa-solid fa-helmet-safety',
+        color: '#f97316',
+        category: 'strategic',
+        description: 'Altyapı, bina ve mega proje inşaatı.',
+        metrics: ['projects', 'capacity', 'completion_rate', 'tenders'],
+        defaultProducts: ['Konut', 'Ticari Bina', 'Köprü', 'Tünel', 'Havalimanı']
+    },
+    FOUNDATION: {
+        id: 'foundation',
+        name: 'Vakıf',
+        icon: 'fa-solid fa-hand-holding-heart',
+        color: '#ec4899',
+        category: 'social',
+        description: 'Eğitim, teknoloji ve toplumsal gelişim. Sosyal etki.',
+        metrics: ['impact_score', 'beneficiaries', 'fund_raised', 'projects'],
+        defaultProducts: ['Eğitim Bursu', 'Araştırma Fonu', 'Sağlık Desteği', 'Teknoloji Hibesi'],
+        nonprofit: true
+    },
+    TECH: {
+        id: 'tech',
+        name: 'Teknoloji',
+        icon: 'fa-solid fa-microchip',
+        color: '#3b82f6',
+        category: 'innovation',
+        description: 'Yazılım, donanım ve inovasyon.',
+        metrics: ['innovation', 'patents', 'users', 'market_share'],
+        defaultProducts: ['Yazılım', 'Uygulama', 'Çip', 'AI Sistemi', 'Cloud']
+    },
+
+    // === TİCARET SEKTÖRÜ ===
+    CLOTHING: {
+        id: 'clothing',
+        name: 'Tekstil & Moda',
+        icon: 'fa-solid fa-shirt',
+        color: '#e879f9',
+        category: 'retail',
+        description: 'Giyim, aksesuar ve moda ürünleri.',
+        metrics: ['collections', 'sales', 'inventory', 'trends'],
+        defaultProducts: ['T-Shirt', 'Pantolon', 'Elbise', 'Ceket', 'Aksesuar']
     },
     LUXURY: {
         id: 'luxury',
         name: 'Lüks Ürünler',
         icon: 'fa-solid fa-crown',
         color: '#a855f7',
-        description: 'Premium ve lüks ürün satışı',
+        category: 'retail',
+        description: 'Premium ve lüks ürün ticareti.',
         metrics: ['exclusivity', 'brand_value', 'vip_clients', 'prestige'],
         defaultProducts: ['Mücevher', 'Saat', 'Parfüm', 'Deri Eşya', 'Sanat']
-    },
-    LOGISTICS: {
-        id: 'logistics',
-        name: 'Lojistik',
-        icon: 'fa-solid fa-truck-fast',
-        color: '#06b6d4',
-        description: 'Taşımacılık ve depolama hizmetleri',
-        metrics: ['deliveries', 'fleet_size', 'coverage', 'on_time_rate'],
-        defaultProducts: ['Karayolu', 'Denizyolu', 'Havayolu', 'Demiryolu', 'Depolama']
     }
 };
 

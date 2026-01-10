@@ -7,12 +7,13 @@ import { renderMyCompanySection } from './my-company/index.js';
 import { renderStockExchangeSection } from './stock-exchange/index.js';
 import { renderMarketNews } from './news/index.js';
 import { renderShipmentTracker } from './logistics/index.js';
+import { renderCommodityExchangeWidget, renderCommodityExchangeSection } from './commodity-exchange/index.js';
 import { loadPlayerCompany, getPlayerCompany } from './data/company-data.js';
 import { loadShipments } from './data/shipment-data.js';
 
 // Dashboard State
 let dashboardState = {
-    activeTab: 'overview', // 'overview', 'company', 'exchange', 'logistics'
+    activeTab: 'overview', // 'overview', 'company', 'exchange', 'commodity', 'logistics'
     companyData: null,
     shipments: [],
     marketNews: [],
@@ -76,6 +77,10 @@ function generateDashboardHTML() {
                         <button class="tab-btn" data-tab="exchange">
                             <i class="fa-solid fa-chart-line"></i>
                             Borsa
+                        </button>
+                        <button class="tab-btn" data-tab="commodity">
+                            <i class="fa-solid fa-scale-balanced"></i>
+                            Emtia
                         </button>
                         <button class="tab-btn" data-tab="logistics">
                             <i class="fa-solid fa-truck-fast"></i>
@@ -149,6 +154,8 @@ function renderTabContent(tabId) {
             return renderMyCompanySection(dashboardState.companyData, false);
         case 'exchange':
             return renderStockExchangeSection(false);
+        case 'commodity':
+            return renderCommodityExchangeSection();
         case 'logistics':
             return renderShipmentTracker(dashboardState.shipments, false);
         default:
