@@ -3,8 +3,8 @@
 
 import { getGameState } from '../../data/state.js';
 import { marketState, initMarket } from '../../data/market.js';
-import { renderMyCompanySection } from './my-company/index.js';
-import { renderStockExchangeSection } from './stock-exchange/index.js';
+import { renderMyCompanySection, setupCompanyEventHandlers } from './my-company/index.js';
+import { renderStockExchangeSection, initInteractiveChart, setupExchangeViewNav } from './stock-exchange/index.js';
 import { renderMarketNews } from './news/index.js';
 import { renderShipmentTracker } from './logistics/index.js';
 import { renderCommodityExchangeWidget, renderCommodityExchangeSection, setupCommodityExchangeEvents } from './commodity-exchange/index.js';
@@ -170,7 +170,7 @@ function renderOverviewTab() {
 
             <!-- Orta Sütun: Lojistik -->
             <div class="overview-column col-center">
-                <div class="widget-card logistics-widget-compact no-header">
+                <div class="widget-card logistics-widget-compact">
                     ${renderShipmentTracker(dashboardState.shipments, true)}
                 </div>
             </div>
@@ -303,21 +303,52 @@ function setupTabSpecificEvents(container, tabId) {
     // Delegate to appropriate module based on tab
     switch (tabId) {
         case 'overview':
-            // Overview specific actions
-            contentArea.querySelectorAll('[data-action="view-news"]').forEach(btn => {
-                btn.addEventListener('click', () => {
-                    const exchangeTab = document.querySelector('[data-tab="exchange"]');
-                    if (exchangeTab) exchangeTab.click();
+            // Overview widget navigation handlers
+
+            // Borsa widget -> Borsa sekmesi
+            contentArea.querySelectorAll('[data-action="view-exchange"], .exchange-widget-compact').forEach(el => {
+                el.style.cursor = 'pointer';
+                el.addEventListener('click', (e) => {
+                    if (e.target.closest('[data-action]') && e.target.closest('[data-action]') !== el) return;
+                    navigateToTab('exchange');
                 });
+            });
+
+            // Şirketim widget -> Şirket sekmesi
+            contentArea.querySelectorAll('[data-action="view-company"], .company-widget-compact').forEach(el => {
+                el.style.cursor = 'pointer';
+                el.addEventListener('click', (e) => {
+                    if (e.target.closest('[data-action]') && e.target.closest('[data-action]') !== el) return;
+                    navigateToTab('company');
+                });
+            });
+
+            // Lojistik widget -> Lojistik sekmesi
+            contentArea.querySelectorAll('[data-action="view-logistics"], .logistics-widget-compact').forEach(el => {
+                el.style.cursor = 'pointer';
+                el.addEventListener('click', (e) => {
+                    if (e.target.closest('[data-action]') && e.target.closest('[data-action]') !== el) return;
+                    navigateToTab('logistics');
+                });
+            });
+
+            // Haberler/Yatırımlar -> Borsa sekmesi (haberler borsayla ilişkili)
+            contentArea.querySelectorAll('[data-action="view-news"], [data-action="view-investments"]').forEach(btn => {
+                btn.addEventListener('click', () => navigateToTab('exchange'));
             });
             break;
         case 'company':
-            // Company module handles its own events
-            break;
-            // Company module handles its own events
+            // Setup company management event handlers
+            setTimeout(() => {
+                setupCompanyEventHandlers();
+            }, 100);
             break;
         case 'exchange':
-            // Exchange module handles its own events
+            // Initialize interactive chart and view navigation after render
+            setTimeout(() => {
+                initInteractiveChart();
+                setupExchangeViewNav();
+            }, 100);
             break;
         case 'commodity':
             // Commodity exchange event listeners
@@ -326,6 +357,14 @@ function setupTabSpecificEvents(container, tabId) {
         case 'logistics':
             // Logistics module handles its own events
             break;
+    }
+}
+
+// Helper function to navigate between tabs
+function navigateToTab(tabId) {
+    const tabBtn = document.querySelector(`[data-tab="${tabId}"]`);
+    if (tabBtn) {
+        tabBtn.click();
     }
 }
 

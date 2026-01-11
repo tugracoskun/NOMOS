@@ -88,17 +88,6 @@ export const PROFESSION_TYPES = {
         metrics: ['assets', 'loans', 'deposits', 'interest_margin'],
         defaultProducts: ['Kredi', 'Mevduat', 'Yatırım', 'Sigorta', 'Döviz']
     },
-    TRADING: {
-        id: 'trading',
-        name: 'Trader',
-        icon: 'fa-solid fa-chart-line',
-        color: '#8b5cf6',
-        category: 'finance',
-        description: 'Borsa ve emtia ticareti. Sosyal medya etkisi, ün kazanımı.',
-        metrics: ['portfolio_value', 'win_rate', 'followers', 'reputation'],
-        defaultProducts: ['Hisse', 'Emtia', 'Türev', 'Kripto', 'Tahvil'],
-        special: ['social_influence', 'portfolio_showcase'] // Warren Buffet tarzı "X'in Portföyü"
-    },
 
     // === STRATEJİK SEKTÖR ===
     DEFENSE: {
@@ -167,12 +156,66 @@ export const PROFESSION_TYPES = {
     }
 };
 
+// === STAFF TİPLERİ ===
+export const STAFF_TYPES = {
+    CFO: {
+        id: 'cfo',
+        name: 'Mali Müdür (CFO)',
+        icon: 'fa-solid fa-chart-pie',
+        color: '#fbbf24',
+        salary: 500,
+        description: 'Detaylı mali raporlar ve gelir-gider analizi sağlar.',
+        unlocks: ['detailed_financials', 'budget_planning', 'tax_optimization']
+    },
+    COO: {
+        id: 'coo',
+        name: 'Operasyon Müdürü (COO)',
+        icon: 'fa-solid fa-gears',
+        color: '#06b6d4',
+        salary: 450,
+        description: 'Üretim verimliliğini artırır, operasyonel maliyetleri düşürür.',
+        unlocks: ['efficiency_boost', 'auto_production', 'supply_chain']
+    },
+    CMO: {
+        id: 'cmo',
+        name: 'Pazarlama Müdürü (CMO)',
+        icon: 'fa-solid fa-bullhorn',
+        color: '#ec4899',
+        salary: 400,
+        description: 'Marka değerini ve müşteri tabanını artırır.',
+        unlocks: ['marketing_campaigns', 'brand_boost', 'customer_analytics']
+    },
+    HR: {
+        id: 'hr',
+        name: 'İK Müdürü',
+        icon: 'fa-solid fa-users-gear',
+        color: '#8b5cf6',
+        salary: 350,
+        description: 'Çalışan verimliliğini ve memnuniyetini artırır.',
+        unlocks: ['talent_pool', 'training_programs', 'morale_boost']
+    },
+    LEGAL: {
+        id: 'legal',
+        name: 'Hukuk Danışmanı',
+        icon: 'fa-solid fa-scale-balanced',
+        color: '#64748b',
+        salary: 400,
+        description: 'Yasal riskleri azaltır, sözleşme avantajları sağlar.',
+        unlocks: ['contract_protection', 'legal_shield', 'merger_support']
+    }
+};
+
+// === MAX ŞİRKET SAYISI ===
+export const MAX_COMPANIES = 7;
+const COMPANIES_STORAGE_KEY = 'nomos_player_companies';
+const ACTIVE_COMPANY_KEY = 'nomos_active_company_id';
+
 // === DEFAULT COMPANY TEMPLATE ===
 function createDefaultCompany(professionType = 'CLOTHING') {
     const profession = PROFESSION_TYPES[professionType] || PROFESSION_TYPES.CLOTHING;
 
     return {
-        id: `company_${Date.now()}`,
+        id: `company_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
         name: 'Yeni Şirket',
         profession: profession.id,
         level: 1,
@@ -185,11 +228,20 @@ function createDefaultCompany(professionType = 'CLOTHING') {
         cash: 5000,
         debt: 0,
 
+        // Detaylı Finansal (CFO ile açılır)
+        financialHistory: [],
+        totalRevenue: 0,
+        totalExpense: 0,
+        netProfit: 0,
+
         // Operasyonel
         employees: 5,
         maxEmployees: 10,
         reputation: 50, // 0-100
         customerSatisfaction: 75,
+
+        // Yönetim Ekibi (Staff)
+        staff: [], // [{id: 'cfo', hiredAt: Date, salary: 500}]
 
         // Ürünler
         products: profession.defaultProducts.map((name, i) => ({
@@ -330,4 +382,554 @@ export function calculateCompanyMetrics(company) {
         productCount: company.products.length,
         employeeEfficiency: Math.round((company.employees / company.maxEmployees) * 100)
     };
+}
+
+// === DELETE PRODUCT ===
+export function deleteProduct(productId) {
+    const company = loadPlayerCompany();
+    company.products = company.products.filter(p => p.id !== productId);
+    savePlayerCompany(company);
+    return company;
+}
+
+// === HIRE EMPLOYEE ===
+export function hireEmployee(count = 1) {
+    const company = loadPlayerCompany();
+    const hireCost = 500 * count;
+
+    if (company.cash < hireCost) {
+        return { success: false, error: 'Yetersiz nakit' };
+    }
+
+    if (company.employees + count > company.maxEmployees) {
+        return { success: false, error: 'Maksimum çalışan sayısına ulaşıldı' };
+    }
+
+    company.employees += count;
+    company.cash -= hireCost;
+    savePlayerCompany(company);
+    return { success: true, company };
+}
+
+// === FIRE EMPLOYEE ===
+export function fireEmployee(count = 1) {
+    const company = loadPlayerCompany();
+
+    if (company.employees - count < 1) {
+        return { success: false, error: 'En az 1 çalışan olmalı' };
+    }
+
+    company.employees -= count;
+    // Severance pay
+    company.cash -= 200 * count;
+    savePlayerCompany(company);
+    return { success: true, company };
+}
+
+// === UPGRADE CAPACITY ===
+export function upgradeCapacity() {
+    const company = loadPlayerCompany();
+    const upgradeCost = company.maxEmployees * 1000;
+
+    if (company.cash < upgradeCost) {
+        return { success: false, error: 'Yetersiz nakit', cost: upgradeCost };
+    }
+
+    company.maxEmployees += 5;
+    company.cash -= upgradeCost;
+    company.experience += 50;
+    savePlayerCompany(company);
+    return { success: true, company };
+}
+
+// === UPDATE ORDER STATUS ===
+export function updateOrderStatus(orderId, newStatus) {
+    const company = loadPlayerCompany();
+    const order = company.orders.find(o => o.id === orderId);
+
+    if (order) {
+        order.status = newStatus;
+        order.updatedAt = Date.now();
+
+        if (newStatus === 'completed') {
+            company.cash += order.totalValue;
+            company.experience += 10;
+            company.reputation = Math.min(100, company.reputation + 1);
+        }
+
+        savePlayerCompany(company);
+    }
+    return company;
+}
+
+// === DELETE ORDER ===
+export function deleteOrder(orderId) {
+    const company = loadPlayerCompany();
+    company.orders = company.orders.filter(o => o.id !== orderId);
+    savePlayerCompany(company);
+    return company;
+}
+
+// === CREATE NEW COMPANY (Full Reset) ===
+export function createNewCompany(companyData) {
+    const profession = PROFESSION_TYPES[companyData.professionKey] || PROFESSION_TYPES.CLOTHING;
+
+    const newCompany = {
+        id: `company_${Date.now()}`,
+        name: companyData.name || 'Yeni Şirket',
+        profession: profession.id,
+        level: 1,
+        experience: 0,
+
+        // Finansal
+        totalValue: companyData.startingCapital || 10000,
+        dailyIncome: 0,
+        weeklyGrowth: 0,
+        cash: companyData.startingCapital || 10000,
+        debt: 0,
+
+        // Operasyonel
+        employees: companyData.initialEmployees || 3,
+        maxEmployees: 10,
+        reputation: 30,
+        customerSatisfaction: 50,
+
+        // Ürünler
+        products: profession.defaultProducts.slice(0, 3).map((name, i) => ({
+            id: `prod_${Date.now()}_${i}`,
+            name: name,
+            stock: 50,
+            price: Math.floor(Math.random() * 300) + 100,
+            demand: 50,
+            quality: 60
+        })),
+
+        // Siparişler
+        orders: [],
+
+        // Yatırımlar
+        investments: [],
+
+        // Zaman damgaları
+        createdAt: Date.now(),
+        lastUpdated: Date.now()
+    };
+
+    savePlayerCompany(newCompany);
+    return newCompany;
+}
+
+// === DELETE COMPANY (Reset to Empty) ===
+export function deleteCompany() {
+    localStorage.removeItem(COMPANY_STORAGE_KEY);
+    return null;
+}
+
+// === ADD INVESTMENT ===
+export function addInvestment(investmentData) {
+    const company = loadPlayerCompany();
+
+    if (company.cash < investmentData.amount) {
+        return { success: false, error: 'Yetersiz nakit' };
+    }
+
+    const investment = {
+        id: `inv_${Date.now()}`,
+        type: investmentData.type,
+        name: investmentData.name,
+        amount: investmentData.amount,
+        expectedReturn: investmentData.expectedReturn || 0.05,
+        startDate: Date.now(),
+        maturityDate: Date.now() + (investmentData.durationDays || 30) * 24 * 60 * 60 * 1000,
+        status: 'active'
+    };
+
+    company.investments.push(investment);
+    company.cash -= investmentData.amount;
+    savePlayerCompany(company);
+
+    return { success: true, investment, company };
+}
+
+// === COLLECT INVESTMENT ===
+export function collectInvestment(investmentId) {
+    const company = loadPlayerCompany();
+    const investment = company.investments.find(i => i.id === investmentId);
+
+    if (!investment) {
+        return { success: false, error: 'Yatırım bulunamadı' };
+    }
+
+    if (Date.now() < investment.maturityDate) {
+        return { success: false, error: 'Yatırım henüz vadesi dolmadı' };
+    }
+
+    const returnAmount = investment.amount * (1 + investment.expectedReturn);
+    company.cash += returnAmount;
+    company.investments = company.investments.filter(i => i.id !== investmentId);
+    savePlayerCompany(company);
+
+    return { success: true, amount: returnAmount, company };
+}
+
+// === BUY STOCK FOR PRODUCT ===
+export function buyProductStock(productId, quantity, unitCost) {
+    const company = loadPlayerCompany();
+    const totalCost = quantity * unitCost;
+
+    if (company.cash < totalCost) {
+        return { success: false, error: 'Yetersiz nakit' };
+    }
+
+    const product = company.products.find(p => p.id === productId);
+    if (!product) {
+        return { success: false, error: 'Ürün bulunamadı' };
+    }
+
+    product.stock += quantity;
+    company.cash -= totalCost;
+    savePlayerCompany(company);
+
+    return { success: true, company };
+}
+
+// === SET PRODUCT PRICE ===
+export function setProductPrice(productId, newPrice) {
+    const company = loadPlayerCompany();
+    const product = company.products.find(p => p.id === productId);
+
+    if (!product) {
+        return { success: false, error: 'Ürün bulunamadı' };
+    }
+
+    product.price = newPrice;
+    savePlayerCompany(company);
+
+    return { success: true, company };
+}
+
+// === SIMULATE DAILY OPERATIONS ===
+export function simulateDailyOperations() {
+    const company = loadPlayerCompany();
+
+    // Calculate daily income based on products and employees
+    let dailyRevenue = 0;
+    const employeeEfficiency = company.employees / company.maxEmployees;
+
+    company.products.forEach(product => {
+        // Sales based on demand, price, and employee efficiency
+        const salesRate = (product.demand / 100) * employeeEfficiency;
+        const potentialSales = Math.floor(product.stock * salesRate * 0.1);
+        const actualSales = Math.min(potentialSales, product.stock);
+
+        if (actualSales > 0) {
+            product.stock -= actualSales;
+            dailyRevenue += actualSales * product.price;
+
+            // Adjust demand based on stock levels
+            if (product.stock < 10) {
+                product.demand = Math.min(100, product.demand + 5);
+            } else if (product.stock > 100) {
+                product.demand = Math.max(10, product.demand - 3);
+            }
+        }
+    });
+
+    // Daily costs
+    const employeeCosts = company.employees * 50;
+    const operationalCosts = company.products.length * 20;
+    const totalCosts = employeeCosts + operationalCosts;
+
+    // Net income
+    const netIncome = dailyRevenue - totalCosts;
+    company.cash += netIncome;
+    company.dailyIncome = netIncome;
+
+    // Update total value
+    company.totalValue = company.cash +
+        company.products.reduce((sum, p) => sum + (p.stock * p.price), 0) +
+        company.investments.reduce((sum, i) => sum + i.amount, 0);
+
+    // Experience gain
+    if (netIncome > 0) {
+        company.experience += Math.floor(netIncome / 100);
+
+        // Level up check
+        if (company.experience >= 100) {
+            company.level += 1;
+            company.experience -= 100;
+            company.maxEmployees += 2;
+        }
+    }
+
+    // Update reputation slightly
+    if (company.orders.filter(o => o.status === 'completed').length > 0) {
+        company.reputation = Math.min(100, company.reputation + 0.5);
+    }
+
+    savePlayerCompany(company);
+    return company;
+}
+
+// === GET ALL PROFESSION CATEGORIES ===
+export function getProfessionsByCategory() {
+    const categories = {
+        production: { name: 'Üretim Sektörü', icon: 'fa-industry', professions: [] },
+        services: { name: 'Hizmet Sektörü', icon: 'fa-handshake', professions: [] },
+        finance: { name: 'Finans Sektörü', icon: 'fa-building-columns', professions: [] },
+        strategic: { name: 'Stratejik Sektör', icon: 'fa-shield-halved', professions: [] },
+        social: { name: 'Sosyal Sektör', icon: 'fa-heart', professions: [] },
+        innovation: { name: 'İnovasyon Sektörü', icon: 'fa-lightbulb', professions: [] },
+        retail: { name: 'Ticaret Sektörü', icon: 'fa-store', professions: [] }
+    };
+
+    Object.entries(PROFESSION_TYPES).forEach(([key, profession]) => {
+        if (categories[profession.category]) {
+            categories[profession.category].professions.push({
+                key,
+                ...profession
+            });
+        }
+    });
+
+    return categories;
+}
+
+// === ÇOKLU ŞİRKET YÖNETİMİ ===
+
+// Tüm şirketleri getir
+export function getAllCompanies() {
+    try {
+        const raw = localStorage.getItem(COMPANIES_STORAGE_KEY);
+        if (raw) {
+            return JSON.parse(raw);
+        }
+        // İlk şirketi ana şirketlerden al
+        const mainCompany = loadPlayerCompany();
+        if (mainCompany) {
+            const companies = [mainCompany];
+            saveAllCompanies(companies);
+            return companies;
+        }
+        return [];
+    } catch (e) {
+        console.error('Companies load error:', e);
+        return [];
+    }
+}
+
+// Tüm şirketleri kaydet
+export function saveAllCompanies(companies) {
+    localStorage.setItem(COMPANIES_STORAGE_KEY, JSON.stringify(companies));
+}
+
+// Aktif şirket ID'sini al
+export function getActiveCompanyId() {
+    return localStorage.getItem(ACTIVE_COMPANY_KEY) || null;
+}
+
+// Aktif şirketi değiştir
+export function setActiveCompany(companyId) {
+    localStorage.setItem(ACTIVE_COMPANY_KEY, companyId);
+    const companies = getAllCompanies();
+    const company = companies.find(c => c.id === companyId);
+    if (company) {
+        savePlayerCompany(company);
+    }
+}
+
+// Yeni şirket oluştur (max 7)
+export function createAdditionalCompany(professionType, name, initialCapital = 5000) {
+    const companies = getAllCompanies();
+
+    if (companies.length >= MAX_COMPANIES) {
+        return { success: false, error: 'Maksimum şirket sayısına ulaşıldı (7)' };
+    }
+
+    const newCompany = createDefaultCompany(professionType);
+    newCompany.name = name;
+    newCompany.cash = initialCapital;
+    newCompany.totalValue = initialCapital * 2;
+
+    companies.push(newCompany);
+    saveAllCompanies(companies);
+
+    return { success: true, company: newCompany };
+}
+
+// Şirket sil
+export function removeCompany(companyId) {
+    let companies = getAllCompanies();
+    if (companies.length <= 1) {
+        return { success: false, error: 'En az bir şirketiniz olmalı' };
+    }
+
+    companies = companies.filter(c => c.id !== companyId);
+    saveAllCompanies(companies);
+
+    // Aktif şirket silindiyse ilkini seç
+    if (getActiveCompanyId() === companyId && companies.length > 0) {
+        setActiveCompany(companies[0].id);
+    }
+
+    return { success: true };
+}
+
+// Şirket sayısını kontrol et
+export function canCreateCompany() {
+    return getAllCompanies().length < MAX_COMPANIES;
+}
+
+// === PARA TRANSFERİ ===
+
+// Oyuncudan şirkete para aktar
+export function transferToCompany(companyId, amount) {
+    // Oyuncu bakiyesi kontrolü (gameState'den alınır)
+    const gameState = JSON.parse(localStorage.getItem('nomos_game_state') || '{}');
+    const playerMoney = gameState.money || 0;
+
+    if (amount <= 0) {
+        return { success: false, error: 'Geçersiz miktar' };
+    }
+
+    if (playerMoney < amount) {
+        return { success: false, error: 'Yetersiz bakiye' };
+    }
+
+    // Para transferi
+    gameState.money = playerMoney - amount;
+    localStorage.setItem('nomos_game_state', JSON.stringify(gameState));
+
+    // Şirkete ekle
+    const companies = getAllCompanies();
+    const company = companies.find(c => c.id === companyId);
+    if (company) {
+        company.cash += amount;
+        company.lastUpdated = Date.now();
+        saveAllCompanies(companies);
+
+        // Ana şirket ise onu da güncelle
+        if (getActiveCompanyId() === companyId || loadPlayerCompany().id === companyId) {
+            savePlayerCompany(company);
+        }
+    }
+
+    return { success: true, newBalance: gameState.money };
+}
+
+// Şirketten oyuncuya para çek
+export function withdrawFromCompany(companyId, amount) {
+    const companies = getAllCompanies();
+    const company = companies.find(c => c.id === companyId);
+
+    if (!company) {
+        return { success: false, error: 'Şirket bulunamadı' };
+    }
+
+    if (amount <= 0) {
+        return { success: false, error: 'Geçersiz miktar' };
+    }
+
+    if (company.cash < amount) {
+        return { success: false, error: 'Şirkette yetersiz bakiye' };
+    }
+
+    // Şirketten çıkar
+    company.cash -= amount;
+    company.lastUpdated = Date.now();
+    saveAllCompanies(companies);
+
+    // Ana şirket ise onu da güncelle
+    if (getActiveCompanyId() === companyId || loadPlayerCompany().id === companyId) {
+        savePlayerCompany(company);
+    }
+
+    // Oyuncuya ekle
+    const gameState = JSON.parse(localStorage.getItem('nomos_game_state') || '{}');
+    gameState.money = (gameState.money || 0) + amount;
+    localStorage.setItem('nomos_game_state', JSON.stringify(gameState));
+
+    return { success: true, newBalance: gameState.money };
+}
+
+// === STAFF YÖNETİMİ ===
+
+// Staff işe al
+export function hireStaff(staffTypeId) {
+    const company = loadPlayerCompany();
+    const staffType = Object.values(STAFF_TYPES).find(s => s.id === staffTypeId);
+
+    if (!staffType) {
+        return { success: false, error: 'Geçersiz personel türü' };
+    }
+
+    // Zaten işe alınmış mı?
+    if (company.staff && company.staff.some(s => s.id === staffTypeId)) {
+        return { success: false, error: 'Bu personel zaten mevcut' };
+    }
+
+    // İşe alma ücreti (aylık maaşın 3 katı)
+    const hiringCost = staffType.salary * 3;
+    if (company.cash < hiringCost) {
+        return { success: false, error: `Yetersiz bakiye. İşe alma maliyeti: ${hiringCost.toLocaleString()} ₳` };
+    }
+
+    // İşe al
+    company.cash -= hiringCost;
+    if (!company.staff) company.staff = [];
+    company.staff.push({
+        id: staffTypeId,
+        hiredAt: Date.now(),
+        salary: staffType.salary
+    });
+
+    savePlayerCompany(company);
+
+    // Tüm şirketleri de güncelle
+    const companies = getAllCompanies();
+    const idx = companies.findIndex(c => c.id === company.id);
+    if (idx >= 0) {
+        companies[idx] = company;
+        saveAllCompanies(companies);
+    }
+
+    return { success: true, staff: staffType };
+}
+
+// Staff işten çıkar
+export function fireStaff(staffTypeId) {
+    const company = loadPlayerCompany();
+
+    if (!company.staff || !company.staff.some(s => s.id === staffTypeId)) {
+        return { success: false, error: 'Bu personel mevcut değil' };
+    }
+
+    company.staff = company.staff.filter(s => s.id !== staffTypeId);
+    savePlayerCompany(company);
+
+    // Tüm şirketleri de güncelle
+    const companies = getAllCompanies();
+    const idx = companies.findIndex(c => c.id === company.id);
+    if (idx >= 0) {
+        companies[idx] = company;
+        saveAllCompanies(companies);
+    }
+
+    return { success: true };
+}
+
+// Staff mevcut mu kontrol
+export function hasStaff(staffTypeId) {
+    const company = loadPlayerCompany();
+    return company.staff && company.staff.some(s => s.id === staffTypeId);
+}
+
+// Toplam staff maaşını hesapla
+export function getTotalStaffSalary() {
+    const company = loadPlayerCompany();
+    if (!company.staff) return 0;
+    return company.staff.reduce((total, s) => {
+        const staffType = Object.values(STAFF_TYPES).find(st => st.id === s.id);
+        return total + (staffType ? staffType.salary : 0);
+    }, 0);
 }

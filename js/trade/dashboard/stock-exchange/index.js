@@ -45,45 +45,33 @@ function renderExchangeWidget() {
 
     return `
         <div class="exchange-widget-content">
-            <!-- Header with Main Index -->
-            <div class="exchange-widget-header">
-                <div class="main-index">
-                    <div class="index-header">
+            <!-- Header with Main Index and Sparkline -->
+            <div class="exchange-widget-header-v2">
+                <div class="index-info-box">
+                    <div class="index-name-row">
                         <span class="index-label">${mainIndex.name}</span>
-                        <div class="market-status">
-                            <span class="status-dot"></span>
-                            <span>Açık</span>
-                        </div>
+                        <span class="status-indicator open">AÇIK</span>
                     </div>
-                    <div class="index-value-large">${mainIndex.value.toLocaleString()}</div>
-                    <div class="index-change-badge ${mainIndex.change >= 0 ? 'positive' : 'negative'}">
-                        <i class="fa-solid fa-${mainIndex.change >= 0 ? 'arrow-up' : 'arrow-down'}"></i>
-                        ${mainIndex.change >= 0 ? '+' : ''}${mainIndex.change}%
-                    </div>
-                </div>
-                <div class="mini-chart-container">
-                    ${renderMiniChart(mainIndex.change >= 0, 100, 50)}
-                </div>
-            </div>
-
-            <!-- Index Strip -->
-            <div class="index-strip">
-                ${STOCK_DATA.indices.slice(1).map(index => `
-                    <div class="index-mini">
-                        <span class="idx-name">${index.name.split(' ')[0]}</span>
-                        <span class="idx-change ${index.change >= 0 ? 'positive' : 'negative'}">
-                            ${index.change >= 0 ? '+' : ''}${index.change}%
+                    <div class="index-price-row">
+                        <span class="value-large">${mainIndex.value.toLocaleString()}</span>
+                        <span class="change-tag ${mainIndex.change >= 0 ? 'positive' : 'negative'}">
+                            <i class="fa-solid fa-${mainIndex.change >= 0 ? 'arrow-up' : 'arrow-down'}"></i> ${mainIndex.change >= 0 ? '+' : ''}${mainIndex.change}%
                         </span>
                     </div>
-                `).join('')}
+                </div>
+                <div class="index-sparkline">
+                    <svg viewBox="0 0 100 40">
+                        <path d="M0 35 L10 32 L20 38 L30 25 L40 28 L50 15 L60 22 L70 10 L80 18 L90 5 L100 12" fill="none" stroke="#22d3ee" stroke-width="1.5" />
+                    </svg>
+                </div>
             </div>
 
-            <!-- Top Movers Grid -->
-            <div class="movers-grid">
+            <!-- Top Movers Grid (2 Columns) -->
+            <div class="top-movers-grid">
                 ${topMovers.map(stock => `
-                    <div class="mover-card ${stock.change >= 0 ? 'up' : 'down'}">
-                        <div class="mover-header">
-                            <span class="mover-ticker">${stock.ticker}</span>
+                    <div class="mover-grid-item">
+                        <div class="mover-top">
+                            <span class="ticker">${stock.ticker}</span>
                             <span class="mover-change ${stock.change >= 0 ? 'positive' : 'negative'}">
                                 ${stock.change >= 0 ? '+' : ''}${stock.change}%
                             </span>
@@ -125,6 +113,23 @@ function renderFullExchangeView() {
                         Piyasa Açık
                     </div>
                 </div>
+                <div class="header-center">
+                    <!-- Navigation Tabs -->
+                    <div class="exchange-nav-tabs">
+                        <button class="exchange-nav-btn active" data-view="chart">
+                            <i class="fa-solid fa-chart-candlestick"></i>
+                            <span>Grafik</span>
+                        </button>
+                        <button class="exchange-nav-btn" data-view="stocks">
+                            <i class="fa-solid fa-building"></i>
+                            <span>Şirketler</span>
+                        </button>
+                        <button class="exchange-nav-btn" data-view="funds">
+                            <i class="fa-solid fa-coins"></i>
+                            <span>Fonlar</span>
+                        </button>
+                    </div>
+                </div>
                 <div class="header-right">
                     <div class="portfolio-summary">
                         <span class="label">Portföy Değeri</span>
@@ -134,163 +139,387 @@ function renderFullExchangeView() {
                 </div>
             </header>
 
-            <!-- TradingView Style Main Layout -->
+            <!-- Main Layout with Views -->
             <div class="exchange-main-layout">
-                <!-- Sol Panel: Grafik ve Şirketler -->
+                <!-- Sol Panel: İçerik Görünümleri -->
                 <div class="exchange-left-panel">
-                    <!-- Index Bar -->
-                    <div class="index-bar">
+
+                    <!-- VIEW: Chart (Default) -->
+                    <div class="exchange-view-panel active" id="view-chart">
+                        <div class="tv-chart-container">
+                            <div class="chart-header">
+                                <div class="chart-symbol">
+                                    <span class="symbol">NOMOS 100</span>
+                                    <span class="price">12,458.32</span>
+                                    <span class="change positive">+1.34%</span>
+                                </div>
+                                <div class="chart-timeframes">
+                                    <button class="tf-btn">1S</button>
+                                    <button class="tf-btn">1G</button>
+                                    <button class="tf-btn active">1H</button>
+                                    <button class="tf-btn">1A</button>
+                                    <button class="tf-btn">Tümü</button>
+                                </div>
+                            </div>
+                            <div class="chart-area">
+                                ${renderAdvancedChart()}
+                            </div>
+                            <div class="chart-footer">
+                                <div class="chart-stats">
+                                    <div class="stat"><span class="label">Açılış</span><span class="val">12,280</span></div>
+                                    <div class="stat"><span class="label">Yüksek</span><span class="val text-green">12,520</span></div>
+                                    <div class="stat"><span class="label">Düşük</span><span class="val text-red">12,195</span></div>
+                                    <div class="stat"><span class="label">Hacim</span><span class="val">2.4M</span></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- VIEW: Stocks -->
+                    <div class="exchange-view-panel" id="view-stocks">
+                        <section class="stocks-section">
+                            <div class="section-header">
+                                <h2>Şirket Hisseleri</h2>
+                                <div class="section-controls">
+                                    <input type="text" class="search-input" placeholder="Hisse ara..." id="stock-search">
+                                    <div class="filter-tabs">
+                                        <button class="filter-tab active" data-filter="all">Tümü</button>
+                                        <button class="filter-tab" data-filter="gainers">Yükselenler</button>
+                                        <button class="filter-tab" data-filter="losers">Düşenler</button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="stocks-table">
+                                <div class="table-header">
+                                    <div class="col-ticker">Sembol</div>
+                                    <div class="col-name">Şirket</div>
+                                    <div class="col-price">Fiyat</div>
+                                    <div class="col-change">Değişim</div>
+                                    <div class="col-volume">Hacim</div>
+                                    <div class="col-mcap">Piyasa Değeri</div>
+                                    <div class="col-actions">İşlem</div>
+                                </div>
+                                <div class="table-body" id="stocks-table-body">
+                                    ${STOCK_DATA.companies.map(stock => renderStockRow(stock)).join('')}
+                                </div>
+                            </div>
+                        </section>
+                    </div>
+
+                    <!-- VIEW: Funds -->
+                    <div class="exchange-view-panel" id="view-funds">
+                        <section class="funds-section">
+                            <div class="section-header">
+                                <h2>Yatırım Fonları</h2>
+                                <div class="section-controls">
+                                    <div class="filter-tabs">
+                                        <button class="filter-tab active" data-filter="all">Tümü</button>
+                                        <button class="filter-tab" data-filter="low">Düşük Risk</button>
+                                        <button class="filter-tab" data-filter="medium">Orta Risk</button>
+                                        <button class="filter-tab" data-filter="high">Yüksek Risk</button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="funds-grid">
+                                ${STOCK_DATA.funds.map(fund => renderFundCard(fund)).join('')}
+                            </div>
+                        </section>
+                    </div>
+                </div>
+
+                <!-- Sağ Panel: Bilgiler ve İndeksler -->
+                <aside class="exchange-right-panel">
+                    <!-- Üst Satır: Son Yatırımlar ve Ülke Ekonomileri -->
+                    <div class="right-panel-row">
+                        ${renderRecentInvestments()}
+                        ${renderCountryEconomies()}
+                    </div>
+                    <!-- Ticari Antlaşmalar -->
+                    <div class="right-panel-full">
+                        ${renderTradeAgreements()}
+                    </div>
+                    <!-- Endeksler (3 küçük kart) -->
+                    <div class="right-panel-indices">
                         ${STOCK_DATA.indices.map(index => `
-                            <div class="index-card">
-                                <div class="index-name">${index.name}</div>
-                                <div class="index-value">${index.value.toLocaleString()}</div>
-                                <div class="index-change ${index.change >= 0 ? 'positive' : 'negative'}">
-                                    <i class="fa-solid fa-${index.change >= 0 ? 'arrow-up' : 'arrow-down'}"></i>
+                            <div class="index-mini-card ${index.change >= 0 ? 'positive' : 'negative'}">
+                                <div class="index-mini-name">${index.name}</div>
+                                <div class="index-mini-value">${index.value.toLocaleString()}</div>
+                                <div class="index-mini-change">
+                                    <i class="fa-solid fa-${index.change >= 0 ? 'caret-up' : 'caret-down'}"></i>
                                     ${index.change >= 0 ? '+' : ''}${index.change}%
                                 </div>
                             </div>
                         `).join('')}
                     </div>
-
-                    <!-- TradingView Style Chart -->
-                    <div class="tv-chart-container">
-                        <div class="chart-header">
-                            <div class="chart-symbol">
-                                <span class="symbol">NOMOS 100</span>
-                                <span class="price">12,458.32</span>
-                                <span class="change positive">+1.34%</span>
-                            </div>
-                            <div class="chart-timeframes">
-                                <button class="tf-btn">1S</button>
-                                <button class="tf-btn">1G</button>
-                                <button class="tf-btn active">1H</button>
-                                <button class="tf-btn">1A</button>
-                                <button class="tf-btn">Tümü</button>
-                            </div>
-                        </div>
-                        <div class="chart-area">
-                            ${renderAdvancedChart()}
-                        </div>
-                        <div class="chart-footer">
-                            <div class="chart-stats">
-                                <div class="stat"><span class="label">Açılış</span><span class="val">12,280</span></div>
-                                <div class="stat"><span class="label">Yüksek</span><span class="val text-green">12,520</span></div>
-                                <div class="stat"><span class="label">Düşük</span><span class="val text-red">12,195</span></div>
-                                <div class="stat"><span class="label">Hacim</span><span class="val">2.4M</span></div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Stocks Table -->
-                    <section class="stocks-section">
-                        <div class="section-header">
-                            <h2>Şirketler</h2>
-                            <div class="section-controls">
-                                <div class="filter-tabs">
-                                    <button class="filter-tab active" data-filter="all">Tümü</button>
-                                    <button class="filter-tab" data-filter="gainers">Yükselenler</button>
-                                    <button class="filter-tab" data-filter="losers">Düşenler</button>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="stocks-table">
-                            <div class="table-header">
-                                <div class="col-ticker">Sembol</div>
-                                <div class="col-name">Şirket</div>
-                                <div class="col-price">Fiyat</div>
-                                <div class="col-change">Değişim</div>
-                                <div class="col-chart">Grafik</div>
-                                <div class="col-actions">İşlem</div>
-                            </div>
-                            <div class="table-body">
-                                ${STOCK_DATA.companies.map(stock => renderStockRow(stock)).join('')}
-                            </div>
-                        </div>
-                    </section>
-                </div>
-
-                <!-- Sağ Panel: Ekonomiler, Yatırımlar, Haberler -->
-                <aside class="exchange-right-panel">
-                    <!-- Ülke Ekonomileri -->
-                    ${renderCountryEconomies()}
-
-                    <!-- Son Yatırımlar -->
-                    ${renderRecentInvestments()}
-
-                    <!-- Ticari Antlaşmalar -->
-                    ${renderTradeAgreements()}
                 </aside>
             </div>
         </div>
     `;
 }
 
-// === ADVANCED CHART (TradingView Style) ===
+// Setup exchange view navigation
+export function setupExchangeViewNav() {
+    const navBtns = document.querySelectorAll('.exchange-nav-btn');
+    const viewPanels = document.querySelectorAll('.exchange-view-panel');
+
+    navBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            const viewId = btn.dataset.view;
+
+            // Update active button
+            navBtns.forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+
+            // Show corresponding view
+            viewPanels.forEach(panel => {
+                panel.classList.remove('active');
+                if (panel.id === `view-${viewId}`) {
+                    panel.classList.add('active');
+                }
+            });
+
+            // Reinitialize chart if switching to chart view
+            if (viewId === 'chart') {
+                setTimeout(() => initInteractiveChart(), 50);
+            }
+        });
+    });
+}
+
+// === ADVANCED CHART (TradingView Style - Interactive Canvas) ===
 function renderAdvancedChart() {
-    // SVG based candlestick-like chart
-    const width = 800;
-    const height = 250;
-    const candles = generateCandleData(40);
+    // Return HTML with canvas element - chart will be drawn after render
+    return `
+        <div class="tv-chart-wrapper" id="tv-chart-wrapper">
+            <canvas id="tv-chart-canvas" class="tv-chart-canvas"></canvas>
+            <div class="tv-chart-tooltip" id="tv-chart-tooltip" style="display: none;"></div>
+            <div class="tv-chart-crosshair-x" id="tv-crosshair-x"></div>
+            <div class="tv-chart-crosshair-y" id="tv-crosshair-y"></div>
+            <div class="tv-price-label" id="tv-price-label"></div>
+        </div>
+    `;
+}
+
+// Initialize the interactive chart after DOM is ready
+export function initInteractiveChart() {
+    const canvas = document.getElementById('tv-chart-canvas');
+    if (!canvas) return;
+
+    const wrapper = document.getElementById('tv-chart-wrapper');
+    const ctx = canvas.getContext('2d');
+
+    // Set canvas size
+    const rect = wrapper.getBoundingClientRect();
+    canvas.width = rect.width || 800;
+    canvas.height = rect.height || 280;
+
+    const width = canvas.width;
+    const height = canvas.height;
+    const chartHeight = height - 60; // Leave space for volume
+    const volumeHeight = 40;
+
+    // Generate candle data
+    const candles = generateCandleData(50);
     const maxHigh = Math.max(...candles.map(c => c.high));
     const minLow = Math.min(...candles.map(c => c.low));
     const range = maxHigh - minLow;
+    const maxVolume = Math.max(...candles.map(c => c.volume));
 
-    const candleWidth = 16;
-    const gap = 4;
+    const candleWidth = Math.floor((width - 80) / candles.length) - 2;
+    const gap = 2;
 
-    let candleSVG = candles.map((c, i) => {
-        const x = i * (candleWidth + gap) + 20;
-        const yHigh = height - 30 - ((c.high - minLow) / range) * (height - 60);
-        const yLow = height - 30 - ((c.low - minLow) / range) * (height - 60);
-        const yOpen = height - 30 - ((c.open - minLow) / range) * (height - 60);
-        const yClose = height - 30 - ((c.close - minLow) / range) * (height - 60);
-        const color = c.close >= c.open ? '#22c55e' : '#ef4444';
-        const bodyTop = Math.min(yOpen, yClose);
-        const bodyHeight = Math.abs(yClose - yOpen) || 2;
+    // Store candle positions for hit detection
+    const candlePositions = [];
 
-        return `
-            <line x1="${x + candleWidth / 2}" y1="${yHigh}" x2="${x + candleWidth / 2}" y2="${yLow}" stroke="${color}" stroke-width="1.5"/>
-            <rect x="${x}" y="${bodyTop}" width="${candleWidth}" height="${bodyHeight}" fill="${color}" rx="1"/>
-        `;
-    }).join('');
+    // Draw function
+    function draw(highlightIndex = -1) {
+        // Clear canvas
+        ctx.clearRect(0, 0, width, height);
 
-    return `
-        <svg viewBox="0 0 ${width} ${height}" class="tv-chart-svg">
-            <defs>
-                <linearGradient id="chartBg" x1="0%" y1="0%" x2="0%" y2="100%">
-                    <stop offset="0%" style="stop-color:#1e293b;stop-opacity:0.5"/>
-                    <stop offset="100%" style="stop-color:#0f172a;stop-opacity:1"/>
-                </linearGradient>
-            </defs>
-            <rect width="${width}" height="${height}" fill="url(#chartBg)"/>
-            <!-- Grid Lines -->
-            ${[0.25, 0.5, 0.75].map(pct => `
-                <line x1="0" y1="${height * pct}" x2="${width}" y2="${height * pct}" stroke="rgba(255,255,255,0.05)" stroke-dasharray="4"/>
-            `).join('')}
-            <!-- Candles -->
-            ${candleSVG}
-            <!-- Volume bars at bottom -->
-            ${candles.map((c, i) => {
-        const x = i * (candleWidth + gap) + 20;
-        const volHeight = (c.volume / 100) * 30;
-        const color = c.close >= c.open ? 'rgba(34,197,94,0.3)' : 'rgba(239,68,68,0.3)';
-        return `<rect x="${x}" y="${height - volHeight - 5}" width="${candleWidth}" height="${volHeight}" fill="${color}"/>`;
-    }).join('')}
-        </svg>
-    `;
+        // Background gradient
+        const bgGrad = ctx.createLinearGradient(0, 0, 0, height);
+        bgGrad.addColorStop(0, 'rgba(30, 41, 59, 0.8)');
+        bgGrad.addColorStop(1, 'rgba(15, 23, 42, 1)');
+        ctx.fillStyle = bgGrad;
+        ctx.fillRect(0, 0, width, height);
+
+        // Grid lines
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.05)';
+        ctx.lineWidth = 1;
+        for (let i = 1; i < 5; i++) {
+            const y = (chartHeight / 5) * i;
+            ctx.beginPath();
+            ctx.setLineDash([4, 4]);
+            ctx.moveTo(0, y);
+            ctx.lineTo(width - 60, y);
+            ctx.stroke();
+        }
+        ctx.setLineDash([]);
+
+        // Price axis labels
+        ctx.fillStyle = 'rgba(148, 163, 184, 0.8)';
+        ctx.font = '10px Inter, sans-serif';
+        ctx.textAlign = 'right';
+        for (let i = 0; i <= 4; i++) {
+            const price = maxHigh - (range / 4) * i;
+            const y = (chartHeight / 4) * i + 12;
+            ctx.fillText(price.toFixed(0), width - 5, y);
+        }
+
+        candlePositions.length = 0;
+
+        // Draw candles
+        candles.forEach((c, i) => {
+            const x = i * (candleWidth + gap) + 20;
+            const yHigh = 10 + ((maxHigh - c.high) / range) * (chartHeight - 20);
+            const yLow = 10 + ((maxHigh - c.low) / range) * (chartHeight - 20);
+            const yOpen = 10 + ((maxHigh - c.open) / range) * (chartHeight - 20);
+            const yClose = 10 + ((maxHigh - c.close) / range) * (chartHeight - 20);
+
+            const bullish = c.close >= c.open;
+            const bodyTop = Math.min(yOpen, yClose);
+            const bodyHeight = Math.max(Math.abs(yClose - yOpen), 2);
+
+            // Store position for hit detection
+            candlePositions.push({
+                x: x,
+                xEnd: x + candleWidth,
+                data: c,
+                index: i
+            });
+
+            // Highlight effect
+            if (i === highlightIndex) {
+                ctx.fillStyle = 'rgba(34, 211, 238, 0.1)';
+                ctx.fillRect(x - 2, 0, candleWidth + 4, chartHeight);
+            }
+
+            // Wick
+            ctx.strokeStyle = bullish ? '#22c55e' : '#ef4444';
+            ctx.lineWidth = 1.5;
+            ctx.beginPath();
+            ctx.moveTo(x + candleWidth / 2, yHigh);
+            ctx.lineTo(x + candleWidth / 2, yLow);
+            ctx.stroke();
+
+            // Body
+            if (i === highlightIndex) {
+                ctx.fillStyle = bullish ? '#4ade80' : '#f87171';
+                ctx.shadowColor = bullish ? '#22c55e' : '#ef4444';
+                ctx.shadowBlur = 8;
+            } else {
+                ctx.fillStyle = bullish ? '#22c55e' : '#ef4444';
+                ctx.shadowBlur = 0;
+            }
+            ctx.fillRect(x, bodyTop, candleWidth, bodyHeight);
+            ctx.shadowBlur = 0;
+
+            // Volume bar
+            const volHeight = (c.volume / maxVolume) * volumeHeight;
+            ctx.fillStyle = bullish ? 'rgba(34, 197, 94, 0.25)' : 'rgba(239, 68, 68, 0.25)';
+            ctx.fillRect(x, height - volHeight - 5, candleWidth, volHeight);
+        });
+
+        // Volume label
+        ctx.fillStyle = 'rgba(148, 163, 184, 0.5)';
+        ctx.font = '9px Inter, sans-serif';
+        ctx.textAlign = 'left';
+        ctx.fillText('VOL', 5, height - 10);
+    }
+
+    // Initial draw
+    draw();
+
+    // Mouse interaction
+    const tooltip = document.getElementById('tv-chart-tooltip');
+    const crosshairX = document.getElementById('tv-crosshair-x');
+    const crosshairY = document.getElementById('tv-crosshair-y');
+    const priceLabel = document.getElementById('tv-price-label');
+
+    canvas.addEventListener('mousemove', (e) => {
+        const rect = canvas.getBoundingClientRect();
+        const mouseX = e.clientX - rect.left;
+        const mouseY = e.clientY - rect.top;
+
+        // Find hovered candle
+        const hovered = candlePositions.find(cp => mouseX >= cp.x && mouseX <= cp.xEnd);
+
+        if (hovered && mouseY < chartHeight) {
+            // Show crosshair
+            crosshairX.style.display = 'block';
+            crosshairY.style.display = 'block';
+            crosshairX.style.left = `${mouseX}px`;
+            crosshairY.style.top = `${mouseY}px`;
+
+            // Price label
+            const price = maxHigh - (mouseY / chartHeight) * range;
+            priceLabel.style.display = 'block';
+            priceLabel.style.top = `${mouseY - 10}px`;
+            priceLabel.textContent = price.toFixed(2);
+
+            // Tooltip
+            const c = hovered.data;
+            const bullish = c.close >= c.open;
+            tooltip.innerHTML = `
+                <div class="tt-header ${bullish ? 'bullish' : 'bearish'}">
+                    <span class="tt-symbol">NOMOS 100</span>
+                    <span class="tt-change ${bullish ? 'positive' : 'negative'}">
+                        ${bullish ? '+' : ''}${((c.close - c.open) / c.open * 100).toFixed(2)}%
+                    </span>
+                </div>
+                <div class="tt-row"><span>Açılış</span><span>${c.open.toFixed(2)}</span></div>
+                <div class="tt-row"><span>Yüksek</span><span class="text-green">${c.high.toFixed(2)}</span></div>
+                <div class="tt-row"><span>Düşük</span><span class="text-red">${c.low.toFixed(2)}</span></div>
+                <div class="tt-row"><span>Kapanış</span><span>${c.close.toFixed(2)}</span></div>
+                <div class="tt-row"><span>Hacim</span><span>${c.volume.toFixed(0)}K</span></div>
+            `;
+            tooltip.style.display = 'block';
+            tooltip.style.left = `${Math.min(mouseX + 15, width - 160)}px`;
+            tooltip.style.top = `${Math.min(mouseY + 15, chartHeight - 140)}px`;
+
+            // Redraw with highlight
+            draw(hovered.index);
+        } else {
+            tooltip.style.display = 'none';
+            crosshairX.style.display = 'none';
+            crosshairY.style.display = 'none';
+            priceLabel.style.display = 'none';
+            draw(-1);
+        }
+    });
+
+    canvas.addEventListener('mouseleave', () => {
+        tooltip.style.display = 'none';
+        crosshairX.style.display = 'none';
+        crosshairY.style.display = 'none';
+        priceLabel.style.display = 'none';
+        draw(-1);
+    });
 }
 
 function generateCandleData(count) {
     let price = 12000 + Math.random() * 500;
-    return Array.from({ length: count }, () => {
+    const data = [];
+
+    for (let i = 0; i < count; i++) {
         const open = price;
-        const change = (Math.random() - 0.48) * 100;
+        const volatility = 50 + Math.random() * 80;
+        const trend = Math.sin(i / 8) * 0.3 + (Math.random() - 0.48);
+        const change = trend * volatility;
         const close = price + change;
-        const high = Math.max(open, close) + Math.random() * 30;
-        const low = Math.min(open, close) - Math.random() * 30;
+        const high = Math.max(open, close) + Math.random() * 40;
+        const low = Math.min(open, close) - Math.random() * 40;
         price = close;
-        return { open, close, high, low, volume: 30 + Math.random() * 70 };
-    });
+        data.push({
+            open,
+            close,
+            high,
+            low,
+            volume: 30 + Math.random() * 70
+        });
+    }
+
+    return data;
 }
 
 // === COUNTRY ECONOMIES ===
@@ -612,31 +841,28 @@ function renderFundCard(fund) {
                 </div>
             </div>
             <div class="fund-name">${fund.name}</div>
-            <div class="fund-stats">
-                <div class="stat">
-                    <span class="label">Fiyat</span>
-                    <span class="value">${fund.price.toLocaleString()} ₳</span>
+            <div class="fund-stats-row">
+                <div class="fund-stat">
+                    <span class="fund-stat-value">${fund.price.toLocaleString()} ₳</span>
+                    <span class="fund-stat-label">Fiyat</span>
                 </div>
-                <div class="stat">
-                    <span class="label">Değişim</span>
-                    <span class="value ${fund.change >= 0 ? 'text-green' : 'text-red'}">
+                <div class="fund-stat">
+                    <span class="fund-stat-value ${fund.change >= 0 ? 'text-green' : 'text-red'}">
                         ${fund.change >= 0 ? '+' : ''}${fund.change}%
                     </span>
+                    <span class="fund-stat-label">Değişim</span>
                 </div>
-                <div class="stat">
-                    <span class="label">AUM</span>
-                    <span class="value">${(fund.aum / 1000000).toFixed(1)}M ₳</span>
+                <div class="fund-stat">
+                    <span class="fund-stat-value">${(fund.aum / 1000000).toFixed(1)}M</span>
+                    <span class="fund-stat-label">AUM</span>
                 </div>
-            </div>
-            <div class="fund-chart">
-                ${renderMiniChart(fund.change >= 0, 80, 40)}
             </div>
             <div class="fund-actions">
-                <button class="btn-fund primary" data-action="invest-fund" data-fund="${fund.id}">
-                    <i class="fa-solid fa-coins"></i> Yatırım Yap
+                <button class="btn-fund-mini primary" data-action="invest-fund" data-fund="${fund.id}">
+                    <i class="fa-solid fa-coins"></i> Yatırım
                 </button>
-                <button class="btn-fund" data-action="fund-details" data-fund="${fund.id}">
-                    <i class="fa-solid fa-chart-pie"></i> Detaylar
+                <button class="btn-fund-mini" data-action="fund-details" data-fund="${fund.id}">
+                    <i class="fa-solid fa-info-circle"></i>
                 </button>
             </div>
         </div>
