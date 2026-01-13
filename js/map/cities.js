@@ -95,14 +95,19 @@ export function openCityPanel(cityData) {
     currentOpenCity = cityData;
 
     // --- YENİ EKLENTİ: ÜLKE DETAY OVERLAYİ ---
-    if (!document.getElementById('nation-panel-style')) {
+    const existingLink = document.getElementById('nation-panel-style');
+    if (!existingLink) {
         const link = document.createElement('link');
         link.id = 'nation-panel-style';
         link.rel = 'stylesheet';
         link.href = 'css/nation-panel.css';
+        // CSS yüklenene kadar bekle, sonra overlay'i aç
+        link.onload = () => openCountryOverlay(cityData);
         document.head.appendChild(link);
+    } else {
+        // CSS zaten yüklü, direkt aç
+        openCountryOverlay(cityData);
     }
-    openCountryOverlay(cityData);
     // ----------------------------------------
 
     const panel = document.getElementById('city-detail-panel');
