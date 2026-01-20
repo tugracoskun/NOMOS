@@ -5,6 +5,7 @@ import { initEditor } from './editor.js';
 import { closeCityPanel } from './cities.js';
 import { createModePanelHTML, initModePanelEvents } from './modes.js';
 import { initFlightTracking, stopFlightTracking } from './flights.js';
+import { initAirports, clearAirports } from './airports.js';
 
 let mapInstance = null;
 
@@ -179,6 +180,13 @@ export function initMap(containerId) {
 
                 // Uçak tracking sistemini başlat
                 initFlightTracking(mapInstance);
+
+                // Havalimanlarını başlat (uçuşlardan sonra)
+                setTimeout(() => {
+                    import('./flights.js').then(module => {
+                        initAirports(mapInstance, module.getActiveFlights());
+                    });
+                }, 1000);
             }, 500);
         }
     });

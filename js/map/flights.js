@@ -408,3 +408,8 @@ export function stopFlightTracking() {
 
     console.log('✈️ Flight tracking stopped');
 }
+
+// Aktif u\u00e7u\u015flar\u0131 al
+export function getActiveFlights() {
+    return activeFlights;
+}
