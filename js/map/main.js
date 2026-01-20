@@ -4,6 +4,7 @@ import { loadLayers } from './layers.js';
 import { initEditor } from './editor.js';
 import { closeCityPanel } from './cities.js';
 import { createModePanelHTML, initModePanelEvents } from './modes.js';
+import { initFlightTracking, stopFlightTracking } from './flights.js';
 
 let mapInstance = null;
 
@@ -175,12 +176,18 @@ export function initMap(containerId) {
 
                 // Harita Modları paneli event'lerini başlat
                 initModePanelEvents();
+
+                // Uçak tracking sistemini başlat
+                initFlightTracking(mapInstance);
             }, 500);
         }
     });
 }
 
 export function destroyMap() {
+    // Uçak tracking'i durdur
+    stopFlightTracking();
+
     if (mapInstance) {
         mapInstance.remove();
         mapInstance = null;
