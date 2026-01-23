@@ -2,6 +2,7 @@
 // Haritayı farklı perspektiflerden görüntüleme
 
 import { toggleStatisticsPanel } from './statistics-panel.js';
+import { showSeaRoutes, hideSeaRoutes } from './routes.js';
 
 export const mapModes = {
     default: {
@@ -85,6 +86,14 @@ export const mapModes = {
             gradient: ['#dbeafe', '#93c5fd', '#3b82f6', '#1d4ed8', '#1e3a8a']
         },
         getValue: (cityData) => cityData.population || 0
+    },
+    trade: {
+        id: 'trade',
+        name: 'Ticaret',
+        icon: 'fa-solid fa-ship',
+        description: 'Deniz ticaret rotalarını gösterir',
+        colorScheme: null,
+        hasToggle: true // Bu mod toggle açar/kapat
     }
 };
 
@@ -105,7 +114,38 @@ export function setMapMode(modeId) {
     // İstatistik modundaysa paneli aç, değilse kapat
     toggleStatisticsPanel(modeId === 'statistics');
 
+    // Ticaret modu toggle
+    if (modeId === 'trade') {
+        toggleTradeRoutes();
+        return; // Ticaret modu toggle, diğer modlar gibi değil
+    }
+
     console.log(`Harita modu değiştirildi: ${modeId}`);
+}
+
+// Ticaret rotaları toggle state
+let tradeRoutesVisible = false;
+
+function toggleTradeRoutes() {
+    tradeRoutesVisible = !tradeRoutesVisible;
+
+    if (tradeRoutesVisible) {
+        showSeaRoutes();
+    } else {
+        hideSeaRoutes();
+    }
+
+    // Buton stilini güncelle
+    const tradeBtn = document.querySelector('[data-mode="trade"]');
+    if (tradeBtn) {
+        tradeBtn.classList.toggle('active', tradeRoutesVisible);
+    }
+    const tradeBtnIcon = document.querySelector('.icon-strip-btn[data-mode="trade"]');
+    if (tradeBtnIcon) {
+        tradeBtnIcon.classList.toggle('active', tradeRoutesVisible);
+    }
+
+    console.log(`Ticaret rotaları: ${tradeRoutesVisible ? 'Görünür' : 'Gizli'}`);
 }
 
 // Aktif modu al

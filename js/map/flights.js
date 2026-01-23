@@ -207,6 +207,11 @@ export function initFlightTracking(map) {
     updateFlightVisibility();
     map.on('zoomend', updateFlightVisibility);
 
+    // Haritaya tıklandığında paneli kapat
+    map.on('click', () => {
+        closeFlightPanel();
+    });
+
     // Smooth güncelleme (her 100ms)
     flightUpdateInterval = setInterval(updateFlights, 100);
 
@@ -283,9 +288,11 @@ function createFlightMarker(flight) {
     marker.on('click', (e) => {
         L.DomEvent.stopPropagation(e);
         trackingFlightId = flight.id;
-        mapInstance.flyTo(marker.getLatLng(), Math.max(mapInstance.getZoom(), 10), {
+        // Zoom yok, sadece soft pan
+        mapInstance.panTo(marker.getLatLng(), {
             animate: true,
-            duration: 1
+            duration: 0.8,
+            easeLinearity: 0.3
         });
         openFlightPanel(flight);
     });

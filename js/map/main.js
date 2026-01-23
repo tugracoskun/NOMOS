@@ -6,6 +6,9 @@ import { closeCityPanel } from './cities.js';
 import { createModePanelHTML, initModePanelEvents } from './modes.js';
 import { initFlightTracking, stopFlightTracking } from './flights.js';
 import { initAirports, clearAirports } from './airports.js';
+import { initShipTracking, stopShipTracking, getActiveShips } from './ships.js';
+import { initPorts, clearPorts } from './ports.js';
+import { initSeaRoutes, clearSeaRoutes } from './routes.js';
 
 let mapInstance = null;
 
@@ -181,11 +184,20 @@ export function initMap(containerId) {
                 // Uçak tracking sistemini başlat
                 initFlightTracking(mapInstance);
 
-                // Havalimanlarını başlat (uçuşlardan sonra)
+                // Gemi tracking sistemini başlat
+                initShipTracking(mapInstance);
+
+                // Deniz rotalarını başlat
+                initSeaRoutes(mapInstance);
+
+                // Havalimanlarını başlat
                 setTimeout(() => {
                     import('./flights.js').then(module => {
                         initAirports(mapInstance, module.getActiveFlights());
                     });
+
+                    // Limanları başlat
+                    initPorts(mapInstance, getActiveShips);
                 }, 1000);
             }, 500);
         }
@@ -195,6 +207,12 @@ export function initMap(containerId) {
 export function destroyMap() {
     // Uçak tracking'i durdur
     stopFlightTracking();
+
+    // Gemi tracking'i durdur
+    stopShipTracking();
+
+    // Limanları temizle
+    clearPorts();
 
     if (mapInstance) {
         mapInstance.remove();
