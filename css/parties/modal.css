@@ -1,133 +1,1590 @@
 /* =========================================
-   PARTİ DETAY PENCERESİ (MODAL)
+   PARTİ DETAY PENCERESİ (MODAL) - YENİ TASARIM
    ========================================= */
 
-/* Modal Arka Planı (Karartma) */
+/* Modal Arka Planı */
 .modal-overlay {
-    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-    background-color: rgba(0,0,0,0.85); /* Arkadaki siteyi karart */
-    z-index: 9999; /* En üstte olsun */
-    display: flex; align-items: center; justify-content: center;
-    backdrop-filter: blur(5px);
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.85);
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(8px);
+    animation: modalFadeIn 0.25s ease;
+}
+
+.modal-overlay.modal-closing {
+    animation: modalFadeOut 0.25s ease forwards;
+}
+
+@keyframes modalFadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes modalFadeOut {
+    from {
+        opacity: 1;
+    }
+
+    to {
+        opacity: 0;
+    }
 }
 
 /* Modal Kutusu */
 .modal-content {
     background-color: var(--bg-panel);
-    width: 90%; max-width: 900px;
-    border-radius: 12px;
+    width: 95%;
+    max-width: 960px;
+    border-radius: 16px;
     border: 1px solid var(--border);
     position: relative;
-    overflow: hidden; /* Taşmaları gizle */
-    max-height: 90vh; /* Ekranın %90'ı kadar yükseklik */
-    overflow-y: auto; /* İçerik taşarsa kaydır */
-    box-shadow: 0 20px 50px rgba(0,0,0,0.8);
-    display: flex; flex-direction: column;
+    overflow: hidden;
+    max-height: 92vh;
+    overflow-y: auto;
+    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(255, 255, 255, 0.05);
+    display: flex;
+    flex-direction: column;
+    animation: modalSlideIn 0.3s ease;
+}
+
+.modal-closing .modal-content {
+    animation: modalSlideOut 0.25s ease forwards;
+}
+
+@keyframes modalSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px) scale(0.98);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+@keyframes modalSlideOut {
+    from {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+
+    to {
+        opacity: 0;
+        transform: translateY(20px) scale(0.98);
+    }
+}
+
+/* Scrollbar */
+.modal-content::-webkit-scrollbar {
+    width: 6px;
+}
+
+.modal-content::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.modal-content::-webkit-scrollbar-thumb {
+    background: var(--border);
+    border-radius: 10px;
 }
 
 /* Kapat Butonu */
 .close-modal {
-    position: absolute; top: 15px; right: 15px;
-    background: rgba(0,0,0,0.5); border: none; color: white;
-    width: 32px; height: 32px; border-radius: 50%;
-    cursor: pointer; z-index: 100; font-size: 1.2rem;
-    display: flex; align-items: center; justify-content: center;
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: rgba(0, 0, 0, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: white;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    cursor: pointer;
+    z-index: 100;
+    font-size: 1.2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     transition: 0.2s;
+    backdrop-filter: blur(10px);
 }
-.close-modal:hover { background: #ef4444; }
 
-/* Header (Logo ve İsim Alanı) */
+.close-modal:hover {
+    background: #ef4444;
+    border-color: #ef4444;
+    transform: rotate(90deg);
+}
+
+/* ========================================= 
+   HEADER
+   ========================================= */
 .party-profile-header {
-    padding: 40px;
-    display: flex; align-items: center; gap: 25px;
+    padding: 35px 40px;
+    display: flex;
+    align-items: center;
     border-bottom: 1px solid var(--border);
     position: relative;
 }
 
-/* Büyük Logo */
+.header-left {
+    display: flex;
+    align-items: center;
+    gap: 25px;
+    width: 100%;
+}
+
 .modal-logo-img {
-    width: 120px; height: 120px;
+    width: 100px;
+    height: 100px;
     object-fit: contain;
-    border-radius: 12px;
-    background: rgba(0,0,0,0.3);
+    border-radius: 16px;
+    background: rgba(0, 0, 0, 0.3);
     padding: 10px;
-    border: 1px solid rgba(255,255,255,0.1);
-    box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+    flex-shrink: 0;
 }
-.big-logo { font-size: 4rem; width: 100px; text-align: center; }
 
-/* Başlıklar */
+.big-logo {
+    font-size: 3.5rem;
+    width: 100px;
+    height: 100px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    flex-shrink: 0;
+}
+
+.header-texts {
+    flex: 1;
+}
+
 .header-texts h1 {
-    font-size: 2.2rem; margin-bottom: 5px; color: white;
-    display: flex; align-items: center; gap: 10px;
-    text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+    font-size: 1.8rem;
+    margin-bottom: 4px;
+    color: white;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+    line-height: 1.3;
 }
-.header-texts h1 img { height: 28px; opacity: 0.9; border-radius: 4px; }
-.slogan { font-style: italic; color: rgba(255,255,255,0.8); font-size: 1.1rem; }
 
-/* İçerik Izgarası (Wiki + Main) */
-.party-profile-grid {
+.header-texts h1 img {
+    height: 24px;
+    opacity: 0.9;
+    border-radius: 3px;
+}
+
+.slogan {
+    font-style: italic;
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 0.95rem;
+    margin-bottom: 12px;
+}
+
+.header-meta-row {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.prestige-badge {
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.78rem;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.meta-chip {
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.78rem;
+    color: var(--text-dim);
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+/* ========================================= 
+   SEKMELER 
+   ========================================= */
+.profile-tabs {
+    display: flex;
+    background: rgba(0, 0, 0, 0.25);
+    border-bottom: 1px solid var(--border);
+    padding: 0 15px;
+    overflow-x: auto;
+    flex-shrink: 0;
+}
+
+.profile-tabs::-webkit-scrollbar {
+    display: none;
+}
+
+.tab-btn {
+    background: none;
+    border: none;
+    color: var(--text-dim);
+    padding: 14px 18px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    transition: 0.2s;
+    position: relative;
+    white-space: nowrap;
+    font-family: 'Inter', sans-serif;
+}
+
+.tab-btn:hover {
+    color: var(--text-light);
+}
+
+.tab-btn.active {
+    color: var(--text-light);
+}
+
+.tab-btn.active::after {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: 15%;
+    right: 15%;
+    height: 2px;
+    background: var(--primary);
+    border-radius: 2px 2px 0 0;
+}
+
+/* ========================================= 
+   SEKME İÇERİK ALANI
+   ========================================= */
+.tab-content-area {
+    flex: 1;
+    overflow-y: auto;
+}
+
+.tab-panel {
+    display: none;
+    padding: 25px 30px;
+    animation: tabFadeIn 0.3s ease;
+}
+
+.tab-panel.active {
+    display: block;
+}
+
+@keyframes tabFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(8px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ========================================= 
+   GENEL BAKIŞ SEKMESİ
+   ========================================= */
+.overview-grid {
     display: grid;
-    grid-template-columns: 300px 1fr; /* Sol 300px, Sağ kalan */
-    min-height: 400px;
+    grid-template-columns: 280px 1fr;
+    gap: 0;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    background: var(--bg-card);
 }
 
-/* Sol Taraf: Wiki Bilgi Kutusu */
 .wiki-infobox {
-    background-color: rgba(0,0,0,0.2);
+    background-color: rgba(0, 0, 0, 0.2);
     padding: 25px;
     border-right: 1px solid var(--border);
-    display: flex; flex-direction: column; gap: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
 }
 
 .wiki-title {
-    text-align: center; font-weight: 700;
+    text-align: center;
+    font-weight: 700;
     border-bottom: 1px solid var(--border);
-    padding-bottom: 10px; margin-bottom: 5px;
-    color: var(--text-light); text-transform: uppercase; letter-spacing: 1px;
+    padding-bottom: 12px;
+    margin-bottom: 8px;
+    color: var(--text-light);
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    font-size: 0.75rem;
+}
+
+.wiki-section-title {
+    text-align: center;
+    font-weight: 700;
+    border-bottom: 1px solid var(--border);
+    border-top: 1px solid var(--border);
+    padding: 10px 0;
+    margin-top: 10px;
+    color: var(--text-light);
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    font-size: 0.7rem;
 }
 
 .wiki-row {
-    display: flex; justify-content: space-between;
-    font-size: 0.9rem;
-    border-bottom: 1px solid rgba(255,255,255,0.05);
-    padding: 8px 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.85rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+    padding: 9px 0;
 }
-.wiki-row span { color: var(--text-dim); }
-.wiki-row strong { color: var(--text-light); }
-.tag { padding: 2px 6px; background: rgba(255,255,255,0.1); border-radius: 4px; font-size: 0.8rem; }
 
-/* Sağ Taraf: Ana İçerik */
-.party-main-content { padding: 30px; display: flex; flex-direction: column; }
+.wiki-row span {
+    color: var(--text-dim);
+}
 
-.party-main-content h3 {
+.wiki-row strong {
+    color: var(--text-light);
+    font-size: 0.85rem;
+}
+
+.ideo-tag {
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 0.78rem;
+    font-weight: 600;
+}
+
+/* Prestij Çubuğu */
+.prestige-progress-area {
+    margin-top: 10px;
+}
+
+.prestige-level-display {
+    font-size: 0.85rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 8px;
+}
+
+.prestige-bar-track {
+    height: 6px;
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.prestige-bar-fill {
+    height: 100%;
+    border-radius: 10px;
+    transition: width 0.8s ease;
+}
+
+.prestige-numbers {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.7rem;
+    color: var(--text-dim);
+    margin-top: 4px;
+}
+
+/* Overview Sağ Taraf */
+.overview-main {
+    padding: 25px 30px;
+    display: flex;
+    flex-direction: column;
+}
+
+.overview-main h3 {
     border-bottom: 1px solid var(--border);
-    padding-bottom: 10px; margin-bottom: 15px; margin-top: 25px;
-    color: var(--text-light); font-size: 1.2rem;
+    padding-bottom: 10px;
+    margin-bottom: 15px;
+    margin-top: 20px;
+    color: var(--text-light);
+    font-size: 1.05rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
 }
-.party-main-content h3:first-child { margin-top: 0; }
 
-.party-main-content p { color: #cbd5e1; line-height: 1.6; font-size: 1rem; }
-
-/* Politikalar Listesi */
-.policy-list {
-    list-style: none; margin-top: 15px;
-    display: grid; grid-template-columns: 1fr 1fr; gap: 10px;
+.overview-main h3:first-child {
+    margin-top: 0;
 }
-.policy-list li { color: #cbd5e1; font-size: 0.95rem; display: flex; align-items: center; gap: 8px; }
+
+.about-text {
+    color: #cbd5e1;
+    line-height: 1.7;
+    font-size: 0.92rem;
+}
+
+/* Politikalar */
+.policies-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+}
+
+.policy-card {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 14px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
+    color: #cbd5e1;
+    font-size: 0.88rem;
+    transition: 0.2s;
+}
+
+.policy-card:hover {
+    background: rgba(255, 255, 255, 0.06);
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Mini Aktivite */
+.mini-activity-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.mini-activity-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 12px;
+    background: rgba(255, 255, 255, 0.02);
+    border-radius: 6px;
+    font-size: 0.83rem;
+}
+
+.activity-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.activity-text {
+    flex: 1;
+    color: #cbd5e1;
+}
+
+.activity-date {
+    color: var(--text-dim);
+    font-size: 0.75rem;
+}
 
 /* Butonlar */
-.action-buttons { margin-top: auto; padding-top: 30px; }
-.join-party-btn {
-    width: 100%; padding: 15px; border: none; border-radius: 8px;
-    color: white; font-weight: 700; cursor: pointer; font-size: 1.1rem;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.3); transition: 0.2s;
-    text-transform: uppercase; letter-spacing: 1px;
+.action-buttons {
+    margin-top: auto;
+    padding-top: 25px;
+    display: flex;
+    gap: 12px;
 }
-.join-party-btn:hover { filter: brightness(1.1); transform: translateY(-2px); }
 
-/* Mobil Uyumluluk */
+.join-party-btn {
+    flex: 1;
+    padding: 14px;
+    border: none;
+    border-radius: 10px;
+    color: white;
+    font-weight: 700;
+    cursor: pointer;
+    font-size: 1rem;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    transition: 0.2s;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.join-party-btn:hover {
+    filter: brightness(1.15);
+    transform: translateY(-2px);
+}
+
+.donate-btn {
+    padding: 14px 24px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--text-dim);
+    font-weight: 600;
+    cursor: pointer;
+    font-size: 0.95rem;
+    transition: 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.donate-btn:hover {
+    border-color: #eab308;
+    color: #eab308;
+    background: rgba(234, 179, 8, 0.08);
+}
+
+/* ========================================= 
+   İSTATİSTİKLER SEKMESİ
+   ========================================= */
+.stat-cards-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    margin-bottom: 25px;
+}
+
+.stat-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    transition: 0.2s;
+    position: relative;
+}
+
+.stat-card:hover {
+    border-color: rgba(255, 255, 255, 0.15);
+    transform: translateY(-1px);
+}
+
+.stat-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem;
+    flex-shrink: 0;
+}
+
+.stat-info {
+    flex: 1;
+}
+
+.stat-value {
+    font-size: 1.4rem;
+    font-weight: 800;
+    color: var(--text-light);
+    line-height: 1.2;
+}
+
+.stat-label {
+    font-size: 0.72rem;
+    color: var(--text-dim);
+    font-weight: 500;
+    margin-top: 2px;
+}
+
+.stat-trend {
+    font-size: 0.72rem;
+    font-weight: 700;
+    padding: 3px 8px;
+    border-radius: 12px;
+    position: absolute;
+    top: 10px;
+    right: 10px;
+}
+
+.stat-trend.positive {
+    background: rgba(16, 185, 129, 0.15);
+    color: #10b981;
+}
+
+.stat-trend.neutral {
+    background: rgba(59, 130, 246, 0.15);
+    color: #3b82f6;
+}
+
+.stat-trend.negative {
+    background: rgba(239, 68, 68, 0.15);
+    color: #ef4444;
+}
+
+.stats-bottom-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+.stats-section {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 22px;
+}
+
+.stats-section h4 {
+    font-size: 0.88rem;
+    color: var(--text-light);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 18px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--border);
+}
+
+/* Yasama */
+.law-stats {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.law-stat-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 0.85rem;
+    color: var(--text-dim);
+}
+
+.law-stat-row strong {
+    color: var(--text-light);
+}
+
+.mini-progress-track {
+    flex: 1;
+    height: 6px;
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 10px;
+    margin: 0 12px;
+    overflow: hidden;
+}
+
+.mini-progress-fill {
+    height: 100%;
+    border-radius: 10px;
+    transition: width 0.6s ease;
+}
+
+/* Aktivite Gauge */
+.activity-gauge {
+    margin-top: 8px;
+}
+
+.gauge-track {
+    height: 8px;
+    background: rgba(255, 255, 255, 0.06);
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.gauge-fill {
+    height: 100%;
+    border-radius: 10px;
+    transition: width 0.6s ease;
+}
+
+.gauge-labels {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.7rem;
+    color: var(--text-dim);
+    margin-top: 5px;
+}
+
+.gauge-value {
+    font-weight: 700;
+    color: var(--text-light);
+}
+
+/* Seçim Grafiği */
+.election-chart {
+    margin-bottom: 20px;
+}
+
+.mini-bar-chart {
+    display: flex;
+    align-items: flex-end;
+    gap: 8px;
+    height: 120px;
+    padding: 0 10px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.bar-col {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    height: 100%;
+    justify-content: flex-end;
+}
+
+.bar-value {
+    font-size: 0.65rem;
+    color: var(--text-dim);
+    margin-bottom: 4px;
+    font-weight: 600;
+}
+
+.bar-visual {
+    width: 100%;
+    flex: 1;
+    position: relative;
+    display: flex;
+    align-items: flex-end;
+}
+
+.bar-fill-col {
+    width: 100%;
+    border-radius: 4px 4px 0 0;
+    transition: height 0.6s ease;
+    min-height: 4px;
+    opacity: 0.85;
+}
+
+.bar-fill-col:hover {
+    opacity: 1;
+}
+
+.bar-label {
+    font-size: 0.6rem;
+    color: var(--text-dim);
+    margin-top: 6px;
+    white-space: nowrap;
+}
+
+/* Seçim Tablosu */
+.election-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.8rem;
+}
+
+.election-table th {
+    text-align: left;
+    padding: 8px 6px;
+    color: var(--text-dim);
+    font-weight: 600;
+    border-bottom: 1px solid var(--border);
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.election-table td {
+    padding: 8px 6px;
+    color: #cbd5e1;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.rank-badge {
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-size: 0.72rem;
+    font-weight: 700;
+}
+
+.rank-badge.rank-1 {
+    background: rgba(234, 179, 8, 0.2);
+    color: #eab308;
+}
+
+.rank-badge.rank-2 {
+    background: rgba(148, 163, 184, 0.2);
+    color: #94a3b8;
+}
+
+.rank-badge.rank-3 {
+    background: rgba(180, 83, 9, 0.2);
+    color: #d97706;
+}
+
+.empty-section {
+    text-align: center;
+    padding: 30px;
+    color: var(--text-dim);
+    font-size: 0.9rem;
+}
+
+/* ========================================= 
+   FİNANS SEKMESİ
+   ========================================= */
+.finance-summary-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    margin-bottom: 25px;
+}
+
+.finance-card {
+    border-radius: 12px;
+    padding: 18px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    border: 1px solid var(--border);
+    transition: 0.2s;
+}
+
+.finance-card:hover {
+    transform: translateY(-1px);
+}
+
+.finance-card.treasury {
+    background: linear-gradient(135deg, rgba(234, 179, 8, 0.08), transparent);
+    border-color: rgba(234, 179, 8, 0.2);
+}
+
+.finance-card.income {
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.08), transparent);
+    border-color: rgba(16, 185, 129, 0.2);
+}
+
+.finance-card.expense {
+    background: linear-gradient(135deg, rgba(239, 68, 68, 0.08), transparent);
+    border-color: rgba(239, 68, 68, 0.2);
+}
+
+.finance-card.net.positive {
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.08), transparent);
+    border-color: rgba(16, 185, 129, 0.2);
+}
+
+.finance-card.net.negative {
+    background: linear-gradient(135deg, rgba(239, 68, 68, 0.08), transparent);
+    border-color: rgba(239, 68, 68, 0.2);
+}
+
+.fc-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    flex-shrink: 0;
+}
+
+.finance-card.treasury .fc-icon {
+    background: rgba(234, 179, 8, 0.15);
+    color: #eab308;
+}
+
+.finance-card.income .fc-icon {
+    background: rgba(16, 185, 129, 0.15);
+    color: #10b981;
+}
+
+.finance-card.expense .fc-icon {
+    background: rgba(239, 68, 68, 0.15);
+    color: #ef4444;
+}
+
+.finance-card.net .fc-icon {
+    background: rgba(59, 130, 246, 0.15);
+    color: #3b82f6;
+}
+
+.fc-info {
+    flex: 1;
+}
+
+.fc-label {
+    font-size: 0.72rem;
+    color: var(--text-dim);
+    font-weight: 500;
+}
+
+.fc-value {
+    font-size: 1.2rem;
+    font-weight: 800;
+    color: var(--text-light);
+    margin-top: 2px;
+}
+
+.finance-card.treasury .fc-value {
+    color: #eab308;
+}
+
+.finance-card.income .fc-value {
+    color: #10b981;
+}
+
+.finance-card.expense .fc-value {
+    color: #ef4444;
+}
+
+.finance-card.net.positive .fc-value {
+    color: #10b981;
+}
+
+.finance-card.net.negative .fc-value {
+    color: #ef4444;
+}
+
+.finance-bottom-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+/* Gider Çubukları */
+.expense-bars {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.expense-row {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.expense-info {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.82rem;
+}
+
+.expense-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.expense-name {
+    flex: 1;
+    color: #cbd5e1;
+}
+
+.expense-amount {
+    color: var(--text-light);
+    font-weight: 600;
+}
+
+.expense-percent {
+    color: var(--text-dim);
+    font-size: 0.72rem;
+}
+
+.expense-bar-track {
+    height: 5px;
+    background: rgba(255, 255, 255, 0.06);
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.expense-bar-fill {
+    height: 100%;
+    border-radius: 10px;
+    transition: width 0.6s ease;
+}
+
+.finance-info-row {
+    margin-top: 20px;
+    padding: 12px 15px;
+    background: rgba(59, 130, 246, 0.06);
+    border: 1px solid rgba(59, 130, 246, 0.12);
+    border-radius: 8px;
+    font-size: 0.78rem;
+    color: var(--text-dim);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.finance-info-row i {
+    color: var(--primary);
+}
+
+/* Bağışlar */
+.donations-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.donation-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 14px;
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
+    transition: 0.2s;
+}
+
+.donation-row:hover {
+    background: rgba(255, 255, 255, 0.04);
+}
+
+.donor-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.06);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-dim);
+    font-size: 0.85rem;
+}
+
+.donor-info {
+    flex: 1;
+}
+
+.donor-name {
+    display: block;
+    font-size: 0.88rem;
+    color: var(--text-light);
+    font-weight: 600;
+}
+
+.donor-date {
+    font-size: 0.72rem;
+    color: var(--text-dim);
+}
+
+.donor-amount {
+    font-weight: 800;
+    color: #10b981;
+    font-size: 0.95rem;
+}
+
+.donation-total {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 15px;
+    margin-top: 15px;
+    background: rgba(16, 185, 129, 0.06);
+    border: 1px solid rgba(16, 185, 129, 0.12);
+    border-radius: 8px;
+    font-size: 0.85rem;
+    color: var(--text-dim);
+}
+
+.donation-total strong {
+    color: #10b981;
+    font-size: 1.1rem;
+}
+
+.donate-action-btn {
+    width: 100%;
+    margin-top: 15px;
+    padding: 13px;
+    border: none;
+    border-radius: 10px;
+    color: white;
+    font-weight: 700;
+    cursor: pointer;
+    font-size: 0.95rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: 0.2s;
+}
+
+.donate-action-btn:hover {
+    filter: brightness(1.15);
+    transform: translateY(-1px);
+}
+
+/* ========================================= 
+   KOALİSYON SEKMESİ
+   ========================================= */
+.coalition-header {
+    border-radius: 12px;
+    padding: 25px;
+    display: flex;
+    align-items: flex-start;
+    gap: 20px;
+    margin-bottom: 25px;
+}
+
+.coalition-icon {
+    font-size: 2.5rem;
+}
+
+.coalition-info h3 {
+    font-size: 1.3rem;
+    margin-bottom: 6px;
+}
+
+.coalition-info p {
+    color: #cbd5e1;
+    font-size: 0.9rem;
+    line-height: 1.5;
+    margin-bottom: 8px;
+}
+
+.coalition-date {
+    font-size: 0.78rem;
+    color: var(--text-dim);
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.coalition-stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    margin-bottom: 25px;
+}
+
+.cs-item {
+    text-align: center;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 18px 12px;
+}
+
+.cs-value {
+    font-size: 1.6rem;
+    font-weight: 800;
+    color: var(--text-light);
+}
+
+.cs-label {
+    font-size: 0.72rem;
+    color: var(--text-dim);
+    margin-top: 4px;
+}
+
+.coalition-partners-section {
+    margin-bottom: 25px;
+}
+
+.coalition-partners-section h4,
+.coalition-policies h4 {
+    font-size: 0.88rem;
+    color: var(--text-light);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--border);
+}
+
+.partner-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 12px;
+}
+
+.partner-card {
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    transition: 0.2s;
+}
+
+.partner-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+}
+
+.partner-top {
+    padding: 16px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.partner-logo {
+    width: 44px;
+    height: 44px;
+    border-radius: 10px;
+    background: rgba(0, 0, 0, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.3rem;
+}
+
+.partner-logo img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    border-radius: 10px;
+}
+
+.partner-name {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--text-light);
+}
+
+.partner-meta {
+    font-size: 0.78rem;
+    color: var(--text-dim);
+    margin-top: 2px;
+}
+
+.partner-stats {
+    display: flex;
+    gap: 15px;
+    padding: 12px 16px;
+    border-top: 1px solid var(--border);
+    background: rgba(0, 0, 0, 0.15);
+    font-size: 0.8rem;
+    color: var(--text-dim);
+}
+
+.partner-stats div {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+/* Ortak Politikalar */
+.shared-policies {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.shared-policy-chip {
+    padding: 8px 16px;
+    border-radius: 8px;
+    border: 1px solid;
+    font-size: 0.82rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(255, 255, 255, 0.02);
+}
+
+.coalition-actions {
+    margin-top: 25px;
+    text-align: right;
+}
+
+.leave-coalition-btn {
+    padding: 10px 24px;
+    border-radius: 8px;
+    background: rgba(239, 68, 68, 0.1);
+    border: 1px solid rgba(239, 68, 68, 0.2);
+    color: #ef4444;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.85rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: 0.2s;
+}
+
+.leave-coalition-btn:hover {
+    background: rgba(239, 68, 68, 0.2);
+}
+
+/* Koalisyon Yok */
+.no-coalition-state {
+    text-align: center;
+    padding: 40px 20px;
+}
+
+.no-coalition-icon {
+    font-size: 3rem;
+    color: var(--text-dim);
+    opacity: 0.3;
+    margin-bottom: 15px;
+}
+
+.no-coalition-state h3 {
+    color: var(--text-light);
+    margin-bottom: 8px;
+}
+
+.no-coalition-state p {
+    color: var(--text-dim);
+    font-size: 0.9rem;
+    max-width: 400px;
+    margin: 0 auto;
+    line-height: 1.5;
+}
+
+.coalition-suggestions {
+    margin-top: 30px;
+}
+
+.coalition-suggestions h4 {
+    font-size: 0.88rem;
+    color: var(--text-light);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--border);
+}
+
+.suggestion-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.suggestion-row {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 14px 18px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    transition: 0.2s;
+}
+
+.suggestion-row:hover {
+    border-color: rgba(255, 255, 255, 0.15);
+}
+
+.suggestion-logo {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    background: rgba(0, 0, 0, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+}
+
+.suggestion-logo img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    border-radius: 10px;
+}
+
+.suggestion-info {
+    flex: 1;
+}
+
+.suggestion-name {
+    font-size: 0.92rem;
+    font-weight: 600;
+    color: var(--text-light);
+}
+
+.suggestion-meta {
+    font-size: 0.78rem;
+    color: var(--text-dim);
+    margin-top: 2px;
+}
+
+.propose-btn {
+    padding: 8px 16px;
+    border-radius: 8px;
+    background: transparent;
+    border: 1px solid;
+    font-weight: 600;
+    font-size: 0.8rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: 0.2s;
+}
+
+.propose-btn:hover {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+/* ========================================= 
+   TARİHÇE SEKMESİ
+   ========================================= */
+.history-timeline {
+    position: relative;
+    padding-left: 30px;
+}
+
+.timeline-item {
+    position: relative;
+    padding-bottom: 24px;
+    animation: timelineFade 0.4s ease;
+}
+
+@keyframes timelineFade {
+    from {
+        opacity: 0;
+        transform: translateX(-10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.timeline-dot {
+    position: absolute;
+    left: -30px;
+    top: 6px;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    z-index: 2;
+}
+
+.timeline-line {
+    position: absolute;
+    left: -25px;
+    top: 22px;
+    width: 2px;
+    bottom: 0;
+    background: rgba(255, 255, 255, 0.06);
+}
+
+.timeline-item:last-child .timeline-line {
+    display: none;
+}
+
+.timeline-content {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 18px;
+    transition: 0.2s;
+}
+
+.timeline-content:hover {
+    border-color: rgba(255, 255, 255, 0.15);
+}
+
+.timeline-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 6px;
+}
+
+.timeline-type-badge {
+    padding: 3px 10px;
+    border-radius: 12px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.timeline-date {
+    font-size: 0.72rem;
+    color: var(--text-dim);
+}
+
+.timeline-text {
+    color: #cbd5e1;
+    font-size: 0.88rem;
+    line-height: 1.4;
+}
+
+.timeline-detail {
+    font-size: 0.82rem;
+    font-weight: 700;
+    margin-top: 4px;
+}
+
+/* ========================================= 
+   MOBİL UYUMLULUK
+   ========================================= */
 @media (max-width: 800px) {
-    .party-profile-grid { grid-template-columns: 1fr; }
-    .wiki-infobox { border-right: none; border-bottom: 1px solid var(--border); }
+    .overview-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .wiki-infobox {
+        border-right: none;
+        border-bottom: 1px solid var(--border);
+    }
+
+    .stat-cards-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .finance-summary-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .stats-bottom-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .finance-bottom-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .coalition-stats {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .partner-cards {
+        grid-template-columns: 1fr;
+    }
+
+    .party-profile-header {
+        padding: 20px;
+    }
+
+    .header-texts h1 {
+        font-size: 1.3rem;
+    }
+
+    .tab-panel {
+        padding: 15px;
+    }
+
+    .policies-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .action-buttons {
+        flex-direction: column;
+    }
 }
