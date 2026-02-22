@@ -19,8 +19,9 @@ export function setupModal(container) {
         setTimeout(() => {
             modal.style.display = 'none';
             modal.classList.remove('modal-closing');
+            // Hash'i #parties olarak güncelle (sayfa yeniden render edilmez)
             if (window.location.hash.includes('detail')) {
-                history.back();
+                history.replaceState({ page: 'parties' }, null, '#parties');
             }
         }, 250);
     };

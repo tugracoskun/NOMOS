@@ -1,15 +1,11 @@
-// PARTİLER: DASHBOARD (Genişletilmiş)
+// PARTİLER: DASHBOARD (Kompakt Sidebar + Modal Fix)
 import { partiesData, availableIdeologies, invitations, playerProfile, coalitions, getPrestigeLevel, formatMoney } from './data.js';
-import { setupModal } from './modal.js';
+import { setupModal, openPartyModal } from './modal.js';
 
 export function renderDashboard(container) {
     const ideologyOptions = availableIdeologies.sort().map(i => `<option value="${i}">${i}</option>`).join('');
     const countries = [...new Set(partiesData.map(p => p.country))];
     const countryOptions = countries.map(c => `<option value="${c}">${c}</option>`).join('');
-
-    // Genel istatistikler
-    const totalMembers = partiesData.reduce((s, p) => s + p.members, 0);
-    const totalSeats = partiesData.reduce((s, p) => s + p.stats.seatsInParliament, 0);
 
     container.innerHTML = `
         <div class="parties-dashboard-layout">
@@ -23,6 +19,19 @@ export function renderDashboard(container) {
                             <i class="fa-solid fa-magnifying-glass"></i>
                             <input type="text" id="party-search" placeholder="Parti ara...">
                         </div>
+
+                        <!-- KOMPAKT İKON BUTONLARI -->
+                        <div class="toolbar-icons">
+                            <button class="toolbar-icon-btn" id="btn-toggle-coalitions" title="İttifaklar">
+                                <i class="fa-solid fa-handshake"></i>
+                                ${coalitions.length > 0 ? `<span class="toolbar-badge">${coalitions.length}</span>` : ''}
+                            </button>
+                            <button class="toolbar-icon-btn" id="btn-toggle-invitations" title="Davetiyeler">
+                                <i class="fa-solid fa-envelope"></i>
+                                ${invitations.length > 0 ? `<span class="toolbar-badge pulse">${invitations.length}</span>` : ''}
+                            </button>
+                        </div>
+
                         <button class="create-btn" data-page="parties" data-view="create">
                             <i class="fa-solid fa-plus"></i> <span>Yeni Parti</span>
                         </button>
@@ -39,6 +48,54 @@ export function renderDashboard(container) {
                     </div>
                 </div>
 
+                <!-- DROPDOWN PANELLER (ikon tıklayınca açılır) -->
+                <div id="panel-coalitions" class="dropdown-panel" style="display:none;">
+                    <div class="dropdown-panel-header">
+                        <span><i class="fa-solid fa-handshake"></i> Aktif İttifaklar</span>
+                        <button class="dropdown-close" id="close-coalitions"><i class="fa-solid fa-xmark"></i></button>
+                    </div>
+                    <div class="dropdown-panel-body">
+                        ${coalitions.length > 0 ? coalitions.map(c => {
+        const members = c.partyIds.map(id => partiesData.find(p => p.id === id)).filter(Boolean);
+        return `
+                            <div class="mini-coalition-row" style="border-left-color:${c.color}">
+                                <div class="mcr-info">
+                                    <strong style="color:${c.color}">${c.name}</strong>
+                                    <span class="mcr-meta">${members.map(m => m.shortName).join(' + ')} • ${members.reduce((s, m) => s + m.members, 0).toLocaleString()} üye</span>
+                                </div>
+                                <div class="mcr-avatars">
+                                    ${members.map(p => `<div class="mcr-avatar" style="color:${p.color}" title="${p.name}"><i class="fa-solid ${p.icon || 'fa-flag'}"></i></div>`).join('')}
+                                </div>
+                            </div>`;
+    }).join('') : '<div class="dropdown-empty">Aktif ittifak yok.</div>'}
+                    </div>
+                </div>
+
+                <div id="panel-invitations" class="dropdown-panel" style="display:none;">
+                    <div class="dropdown-panel-header">
+                        <span><i class="fa-solid fa-envelope"></i> Davetiyeler</span>
+                        <button class="dropdown-close" id="close-invitations"><i class="fa-solid fa-xmark"></i></button>
+                    </div>
+                    <div class="dropdown-panel-body">
+                        ${invitations.length > 0 ? invitations.map(inv => {
+        const p = partiesData.find(x => x.id === inv.partyId);
+        if (!p) return '';
+        return `
+                            <div class="mini-invite-row" style="border-left-color:${p.color}">
+                                <div class="mir-logo" style="color:${p.color}"><i class="fa-solid ${p.icon || 'fa-flag'}"></i></div>
+                                <div class="mir-info">
+                                    <strong>${p.name}</strong>
+                                    <span>${inv.inviter} — "${inv.message}"</span>
+                                </div>
+                                <div class="mir-actions">
+                                    <button class="mir-accept"><i class="fa-solid fa-check"></i></button>
+                                    <button class="mir-reject"><i class="fa-solid fa-xmark"></i></button>
+                                </div>
+                            </div>`;
+    }).join('') : '<div class="dropdown-empty">Davetiye yok.</div>'}
+                    </div>
+                </div>
+
                 <div class="list-header-label">TÜM PARTİLER (${partiesData.length})</div>
                 
                 <!-- Liste Wrapper -->
@@ -47,73 +104,15 @@ export function renderDashboard(container) {
                 </div>
             </div>
 
-            <!-- SAĞ SÜTUN: WIDGETLAR -->
+            <!-- SAĞ SÜTUN: WIDGETLAR (sadece öneriler ve bilgi) -->
             <div class="parties-side-col">
-                
-                <!-- 1. İstatistik Özeti -->
-                <div class="side-widget">
-                    <div class="widget-header"><i class="fa-solid fa-chart-simple"></i> Genel Bakış</div>
-                    <div class="widget-content">
-                        <div class="mini-stats-grid">
-                            <div class="mini-stat">
-                                <div class="ms-value">${partiesData.length}</div>
-                                <div class="ms-label">Parti</div>
-                            </div>
-                            <div class="mini-stat">
-                                <div class="ms-value">${formatMoney(totalMembers)}</div>
-                                <div class="ms-label">Üye</div>
-                            </div>
-                            <div class="mini-stat">
-                                <div class="ms-value">${coalitions.length}</div>
-                                <div class="ms-label">İttifak</div>
-                            </div>
-                            <div class="mini-stat">
-                                <div class="ms-value">${totalSeats}</div>
-                                <div class="ms-label">Koltuk</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- 2. Aktif İttifaklar -->
-                ${coalitions.length > 0 ? `
-                <div class="side-widget">
-                    <div class="widget-header"><i class="fa-solid fa-handshake"></i> Aktif İttifaklar</div>
-                    <div class="widget-content">
-                        ${coalitions.map(c => {
-        const members = c.partyIds.map(id => partiesData.find(p => p.id === id)).filter(Boolean);
-        return `
-                            <div class="mini-coalition-card" style="border-left-color:${c.color}">
-                                <div class="mcc-header">
-                                    <strong style="color:${c.color}">${c.name}</strong>
-                                    <span class="mcc-count">${members.length} parti</span>
-                                </div>
-                                <div class="mcc-avatars">
-                                    ${members.map(p => `
-                                        <div class="mcc-avatar" style="color:${p.color}; border-color:${p.color}44" title="${p.name}">
-                                            <i class="fa-solid ${p.icon || 'fa-flag'}"></i>
-                                        </div>
-                                    `).join('')}
-                                </div>
-                            </div>`;
-    }).join('')}
-                    </div>
-                </div>` : ''}
-
-                <!-- 3. Davetiyeler -->
-                ${invitations.length > 0 ? `
-                <div class="side-widget">
-                    <div class="widget-header"><i class="fa-solid fa-envelope"></i> Davetiyeler <span class="badge">${invitations.length}</span></div>
-                    <div class="widget-content">${renderInvitations()}</div>
-                </div>` : ''}
-
-                <!-- 4. Öneriler -->
+                <!-- Öneriler -->
                 <div class="side-widget">
                     <div class="widget-header"><i class="fa-solid fa-star"></i> Sizin İçin (${playerProfile.ideology})</div>
                     <div class="widget-content">${renderRecommended()}</div>
                 </div>
 
-                <!-- 5. Bilgi -->
+                <!-- Bilgi -->
                 <div class="info-box">
                     <i class="fa-solid fa-circle-info"></i>
                     <p>Parti kurmak için 1000 Altın ve en az 10. seviye gereklidir.</p>
@@ -125,33 +124,65 @@ export function renderDashboard(container) {
     setupModal(container);
     applyFilters();
 
-    // Event Listeners
+    // --- EVENT LISTENERS ---
     document.getElementById('party-search').addEventListener('input', applyFilters);
     document.getElementById('country-filter').addEventListener('change', applyFilters);
     document.getElementById('ideology-filter').addEventListener('change', applyFilters);
     document.getElementById('sort-filter').addEventListener('change', applyFilters);
+
+    // Dropdown toggle: İttifaklar
+    document.getElementById('btn-toggle-coalitions').addEventListener('click', (e) => {
+        e.stopPropagation();
+        togglePanel('panel-coalitions', 'panel-invitations');
+    });
+    document.getElementById('close-coalitions').addEventListener('click', () => {
+        document.getElementById('panel-coalitions').style.display = 'none';
+    });
+
+    // Dropdown toggle: Davetiyeler
+    document.getElementById('btn-toggle-invitations').addEventListener('click', (e) => {
+        e.stopPropagation();
+        togglePanel('panel-invitations', 'panel-coalitions');
+    });
+    document.getElementById('close-invitations').addEventListener('click', () => {
+        document.getElementById('panel-invitations').style.display = 'none';
+    });
+
+    // --- PARTİ KARTI TIKLAMA: DOĞRUDAN MODAL AÇ (sayfa yenilenmez) ---
+    setupPartyCardClicks(container);
+}
+
+// Dropdown panel toggle
+function togglePanel(showId, hideId) {
+    const showPanel = document.getElementById(showId);
+    const hidePanel = document.getElementById(hideId);
+    if (hidePanel) hidePanel.style.display = 'none';
+    if (showPanel) {
+        showPanel.style.display = showPanel.style.display === 'none' ? 'block' : 'none';
+    }
+}
+
+// Parti kartlarına tıklayınca doğrudan modal aç (router üzerinden geçmeden)
+function setupPartyCardClicks(container) {
+    container.addEventListener('click', (e) => {
+        const target = e.target.closest('[data-view="detail"][data-id]');
+        if (target && target.closest('.parties-dashboard-layout')) {
+            e.stopPropagation(); // Global router handler'ı engelle
+            e.preventDefault();
+
+            const id = target.getAttribute('data-id');
+            const party = partiesData.find(p => p.id == id);
+            if (party) {
+                // URL'i güncelle ama sayfayı yeniden render etme
+                const hash = `parties/detail/${id}`;
+                history.pushState({ page: 'parties', view: 'detail', id: id }, null, `#${hash}`);
+                openPartyModal(party);
+            }
+        }
+    });
 }
 
 // --- RENDER YARDIMCILARI ---
-
-function renderInvitations() {
-    return invitations.map(inv => {
-        const p = partiesData.find(x => x.id === inv.partyId);
-        if (!p) return '';
-        return `
-            <div class="mini-invite-card" style="border-left-color:${p.color}">
-                <div class="mini-invite-top">
-                    <span style="color:var(--text-dim); font-size:0.8rem">${inv.inviter}</span>
-                    <img src="https://flagcdn.com/20x15/${p.countryCode}.png">
-                </div>
-                <div class="mini-invite-body">
-                    <strong>${p.name}</strong>
-                    <p>"${inv.message}"</p>
-                </div>
-                <button class="btn-accept">Kabul</button>
-            </div>`;
-    }).join('');
-}
 
 function renderRecommended() {
     const recs = partiesData.filter(p => p.ideology === playerProfile.ideology);
@@ -238,12 +269,12 @@ function applyFilters() {
                 <i class="fa-solid fa-chair"></i> ${p.stats.seatsInParliament}
             </div>
 
-            <button class="row-btn" data-page="parties" data-view="detail" data-id="${p.id}">
+            <button class="row-btn">
                 <i class="fa-solid fa-eye"></i>
             </button>
         `;
 
-        div.setAttribute('data-page', 'parties');
+        // data-view ve data-id set et (modal açma için)
         div.setAttribute('data-view', 'detail');
         div.setAttribute('data-id', p.id);
 
