@@ -2,96 +2,153 @@
 import { partiesData, coalitions, getPrestigeLevel, formatMoney } from './data.js';
 
 export function setupModal(container) {
+    // Modal'ı <html> elementine ekle - body'nin overflow:hidden sorunu atlanır
     if (!document.getElementById('party-modal')) {
         const modalHtml = `
-            <div id="party-modal" class="modal-overlay" style="display:none;">
+            <div id="party-modal" class="modal-overlay">
                 <div class="modal-content">
                     <button class="close-modal"><i class="fa-solid fa-xmark"></i></button>
                     <div id="modal-body"></div>
                 </div>
             </div>`;
-        container.insertAdjacentHTML('beforeend', modalHtml);
+        document.documentElement.insertAdjacentHTML('beforeend', modalHtml);
+        console.log('Modal HTML eklendi (documentElement)');
     }
 
     const modal = document.getElementById('party-modal');
+    if (!modal) {
+        console.error('HATA: Modal oluşturulamadı!');
+        return;
+    }
+
+    setupModalCloseHandlers(modal);
+}
+
+function setupModalCloseHandlers(modal) {
     const closeAction = () => {
         modal.classList.add('modal-closing');
         setTimeout(() => {
-            modal.style.display = 'none';
+            modal.style.cssText = '';
+            modal.classList.remove('modal-open');
             modal.classList.remove('modal-closing');
-            // Hash'i #parties olarak güncelle (sayfa yeniden render edilmez)
             if (window.location.hash.includes('detail')) {
                 history.replaceState({ page: 'parties' }, null, '#parties');
             }
         }, 250);
     };
-
-    modal.addEventListener('click', (e) => { if (e.target === modal) closeAction(); });
-    document.querySelector('.close-modal').addEventListener('click', closeAction);
+    const closeBtn = modal.querySelector('.close-modal');
+    if (closeBtn) closeBtn.onclick = closeAction;
+    modal.onclick = (e) => { if (e.target === modal) closeAction(); };
 }
 
 export function openPartyModal(party) {
-    const modal = document.getElementById('party-modal');
-    const body = document.getElementById('modal-body');
-    if (!modal || !body) return;
+    console.log('openPartyModal çağrıldı:', party.name);
 
-    const prestige = getPrestigeLevel(party.prestige);
+    // Varsa eski modalı kaldır
+    const oldModal = document.getElementById('party-modal');
+    if (oldModal) oldModal.remove();
 
-    let logoDisplay = party.logo
-        ? `<img src="${party.logo}" class="modal-logo-img">`
-        : `<div class="big-logo" style="color:${party.color}"><i class="fa-solid ${party.icon || 'fa-flag'}"></i></div>`;
+    // Overlay oluştur - tamamen inline style (CSS class yok!)
+    const overlay = document.createElement('div');
+    overlay.id = 'party-modal';
+    overlay.style.cssText = 'position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.85); z-index:999999; display:flex; align-items:center; justify-content:center; backdrop-filter:blur(8px); animation:modalFadeIn 0.25s ease;';
 
-    body.innerHTML = `
-        <!-- HEADER -->
-        <div class="party-profile-header" style="background: linear-gradient(135deg, rgba(15,23,42,0.97) 0%, rgba(15,23,42,0.7) 50%, rgba(15,23,42,0.95) 100%), linear-gradient(135deg, ${party.color}44 0%, transparent 60%);">
-            <div class="header-left">
-                ${logoDisplay}
-                <div class="header-texts">
-                    <h1>${party.name} <img src="https://flagcdn.com/32x24/${party.countryCode}.png" title="${party.country}"></h1>
-                    <p class="slogan">"${party.slogan || ''}"</p>
-                    <div class="header-meta-row">
-                        <span class="prestige-badge" style="background:${prestige.color}22; color:${prestige.color}; border:1px solid ${prestige.color}44">
-                            <i class="fa-solid ${prestige.icon}"></i> ${prestige.name} • ${party.prestige.toLocaleString()} PP
-                        </span>
-                        <span class="meta-chip"><i class="fa-solid fa-users"></i> ${party.members.toLocaleString()} Üye</span>
-                        <span class="meta-chip"><i class="fa-solid fa-chair"></i> ${party.stats.seatsInParliament} Koltuk</span>
+    // Content kutusu - inline style + modal-content class (iç stilleme için)
+    const contentBox = document.createElement('div');
+    contentBox.className = 'modal-content';
+    contentBox.style.cssText = 'background:#0f172a; width:95%; max-width:960px; border-radius:16px; border:1px solid #334155; position:relative; overflow:hidden; max-height:92vh; overflow-y:auto; box-shadow:0 24px 60px rgba(0,0,0,0.8); display:flex; flex-direction:column;';
+
+    // Close butonu
+    const closeBtn = document.createElement('button');
+    closeBtn.className = 'close-modal';
+    closeBtn.innerHTML = '<i class="fa-solid fa-xmark"></i>';
+    closeBtn.style.cssText = 'position:absolute; top:15px; right:15px; background:rgba(0,0,0,0.6); border:1px solid rgba(255,255,255,0.1); color:white; width:36px; height:36px; border-radius:50%; cursor:pointer; z-index:100; font-size:1.2rem; display:flex; align-items:center; justify-content:center;';
+
+    // Modal body
+    const modalBody = document.createElement('div');
+    modalBody.id = 'modal-body';
+
+    contentBox.appendChild(closeBtn);
+    contentBox.appendChild(modalBody);
+    overlay.appendChild(contentBox);
+
+    // <html> elementine ekle
+    document.documentElement.appendChild(overlay);
+
+    // Kapanma işlemleri
+    const closeModal = () => {
+        overlay.style.animation = 'modalFadeOut 0.25s ease forwards';
+        setTimeout(() => overlay.remove(), 250);
+    };
+    closeBtn.onclick = closeModal;
+    overlay.addEventListener('click', (e) => { if (e.target === overlay) closeModal(); });
+
+    // İçeriği render et
+    renderModalContent(overlay, modalBody, party);
+}
+
+function renderModalContent(modal, body, party) {
+    try {
+        const prestige = getPrestigeLevel(party.prestige);
+
+        let logoDisplay = party.logo
+            ? `<img src="${party.logo}" class="modal-logo-img">`
+            : `<div class="big-logo" style="color:${party.color}"><i class="fa-solid ${party.icon || 'fa-flag'}"></i></div>`;
+
+        body.innerHTML = `
+            <!-- HEADER -->
+            <div class="party-profile-header" style="background: linear-gradient(135deg, rgba(15,23,42,0.97) 0%, rgba(15,23,42,0.7) 50%, rgba(15,23,42,0.95) 100%), linear-gradient(135deg, ${party.color}44 0%, transparent 60%);">
+                <div class="header-left">
+                    ${logoDisplay}
+                    <div class="header-texts">
+                        <h1>${party.name} <img src="https://flagcdn.com/32x24/${party.countryCode}.png" title="${party.country}"></h1>
+                        <p class="slogan">"${party.slogan || ''}"</p>
+                        <div class="header-meta-row">
+                            <span class="prestige-badge" style="background:${prestige.color}22; color:${prestige.color}; border:1px solid ${prestige.color}44">
+                                <i class="fa-solid ${prestige.icon}"></i> ${prestige.name} • ${party.prestige.toLocaleString()} PP
+                            </span>
+                            <span class="meta-chip"><i class="fa-solid fa-users"></i> ${party.members.toLocaleString()} Üye</span>
+                            <span class="meta-chip"><i class="fa-solid fa-chair"></i> ${party.stats.seatsInParliament} Koltuk</span>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
 
-        <!-- SEKMELER -->
-        <div class="profile-tabs">
-            <button class="tab-btn active" data-tab="overview"><i class="fa-solid fa-house"></i> Genel Bakış</button>
-            <button class="tab-btn" data-tab="stats"><i class="fa-solid fa-chart-bar"></i> İstatistikler</button>
-            <button class="tab-btn" data-tab="finance"><i class="fa-solid fa-coins"></i> Finans</button>
-            <button class="tab-btn" data-tab="coalition"><i class="fa-solid fa-handshake"></i> Koalisyon</button>
-            <button class="tab-btn" data-tab="history"><i class="fa-solid fa-clock-rotate-left"></i> Tarihçe</button>
-        </div>
+            <!-- SEKMELER -->
+            <div class="profile-tabs">
+                <button class="tab-btn active" data-tab="overview"><i class="fa-solid fa-house"></i> Genel Bakış</button>
+                <button class="tab-btn" data-tab="stats"><i class="fa-solid fa-chart-bar"></i> İstatistikler</button>
+                <button class="tab-btn" data-tab="finance"><i class="fa-solid fa-coins"></i> Finans</button>
+                <button class="tab-btn" data-tab="coalition"><i class="fa-solid fa-handshake"></i> Koalisyon</button>
+                <button class="tab-btn" data-tab="history"><i class="fa-solid fa-clock-rotate-left"></i> Tarihçe</button>
+            </div>
 
-        <!-- SEKME İÇERİKLERİ -->
-        <div class="tab-content-area">
-            ${renderOverviewTab(party)}
-            ${renderStatsTab(party)}
-            ${renderFinanceTab(party)}
-            ${renderCoalitionTab(party)}
-            ${renderHistoryTab(party)}
-        </div>
-    `;
+            <!-- SEKME İÇERİKLERİ -->
+            <div class="tab-content-area">
+                ${renderOverviewTab(party)}
+                ${renderStatsTab(party)}
+                ${renderFinanceTab(party)}
+                ${renderCoalitionTab(party)}
+                ${renderHistoryTab(party)}
+            </div>
+        `;
 
-    modal.style.display = 'flex';
-    modal.classList.remove('modal-closing');
+        console.log('Modal içeriği render edildi.');
 
-    // Sekme Geçişleri
-    body.querySelectorAll('.tab-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-            body.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-            body.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
-            btn.classList.add('active');
-            const panel = body.querySelector(`#tab-${btn.dataset.tab}`);
-            if (panel) panel.classList.add('active');
+        // Sekme Geçişleri
+        body.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                body.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                body.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+                btn.classList.add('active');
+                const panel = body.querySelector(`#tab-${btn.dataset.tab}`);
+                if (panel) panel.classList.add('active');
+            });
         });
-    });
+    } catch (err) {
+        console.error('MODAL RENDER HATASI:', err);
+        console.error('Hata stack:', err.stack);
+    }
 }
 
 // =============================================

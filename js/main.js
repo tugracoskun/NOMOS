@@ -6,24 +6,20 @@ import { loadState, startIncomeTicker } from './data/state.js';
 
 document.addEventListener('DOMContentLoaded', () => {
     console.log("NOMOS System Initialized.");
-    loadState(); // Oyun durumunu yükle (Altın, Enerji vb.)
-    startIncomeTicker(); // Gelir döngüsünü başlat (Faz 4)
+    loadState();
+    startIncomeTicker();
 
     // --- GLOBAL EVENT DELEGATION ---
-    // Sayfadaki herhangi bir tıklamayı dinler
     document.body.addEventListener('click', (e) => {
-        // Tıklanan elementin kendisi veya üst ebeveyni bir "data-page" içeriyor mu?
-        // (Örn: Butonun içindeki ikona tıklansa bile butonu bulur)
         const target = e.target.closest('[data-page]');
 
         if (target) {
-            e.preventDefault(); // Sayfanın yenilenmesini engelle
+            e.preventDefault();
 
             const page = target.getAttribute('data-page');
-            const view = target.getAttribute('data-view') || null; // Alt sayfa (create, detail)
-            const id = target.getAttribute('data-id') || null;     // ID (1, 2, 5)
+            const view = target.getAttribute('data-view') || null;
+            const id = target.getAttribute('data-id') || null;
 
-            // Router üzerinden git (Geçmişe kaydeder)
             navigateTo(page, view, id);
         }
     });

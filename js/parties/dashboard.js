@@ -123,6 +123,7 @@ export function renderDashboard(container) {
 
     setupModal(container);
     applyFilters();
+    setupRecommendedClicks();
 
     // --- EVENT LISTENERS ---
     document.getElementById('party-search').addEventListener('input', applyFilters);
@@ -148,8 +149,6 @@ export function renderDashboard(container) {
         document.getElementById('panel-invitations').style.display = 'none';
     });
 
-    // --- PARTİ KARTI TIKLAMA: DOĞRUDAN MODAL AÇ (sayfa yenilenmez) ---
-    setupPartyCardClicks(container);
 }
 
 // Dropdown panel toggle
@@ -162,26 +161,6 @@ function togglePanel(showId, hideId) {
     }
 }
 
-// Parti kartlarına tıklayınca doğrudan modal aç (router üzerinden geçmeden)
-function setupPartyCardClicks(container) {
-    container.addEventListener('click', (e) => {
-        const target = e.target.closest('[data-view="detail"][data-id]');
-        if (target && target.closest('.parties-dashboard-layout')) {
-            e.stopPropagation(); // Global router handler'ı engelle
-            e.preventDefault();
-
-            const id = target.getAttribute('data-id');
-            const party = partiesData.find(p => p.id == id);
-            if (party) {
-                // URL'i güncelle ama sayfayı yeniden render etme
-                const hash = `parties/detail/${id}`;
-                history.pushState({ page: 'parties', view: 'detail', id: id }, null, `#${hash}`);
-                openPartyModal(party);
-            }
-        }
-    });
-}
-
 // --- RENDER YARDIMCILARI ---
 
 function renderRecommended() {
@@ -189,7 +168,7 @@ function renderRecommended() {
     if (recs.length === 0) return '<div style="color:#64748b; font-size:0.85rem; text-align:center;">Öneri bulunamadı.</div>';
 
     return recs.map(p => `
-        <div class="mini-rec-row" data-page="parties" data-view="detail" data-id="${p.id}">
+        <div class="mini-rec-row" data-party-id="${p.id}" style="cursor:pointer">
             <div class="mini-logo" style="color:${p.color}">
                 ${p.logo ? `<img src="${p.logo}">` : `<i class="fa-solid ${p.icon}"></i>`}
             </div>
@@ -200,6 +179,25 @@ function renderRecommended() {
             <i class="fa-solid fa-chevron-right arrow"></i>
         </div>
     `).join('');
+}
+
+// Sidebar önerilere click handler ekle
+function setupRecommendedClicks() {
+    document.querySelectorAll('.mini-rec-row[data-party-id]').forEach(row => {
+        row.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            const id = row.getAttribute('data-party-id');
+            const party = partiesData.find(p => p.id == id);
+            if (party) {
+                try {
+                    openPartyModal(party);
+                } catch (err) {
+                    console.error('Modal açma hatası:', err);
+                }
+            }
+        });
+    });
 }
 
 function applyFilters() {
@@ -274,9 +272,12 @@ function applyFilters() {
             </button>
         `;
 
-        // data-view ve data-id set et (modal açma için)
-        div.setAttribute('data-view', 'detail');
-        div.setAttribute('data-id', p.id);
+        // Parti kartına tıkla → modal aç
+        div.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            openPartyModal(p);
+        });
 
         grid.appendChild(div);
     });

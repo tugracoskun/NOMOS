@@ -140,7 +140,7 @@ export function navigateTo(pageName, subView = null, id = null) {
     if (subView) hash += `/${subView}`;
     if (id) hash += `/${id}`;
 
-    // Eğer zaten aynı sayfadaysak işlem yapma (Gereksiz history şişirme)
+    // Eğer zaten aynı sayfadaysak işlem yapma
     const currentHash = window.location.hash.substring(1);
     if (currentHash === hash) return;
 
