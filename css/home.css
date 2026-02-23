@@ -43,8 +43,13 @@
     display: flex;
     flex-direction: column;
     gap: 8px;
-    overflow-y: auto;
+    overflow: hidden;
     padding-right: 5px;
+}
+
+/* Meclis widget kalan alanı doldursun */
+.parliament-widget {
+    flex: 1;
 }
 
 .home-col-right {
@@ -83,21 +88,25 @@
 
 .widget-header {
     background: rgba(255, 255, 255, 0.03);
-    padding: 8px 12px;
+    padding: 6px 10px;
     border-bottom: 1px solid var(--border);
 }
 
 .widget-header h3 {
-    font-size: 0.85rem;
+    font-size: 0.78rem;
     color: var(--text-light);
     font-weight: 700;
 }
 
+.widget-header h3 i {
+    font-size: 0.72rem;
+}
+
 .widget-body {
-    padding: 10px 12px;
+    padding: 8px 10px;
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 5px;
 }
 
 /* 1. GÖREVLER (Kırmızı Çerçeve) */
@@ -107,10 +116,10 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 6px 8px;
+    padding: 4px 6px;
     background: rgba(255, 255, 255, 0.02);
-    border-radius: 6px;
-    font-size: 0.82rem;
+    border-radius: 5px;
+    font-size: 0.78rem;
     border: 1px solid transparent;
 }
 
@@ -130,7 +139,7 @@
 }
 
 .task-reward {
-    font-size: 0.7rem;
+    font-size: 0.65rem;
     color: #eab308;
 }
 
@@ -138,8 +147,8 @@
 .news-item {
     display: flex;
     align-items: center;
-    gap: 8px;
-    padding-bottom: 6px;
+    gap: 6px;
+    padding-bottom: 4px;
     border-bottom: 1px solid rgba(255, 255, 255, 0.05);
 }
 
@@ -150,6 +159,8 @@
 
 .news-item img {
     border-radius: 2px;
+    width: 18px;
+    height: 13px;
 }
 
 .news-content {
@@ -158,12 +169,12 @@
 }
 
 .news-head {
-    font-size: 0.85rem;
+    font-size: 0.78rem;
     color: #cbd5e1;
 }
 
 .news-time {
-    font-size: 0.7rem;
+    font-size: 0.65rem;
     color: var(--text-dim);
 }
 
@@ -171,13 +182,14 @@
 .region-info {
     display: flex;
     align-items: center;
-    gap: 12px;
-    padding: 8px 12px;
+    gap: 10px;
+    padding: 6px 10px;
 }
 
 .region-flag {
-    border-radius: 6px;
+    border-radius: 4px;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+    width: 40px;
 }
 
 .region-info div {
@@ -187,20 +199,22 @@
 
 .region-info strong {
     color: var(--text-light);
+    font-size: 0.82rem;
 }
 
 .region-info small {
     color: #10b981;
+    font-size: 0.7rem;
 }
 
 /* 4. GÜNDEM (Sarı) */
 .agenda-item {
-    padding: 8px;
+    padding: 5px 8px;
     background: var(--bg-main);
-    border-radius: 6px;
+    border-radius: 5px;
     font-weight: 600;
     color: #cbd5e1;
-    font-size: 0.9rem;
+    font-size: 0.8rem;
     display: flex;
     justify-content: space-between;
 }
@@ -213,25 +227,26 @@
     color: #ef4444;
 }
 
-/* 5. SOSYAL MEDYA (Kahverengi) */
+/* 5. SOSYAL MEDYA */
 .social-item {
     background: rgba(255, 255, 255, 0.02);
-    padding: 10px;
-    border-radius: 6px;
-    font-size: 0.8rem;
+    padding: 8px;
+    border-radius: 5px;
+    font-size: 0.75rem;
 }
 
 .social-head {
     display: flex;
     justify-content: space-between;
-    margin-bottom: 5px;
+    margin-bottom: 3px;
     color: var(--primary);
     font-weight: 700;
+    font-size: 0.75rem;
 }
 
 .social-likes {
     color: var(--text-dim);
-    font-size: 0.7rem;
+    font-size: 0.65rem;
 }
 
 .social-item p {
@@ -239,18 +254,18 @@
     font-style: italic;
 }
 
-/* 6. MECLİS DURUMU (Pembe) */
+/* 6. MECLİS DURUMU */
 .parl-row {
     display: flex;
     align-items: center;
-    gap: 10px;
-    padding: 5px 0;
-    font-size: 0.85rem;
+    gap: 8px;
+    padding: 3px 0;
+    font-size: 0.78rem;
 }
 
 .parl-color {
-    width: 8px;
-    height: 8px;
+    width: 7px;
+    height: 7px;
     border-radius: 50%;
 }
 

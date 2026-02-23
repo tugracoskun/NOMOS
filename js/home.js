@@ -226,14 +226,14 @@ function renderSocialTrends() {
 }
 
 function renderParliamentSummary() {
-    // Sadece ilk 3 partiyi gösterelim
-    return partiesData.slice(0, 3).map(p => `
+    const count = Math.min(partiesData.length, 6);
+    return partiesData.slice(0, count).map(p => `
         <div class="parl-row">
             <div class="parl-color" style="background:${p.color}"></div>
             <span class="parl-name">${p.shortName}</span>
             <span class="parl-count">${p.members} Vekil</span>
         </div>
-    `).join('') + `<div class="parl-more">... ve diğerleri</div>`;
+    `).join('') + (partiesData.length > count ? `<div class="parl-more">... ve ${partiesData.length - count} diğer parti</div>` : '');
 }
 
 function renderMarketNews() {
