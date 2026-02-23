@@ -13,7 +13,11 @@ const tasks = [
 const worldNews = [
     { id: 1, title: "Rusya'da Seçim Gerginliği", time: "10dk önce", flag: "ru" },
     { id: 2, title: "Petrol Fiyatları Çakıldı", time: "1sa önce", flag: "sa" },
-    { id: 3, title: "ABD - Çin Ticaret Anlaşması", time: "3sa önce", flag: "us" }
+    { id: 3, title: "ABD - Çin Ticaret Anlaşması", time: "3sa önce", flag: "us" },
+    { id: 4, title: "Almanya'da Koalisyon Krizi", time: "5sa önce", flag: "de" },
+    { id: 5, title: "Japonya Deprem Uyarısı", time: "8sa önce", flag: "jp" },
+    { id: 6, title: "Brezilya Orman Yangınları", time: "12sa önce", flag: "br" },
+    { id: 7, title: "İngiltere Brexit Sonrası Anlaşma", time: "1gün önce", flag: "gb" }
 ];
 
 const socialTrends = [

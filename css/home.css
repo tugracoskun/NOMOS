@@ -143,6 +143,21 @@
     color: #eab308;
 }
 
+/* Dünyadan Haberler: sabit boyut, içerik scroll */
+.world-widget .widget-body {
+    max-height: 110px;
+    overflow-y: auto;
+}
+
+.world-widget .widget-body::-webkit-scrollbar {
+    width: 3px;
+}
+
+.world-widget .widget-body::-webkit-scrollbar-thumb {
+    background: var(--border);
+    border-radius: 3px;
+}
+
 /* 2. DÜNYA HABERLERİ (Turuncu) */
 .news-item {
     display: flex;
