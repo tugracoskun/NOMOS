@@ -91,10 +91,6 @@ function renderExchangeWidget() {
                     <i class="fa-solid fa-coins"></i>
                     Fonlar
                 </button>
-                <button class="btn-exchange" data-action="portfolio">
-                    <i class="fa-solid fa-wallet"></i>
-                    Portföy
-                </button>
             </div>
         </div>
     `;
