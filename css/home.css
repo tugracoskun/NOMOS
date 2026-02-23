@@ -5,8 +5,8 @@
     display: grid;
     /* Sol (270px) | Orta (Esnek) | Sağ (270px) */
     /* Yanları biraz kıstık ki ortadaki Chat'e yer kalsın ama 1250px'e sığsın */
-    grid-template-columns: 270px 1fr 270px;
-    gap: 25px;
+    grid-template-columns: 260px 1fr 265px;
+    gap: 16px;
     /* Diğer sayfalarla aynı boşluk */
 
     /* KRİTİK AYAR 1: GENİŞLİK SINIRI */
