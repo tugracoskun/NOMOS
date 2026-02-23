@@ -116,13 +116,13 @@ function renderFullExchangeView() {
                 <div class="header-center">
                     <!-- Navigation Tabs -->
                     <div class="exchange-nav-tabs">
-                        <button class="exchange-nav-btn active" data-view="chart">
-                            <i class="fa-solid fa-chart-candlestick"></i>
-                            <span>Grafik</span>
+                        <button class="exchange-nav-btn active" data-view="overview">
+                            <i class="fa-solid fa-gauge-high"></i>
+                            <span>Genel</span>
                         </button>
-                        <button class="exchange-nav-btn" data-view="stocks">
-                            <i class="fa-solid fa-building"></i>
-                            <span>Şirketler</span>
+                        <button class="exchange-nav-btn" data-view="chart">
+                            <i class="fa-solid fa-chart-line"></i>
+                            <span>Borsa</span>
                         </button>
                         <button class="exchange-nav-btn" data-view="funds">
                             <i class="fa-solid fa-coins"></i>
@@ -147,9 +147,50 @@ function renderFullExchangeView() {
             <div class="exchange-main-layout">
                 <!-- Sol Panel: İçerik Görünümleri -->
                 <div class="exchange-left-panel">
+                    
+                    <!-- VIEW: Overview (General Dashboard) -->
+                    <div class="exchange-view-panel active" id="view-overview">
+                        <div class="exchange-dashboard-grid">
+                            <div class="dashboard-top-row">
+                                ${renderRecentInvestments()}
+                                ${renderCountryEconomies()}
+                            </div>
+                            <div class="dashboard-middle-row">
+                                ${renderTradeAgreements()}
+                            </div>
+                            <div class="dashboard-indices-row">
+                                <div class="indices-container-full">
+                                    <h3>Piyasa Endeksleri</h3>
+                                    <div class="indices-grid-mega">
+                                        ${STOCK_DATA.indices.map(index => `
+                                            <div class="index-card-detailed ${index.change >= 0 ? 'positive' : 'negative'}">
+                                                <div class="index-card-header">
+                                                    <span class="index-name">${index.name}</span>
+                                                    <span class="index-tag">Endeks</span>
+                                                </div>
+                                                <div class="index-card-body">
+                                                    <div class="index-value">${index.value.toLocaleString()}</div>
+                                                    <div class="index-change">
+                                                        <i class="fa-solid fa-${index.change >= 0 ? 'caret-up' : 'caret-down'}"></i>
+                                                        ${index.change >= 0 ? '+' : ''}${index.change}%
+                                                    </div>
+                                                </div>
+                                                <div class="index-mini-chart">
+                                                    <svg viewBox="0 0 100 30">
+                                                        <path d="M0,25 Q15,${20 - index.change * 2} 30,${22 + index.change} T60,${20 - index.change} T100,20" 
+                                                              fill="none" stroke="${index.change >= 0 ? '#4ade80' : '#f87171'}" stroke-width="2" />
+                                                    </svg>
+                                                </div>
+                                            </div>
+                                        `).join('')}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
 
-                    <!-- VIEW: Chart (Default) -->
-                    <div class="exchange-view-panel active" id="view-chart">
+                    <!-- VIEW: Chart -->
+                    <div class="exchange-view-panel" id="view-chart">
                         <div class="tv-chart-container">
                             <div class="chart-header">
                                 <div class="chart-symbol">
@@ -179,36 +220,6 @@ function renderFullExchangeView() {
                         </div>
                     </div>
 
-                    <!-- VIEW: Stocks -->
-                    <div class="exchange-view-panel" id="view-stocks">
-                        <section class="stocks-section">
-                            <div class="section-header">
-                                <h2>Şirket Hisseleri</h2>
-                                <div class="section-controls">
-                                    <input type="text" class="search-input" placeholder="Hisse ara..." id="stock-search">
-                                    <div class="filter-tabs">
-                                        <button class="filter-tab active" data-filter="all">Tümü</button>
-                                        <button class="filter-tab" data-filter="gainers">Yükselenler</button>
-                                        <button class="filter-tab" data-filter="losers">Düşenler</button>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="stocks-table">
-                                <div class="table-header">
-                                    <div class="col-ticker">Sembol</div>
-                                    <div class="col-name">Şirket</div>
-                                    <div class="col-price">Fiyat</div>
-                                    <div class="col-change">Değişim</div>
-                                    <div class="col-volume">Hacim</div>
-                                    <div class="col-mcap">Piyasa Değeri</div>
-                                    <div class="col-actions">İşlem</div>
-                                </div>
-                                <div class="table-body" id="stocks-table-body">
-                                    ${STOCK_DATA.companies.map(stock => renderStockRow(stock)).join('')}
-                                </div>
-                            </div>
-                        </section>
-                    </div>
 
                     <!-- VIEW: Funds -->
                     <div class="exchange-view-panel" id="view-funds">
@@ -241,7 +252,7 @@ function renderFullExchangeView() {
                                         <button class="filter-tab active" data-filter="all">Tümü</button>
                                         <button class="filter-tab" data-filter="giants">Piyasa Devleri</button>
                                         <button class="filter-tab" data-filter="trendy">Popüler</button>
-                                        <button class="filter-tab" data-filter="global">Global Yıldızlar</button>
+                                        <button class="filter-tab" data-filter="trendy">Popüler</button>
                                         <button class="filter-tab" data-filter="newcomers">Yeniler</button>
                                     </div>
                                 </div>
@@ -264,31 +275,7 @@ function renderFullExchangeView() {
                     </div>
                 </div>
 
-                <!-- Sağ Panel: Bilgiler ve İndeksler -->
-                <aside class="exchange-right-panel">
-                    <!-- Üst Satır: Son Yatırımlar ve Ülke Ekonomileri -->
-                    <div class="right-panel-row">
-                        ${renderRecentInvestments()}
-                        ${renderCountryEconomies()}
-                    </div>
-                    <!-- Ticari Antlaşmalar -->
-                    <div class="right-panel-full">
-                        ${renderTradeAgreements()}
-                    </div>
-                    <!-- Endeksler (3 küçük kart) -->
-                    <div class="right-panel-indices">
-                        ${STOCK_DATA.indices.map(index => `
-                            <div class="index-mini-card ${index.change >= 0 ? 'positive' : 'negative'}">
-                                <div class="index-mini-name">${index.name}</div>
-                                <div class="index-mini-value">${index.value.toLocaleString()}</div>
-                                <div class="index-mini-change">
-                                    <i class="fa-solid fa-${index.change >= 0 ? 'caret-up' : 'caret-down'}"></i>
-                                    ${index.change >= 0 ? '+' : ''}${index.change}%
-                                </div>
-                            </div>
-                        `).join('')}
-                    </div>
-                </aside>
+                </div>
             </div>
         </div>
     `;
@@ -1015,19 +1002,19 @@ const WORLD_STOCKS = [
     { ticker: 'NVDA', name: 'NVIDIA Corp.', price: 875.30, change: 3.82, mcap: '2.16T', country: 'ABD', flag: '🇺🇸', category: 'trendy' },
     { ticker: 'META', name: 'Meta Platforms', price: 484.10, change: 1.96, mcap: '1.23T', country: 'ABD', flag: '🇺🇸', category: 'trendy' },
     { ticker: 'TSLA', name: 'Tesla Inc.', price: 193.57, change: -2.41, mcap: '615B', country: 'ABD', flag: '🇺🇸', category: 'trendy' },
-    { ticker: 'TSM', name: 'Taiwan Semiconductor', price: 142.56, change: 1.18, mcap: '738B', country: 'Tayvan', flag: '🇹🇼', category: 'global' },
+    { ticker: 'TSM', name: 'Taiwan Semiconductor', price: 142.56, change: 1.18, mcap: '738B', country: 'Tayvan', flag: '🇹🇼', category: 'giants' },
     { ticker: 'V', name: 'Visa Inc.', price: 279.32, change: 0.56, mcap: '572B', country: 'ABD', flag: '🇺🇸', category: 'newcomers' },
     { ticker: 'JPM', name: 'JPMorgan Chase', price: 196.20, change: -0.72, mcap: '564B', country: 'ABD', flag: '🇺🇸', category: 'newcomers' },
-    { ticker: 'SAP', name: 'SAP SE', price: 187.42, change: 0.93, mcap: '229B', country: 'Almanya', flag: '🇩🇪', category: 'global' },
+    { ticker: 'SAP', name: 'SAP SE', price: 187.42, change: 0.93, mcap: '229B', country: 'Almanya', flag: '🇩🇪', category: 'giants' },
     { ticker: 'SHEL', name: 'Shell plc', price: 64.85, change: -1.12, mcap: '206B', country: 'İngiltere', flag: '🇬🇧', category: 'newcomers' },
-    { ticker: 'TM', name: 'Toyota Motor Corp.', price: 214.30, change: 0.41, mcap: '310B', country: 'Japonya', flag: '🇯🇵', category: 'global' },
+    { ticker: 'TM', name: 'Toyota Motor Corp.', price: 214.30, change: 0.41, mcap: '310B', country: 'Japonya', flag: '🇯🇵', category: 'giants' },
     { ticker: 'NESN', name: 'Nestlé S.A.', price: 98.16, change: -0.28, mcap: '265B', country: 'İsviçre', flag: '🇨🇭', category: 'newcomers' },
-    { ticker: 'MC', name: 'LVMH', price: 842.70, change: 1.34, mcap: '423B', country: 'Fransa', flag: '🇫🇷', category: 'global' },
+    { ticker: 'MC', name: 'LVMH', price: 842.70, change: 1.34, mcap: '423B', country: 'Fransa', flag: '🇫🇷', category: 'giants' },
     { ticker: 'BABA', name: 'Alibaba Group', price: 73.82, change: -1.87, mcap: '187B', country: 'Çin', flag: '🇨🇳', category: 'trendy' },
-    { ticker: 'ASML', name: 'ASML Holding', price: 924.50, change: 2.63, mcap: '370B', country: 'Hollanda', flag: '🇳🇱', category: 'global' },
+    { ticker: 'ASML', name: 'ASML Holding', price: 924.50, change: 2.63, mcap: '370B', country: 'Hollanda', flag: '🇳🇱', category: 'giants' },
     { ticker: 'XOM', name: 'Exxon Mobil Corp.', price: 105.72, change: -0.45, mcap: '442B', country: 'ABD', flag: '🇺🇸', category: 'newcomers' },
-    { ticker: 'RY', name: 'Royal Bank of Canada', price: 124.88, change: 0.31, mcap: '175B', country: 'Kanada', flag: '🇨🇦', category: 'global' },
-    { ticker: 'SMSN', name: 'Samsung Electronics', price: 1420.00, change: -0.92, mcap: '348B', country: 'G. Kore', flag: '🇰🇷', category: 'global' },
+    { ticker: 'RY', name: 'Royal Bank of Canada', price: 124.88, change: 0.31, mcap: '175B', country: 'Kanada', flag: '🇨🇦', category: 'giants' },
+    { ticker: 'SMSN', name: 'Samsung Electronics', price: 1420.00, change: -0.92, mcap: '348B', country: 'G. Kore', flag: '🇰🇷', category: 'giants' },
 ];
 
 function renderWorldStocks() {

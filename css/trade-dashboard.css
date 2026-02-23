@@ -10690,6 +10690,48 @@
     grid-template-columns: 0.7fr 1.4fr 0.9fr 0.8fr 0.9fr 0.9fr 0.5fr;
 }
 
+.world-stocks-table {
+    display: flex;
+    flex-direction: column;
+    height: 480px;
+    /* Sabit yükseklik */
+}
+
+.world-stocks-table .table-header {
+    flex-shrink: 0;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background: var(--bg-card);
+    /* Scroll arkasında kalmaması için */
+}
+
+.world-stocks-table .table-body {
+    flex-grow: 1;
+    overflow-y: auto;
+    padding-bottom: 10px;
+}
+
+/* Şık ve İnce Kaydırma Çubuğu */
+.world-stocks-table .table-body::-webkit-scrollbar {
+    width: 5px;
+}
+
+.world-stocks-table .table-body::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.02);
+    border-radius: 10px;
+}
+
+.world-stocks-table .table-body::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    transition: all 0.2s;
+}
+
+.world-stocks-table .table-body::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
 .world-stock-row {
     transition: background 0.15s;
 }
@@ -10750,4 +10792,137 @@
     background: rgba(52, 211, 153, 0.15);
     border-color: rgba(52, 211, 153, 0.3);
     color: #34d399;
+}
+
+/* ========================================
+   BORSA GENEL DASHBOARD (OVERVIEW)
+   ======================================== */
+.exchange-left-panel {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+.exchange-dashboard-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    padding: 10px 0;
+}
+
+.dashboard-top-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+.dashboard-middle-row {
+    display: block;
+}
+
+.dashboard-indices-row h3 {
+    font-size: 0.9rem;
+    color: var(--text-primary);
+    margin: 0 0 12px 0;
+    font-weight: 600;
+}
+
+.indices-grid-mega {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 15px;
+}
+
+.index-card-detailed {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.03) 0%, rgba(255, 255, 255, 0.01) 100%);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    padding: 15px;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.index-card-detailed:hover {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: rgba(59, 130, 246, 0.2);
+    transform: translateY(-2px);
+}
+
+.index-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.index-card-header .index-name {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.index-card-header .index-tag {
+    font-size: 0.6rem;
+    background: rgba(0, 0, 0, 0.2);
+    padding: 2px 6px;
+    border-radius: 4px;
+    color: var(--text-muted);
+}
+
+.index-card-body {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    margin-bottom: 5px;
+}
+
+.index-card-body .index-value {
+    font-size: 1.25rem;
+    font-weight: 800;
+    color: var(--text-primary);
+    letter-spacing: -0.5px;
+}
+
+.index-card-body .index-change {
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.index-card-body .index-change i {
+    font-size: 0.65rem;
+}
+
+.index-mini-chart {
+    height: 30px;
+    margin-top: 5px;
+}
+
+/* Renkler */
+.index-card-detailed.positive .index-change {
+    color: #4ade80;
+}
+
+.index-card-detailed.negative .index-change {
+    color: #f87171;
+}
+
+.index-card-detailed.positive:hover {
+    box-shadow: 0 8px 24px rgba(74, 222, 128, 0.05);
+}
+
+.index-card-detailed.negative:hover {
+    box-shadow: 0 8px 24px rgba(248, 113, 113, 0.05);
+}
+
+/* Aside yok olduğu için layout düzeltme */
+.exchange-main-layout {
+    display: flex;
+    gap: 0;
+}
+
+.exchange-right-panel {
+    display: none;
+    /* Artık nav tab üzerinden yönetiliyor */
 }
