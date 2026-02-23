@@ -21,6 +21,30 @@ const socialTrends = [
     { user: "Baron", text: "Petrol alıyorum, satan DM. 🛢️", likes: 56 }
 ];
 
+// Piyasa Haberleri
+const marketNews = [
+    { title: "Petrol fiyatları %3.2 düştü", source: "Reuters", time: "5dk" },
+    { title: "Altın rekor kırdı: $2,450", source: "Bloomberg", time: "12dk" },
+    { title: "Fed faiz kararı açıklandı", source: "CNBC", time: "1sa" },
+    { title: "EUR/USD paritesi düşüşte", source: "ForexLive", time: "2sa" }
+];
+
+// Borsa Verileri
+const stockMarket = {
+    risers: [
+        { symbol: "NMS", name: "Nomos Corp", change: +5.42, price: "142.30" },
+        { symbol: "GLD", name: "Gold Mining", change: +3.18, price: "87.50" },
+        { symbol: "OIL", name: "PetroEnergy", change: +2.75, price: "63.20" },
+        { symbol: "TEC", name: "TechVision", change: +1.92, price: "234.80" }
+    ],
+    fallers: [
+        { symbol: "BNK", name: "MegaBank", change: -4.15, price: "28.40" },
+        { symbol: "AIR", name: "SkyAirlines", change: -3.67, price: "15.90" },
+        { symbol: "RET", name: "RetailMax", change: -2.83, price: "42.10" },
+        { symbol: "MED", name: "MedPharma", change: -1.54, price: "95.60" }
+    ]
+};
+
 let chatMessages = [
     { id: 1, user: "Sistem", text: "NOMOS sunucularına hoşgeldiniz.", lang: "all", type: "system", time: "10:00" },
     { id: 2, user: "JohnDoe", text: "Hello everyone!", lang: "global", type: "user", time: "10:05" },
@@ -28,7 +52,7 @@ let chatMessages = [
     { id: 4, user: "Admin", text: "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b4/Flag_of_Turkey.svg/320px-Flag_of_Turkey.svg.png", lang: "tr", type: "user", time: "10:20" }
 ];
 
-let currentChannel = "tr"; 
+let currentChannel = "tr";
 
 // --- RENDER ---
 export function renderHome(container) {
@@ -37,10 +61,10 @@ export function renderHome(container) {
     container.innerHTML = `
         <div class="home-layout-grid">
             
-            <!-- 1. SOL SÜTUN (Görevler & Dünya) -->
+            <!-- 1. SOL SÜTUN (Görevler & Dünya & Konum & Meclis) -->
             <div class="home-col-left">
                 
-                <!-- Kırmızı Alan: Görevler -->
+                <!-- Görevler -->
                 <div class="home-widget task-widget">
                     <div class="widget-header">
                         <h3><i class="fa-solid fa-list-check"></i> Görevler</h3>
@@ -50,7 +74,7 @@ export function renderHome(container) {
                     </div>
                 </div>
 
-                <!-- Turuncu Alan: Dünyadan Gelişmeler -->
+                <!-- Dünyadan Haberler -->
                 <div class="home-widget world-widget">
                     <div class="widget-header">
                         <h3><i class="fa-solid fa-earth-americas"></i> Dünyadan Haberler</h3>
@@ -60,7 +84,7 @@ export function renderHome(container) {
                     </div>
                 </div>
 
-                <!-- Mavi Alan (Boşluk/Ekstra) - Şimdilik Bölge Bilgisi -->
+                <!-- Konum -->
                 <div class="home-widget region-widget">
                     <div class="widget-header">
                         <h3><i class="fa-solid fa-map-pin"></i> Konum</h3>
@@ -74,12 +98,21 @@ export function renderHome(container) {
                     </div>
                 </div>
 
+                <!-- Meclis Dağılımı (en altta) -->
+                <div class="home-widget parliament-widget">
+                    <div class="widget-header">
+                        <h3><i class="fa-solid fa-landmark"></i> Meclis Dağılımı</h3>
+                    </div>
+                    <div class="widget-body">
+                        ${renderParliamentSummary()}
+                    </div>
+                </div>
+
             </div>
 
-            <!-- 2. ORTA SÜTUN (Chat - Beyaz Alan) -->
+            <!-- 2. ORTA SÜTUN (Chat) -->
             <div class="home-col-center">
                 <div class="chat-container">
-                    <!-- Sekmeler -->
                     <div class="chat-header-tabs">
                         <button class="chat-tab ${currentChannel === 'global' ? 'active' : ''}" data-channel="global">
                             <i class="fa-solid fa-globe"></i> Global
@@ -88,11 +121,7 @@ export function renderHome(container) {
                             <img src="https://flagcdn.com/20x15/tr.png"> Türkiye
                         </button>
                     </div>
-
-                    <!-- Mesajlar -->
                     <div class="chat-messages-area" id="chat-feed"></div>
-
-                    <!-- Input -->
                     <div class="chat-input-wrapper">
                         <input type="text" id="chat-input" placeholder="Mesaj yaz...">
                         <button id="chat-send-btn"><i class="fa-solid fa-paper-plane"></i></button>
@@ -100,38 +129,50 @@ export function renderHome(container) {
                 </div>
             </div>
 
-            <!-- 3. SAĞ SÜTUN (Gündem, Sosyal, Meclis) -->
+            <!-- 3. SAĞ SÜTUN (Gündem/Popüler + Piyasa/Borsa) -->
             <div class="home-col-right">
                 
-                <!-- Sarı Alan: Gündem -->
-                <div class="home-widget agenda-widget">
-                    <div class="widget-header">
-                        <h3><i class="fa-solid fa-hashtag"></i> Gündem</h3>
+                <!-- Gündem & Popüler (Sekmeli Widget) -->
+                <div class="home-widget trending-widget">
+                    <div class="trending-tabs">
+                        <button class="trending-tab active" data-trend="gundem">
+                            <i class="fa-solid fa-hashtag"></i> Gündem
+                        </button>
+                        <button class="trending-tab" data-trend="populer">
+                            <i class="fa-solid fa-fire"></i> Popüler
+                        </button>
                     </div>
-                    <div class="widget-body">
-                        <div class="agenda-item">#Seçim2025 <span class="trend-up">▲</span></div>
-                        <div class="agenda-item">#DolarKuru <span class="trend-down">▼</span></div>
-                        <div class="agenda-item">#Savaşİhtimali</div>
+                    <div class="widget-body trending-body">
+                        <div class="trend-panel active" id="trend-gundem">
+                            <div class="agenda-item">#Seçim2025 <span class="trend-up">▲</span></div>
+                            <div class="agenda-item">#DolarKuru <span class="trend-down">▼</span></div>
+                            <div class="agenda-item">#Savaşİhtimali</div>
+                            <div class="agenda-item">#EkonomikKriz <span class="trend-up">▲</span></div>
+                            <div class="agenda-item">#NATOZirvesi</div>
+                        </div>
+                        <div class="trend-panel" id="trend-populer">
+                            ${renderSocialTrends()}
+                        </div>
                     </div>
                 </div>
 
-                <!-- Kahverengi Alan: Sosyal Medya -->
-                <div class="home-widget social-widget">
-                    <div class="widget-header">
-                        <h3><i class="fa-solid fa-fire"></i> Popüler</h3>
+                <!-- Piyasa & Borsa (Sekmeli Widget) -->
+                <div class="home-widget market-widget">
+                    <div class="trending-tabs">
+                        <button class="trending-tab active" data-trend="piyasa">
+                            <i class="fa-solid fa-newspaper"></i> Piyasa
+                        </button>
+                        <button class="trending-tab" data-trend="borsa">
+                            <i class="fa-solid fa-chart-line"></i> Borsa
+                        </button>
                     </div>
-                    <div class="widget-body">
-                        ${renderSocialTrends()}
-                    </div>
-                </div>
-
-                <!-- Pembe Alan: Meclis Durumu -->
-                <div class="home-widget parliament-widget">
-                    <div class="widget-header">
-                        <h3><i class="fa-solid fa-landmark"></i> Meclis Dağılımı</h3>
-                    </div>
-                    <div class="widget-body">
-                        ${renderParliamentSummary()}
+                    <div class="widget-body trending-body">
+                        <div class="trend-panel active" id="trend-piyasa">
+                            ${renderMarketNews()}
+                        </div>
+                        <div class="trend-panel" id="trend-borsa">
+                            ${renderStockMarket()}
+                        </div>
                     </div>
                 </div>
 
@@ -195,12 +236,52 @@ function renderParliamentSummary() {
     `).join('') + `<div class="parl-more">... ve diğerleri</div>`;
 }
 
+function renderMarketNews() {
+    return marketNews.map(n => `
+        <div class="market-news-item">
+            <div class="market-news-content">
+                <span class="market-news-title">${n.title}</span>
+                <span class="market-news-meta">${n.source} · ${n.time}</span>
+            </div>
+        </div>
+    `).join('');
+}
+
+function renderStockMarket() {
+    const renderStock = (s) => {
+        const isUp = s.change > 0;
+        return `
+            <div class="stock-row">
+                <div class="stock-info">
+                    <span class="stock-symbol">${s.symbol}</span>
+                    <span class="stock-name">${s.name}</span>
+                </div>
+                <div class="stock-data">
+                    <span class="stock-price">$${s.price}</span>
+                    <span class="stock-change ${isUp ? 'up' : 'down'}">${isUp ? '+' : ''}${s.change.toFixed(2)}%</span>
+                </div>
+            </div>
+        `;
+    };
+
+    return `
+        <div class="stock-section">
+            <div class="stock-section-label up"><i class="fa-solid fa-arrow-trend-up"></i> Yükselenler</div>
+            ${stockMarket.risers.map(renderStock).join('')}
+        </div>
+        <div class="stock-section">
+            <div class="stock-section-label down"><i class="fa-solid fa-arrow-trend-down"></i> Düşenler</div>
+            ${stockMarket.fallers.map(renderStock).join('')}
+        </div>
+    `;
+}
+
 // --- CHAT LOGIC (Aynı) ---
 function renderMessages() {
     const feed = document.getElementById('chat-feed');
-    if(!feed) return;
+    if (!feed) return;
     feed.innerHTML = "";
-    
+
     const filteredMsgs = chatMessages.filter(m => m.lang === currentChannel || m.lang === "all");
 
     filteredMsgs.forEach(msg => {
@@ -235,11 +316,25 @@ function setupEventListeners() {
         });
     });
 
+    // Trending tab geçişleri (her widget bağımsız)
+    document.querySelectorAll('.trending-tab').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const widget = btn.closest('.home-widget');
+            if (!widget) return;
+            // Sadece bu widget içindeki tab ve panelleri güncelle
+            widget.querySelectorAll('.trending-tab').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            widget.querySelectorAll('.trend-panel').forEach(p => p.classList.remove('active'));
+            const target = document.getElementById(`trend-${btn.dataset.trend}`);
+            if (target) target.classList.add('active');
+        });
+    });
+
     const sendMsg = () => {
         const input = document.getElementById('chat-input');
         const text = input.value.trim();
         if (!text) return;
-        chatMessages.push({ id: Date.now(), user: "Başkan [TR]", text: text, lang: currentChannel, type: "user", time: new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}) });
+        chatMessages.push({ id: Date.now(), user: "Başkan [TR]", text: text, lang: currentChannel, type: "user", time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) });
         input.value = "";
         renderMessages();
     };

@@ -5,38 +5,72 @@
     display: grid;
     /* Sol (270px) | Orta (Esnek) | Sağ (270px) */
     /* Yanları biraz kıstık ki ortadaki Chat'e yer kalsın ama 1250px'e sığsın */
-    grid-template-columns: 270px 1fr 270px; 
-    gap: 25px; /* Diğer sayfalarla aynı boşluk */
-    
+    grid-template-columns: 270px 1fr 270px;
+    gap: 25px;
+    /* Diğer sayfalarla aynı boşluk */
+
     /* KRİTİK AYAR 1: GENİŞLİK SINIRI */
-    max-width: 1250px; /* Partiler ve Meclis sayfasıyla birebir aynı */
-    margin: 0 auto;    /* Ortala */
-    
+    max-width: 1250px;
+    /* Partiler ve Meclis sayfasıyla birebir aynı */
+    margin: 0 auto;
+    /* Ortala */
+
     padding: 20px;
-    
-    /* KRİTİK AYAR 2: ALT SINIR (Kırmızı Çizgi) */
-    /* Sayfa boyundan 80px çıkarıyoruz ki altta boşluk kalsın */
-    height: calc(100vh - 80px); 
-    
+
+    /* KRİTİK AYAR 2: ALT SINIR */
+    /* Header (60px top + 50px nav + 2px loading) = 112px + padding */
+    height: calc(100vh - 132px);
+
     overflow: hidden;
-    align-items: start;
+    align-items: stretch;
     animation: fadeIn 0.4s ease;
 }
 
-@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
 
 /* =========================================
    SOL VE SAĞ SÜTUNLAR (WIDGET ALANLARI)
    ========================================= */
-.home-col-left, .home-col-right {
+.home-col-left {
     display: flex;
     flex-direction: column;
-    gap: 15px;
+    gap: 8px;
     overflow-y: auto;
     padding-right: 5px;
 }
+
+.home-col-right {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    overflow: hidden;
+    padding-right: 5px;
+}
+
+
+/* Sağ sütun widget'ları eşit alan paylaşsın */
+.trending-widget,
+.market-widget {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    overflow: hidden;
+}
+
 /* Scrollbarı gizle */
-.home-col-left::-webkit-scrollbar, .home-col-right::-webkit-scrollbar { display: none; }
+.home-col-left::-webkit-scrollbar,
+.home-col-right::-webkit-scrollbar {
+    display: none;
+}
 
 /* ORTAK WIDGET STİLİ */
 .home-widget {
@@ -48,70 +82,383 @@
 }
 
 .widget-header {
-    background: rgba(255,255,255,0.03);
-    padding: 10px 15px; border-bottom: 1px solid var(--border);
+    background: rgba(255, 255, 255, 0.03);
+    padding: 8px 12px;
+    border-bottom: 1px solid var(--border);
 }
-.widget-header h3 { font-size: 0.9rem; color: var(--text-light); font-weight: 700; }
 
-.widget-body { padding: 15px; display: flex; flex-direction: column; gap: 10px; }
+.widget-header h3 {
+    font-size: 0.85rem;
+    color: var(--text-light);
+    font-weight: 700;
+}
+
+.widget-body {
+    padding: 10px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
 
 /* 1. GÖREVLER (Kırmızı Çerçeve) */
-/* .task-widget { border-top: 3px solid #ef4444; } */ /* İsteğe bağlı renkli çizgi */
+/* .task-widget { border-top: 3px solid #ef4444; } */
+/* İsteğe bağlı renkli çizgi */
 .task-item {
-    display: flex; justify-content: space-between; align-items: center;
-    padding: 8px; background: rgba(255,255,255,0.02); border-radius: 6px;
-    font-size: 0.85rem; border: 1px solid transparent;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 6px 8px;
+    background: rgba(255, 255, 255, 0.02);
+    border-radius: 6px;
+    font-size: 0.82rem;
+    border: 1px solid transparent;
 }
-.task-item.completed { border-color: #10b981; color: #10b981; opacity: 0.7; }
-.task-info { display: flex; flex-direction: column; }
-.task-title { color: var(--text-light); }
-.task-reward { font-size: 0.7rem; color: #eab308; }
+
+.task-item.completed {
+    border-color: #10b981;
+    color: #10b981;
+    opacity: 0.7;
+}
+
+.task-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.task-title {
+    color: var(--text-light);
+}
+
+.task-reward {
+    font-size: 0.7rem;
+    color: #eab308;
+}
 
 /* 2. DÜNYA HABERLERİ (Turuncu) */
-.news-item { display: flex; align-items: center; gap: 10px; padding-bottom: 8px; border-bottom: 1px solid rgba(255,255,255,0.05); }
-.news-item:last-child { border: none; padding-bottom: 0; }
-.news-item img { border-radius: 2px; }
-.news-content { display: flex; flex-direction: column; }
-.news-head { font-size: 0.85rem; color: #cbd5e1; }
-.news-time { font-size: 0.7rem; color: var(--text-dim); }
+.news-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.news-item:last-child {
+    border: none;
+    padding-bottom: 0;
+}
+
+.news-item img {
+    border-radius: 2px;
+}
+
+.news-content {
+    display: flex;
+    flex-direction: column;
+}
+
+.news-head {
+    font-size: 0.85rem;
+    color: #cbd5e1;
+}
+
+.news-time {
+    font-size: 0.7rem;
+    color: var(--text-dim);
+}
 
 /* 3. BÖLGE/KONUM (Mavi) */
-.region-info { display: flex; align-items: center; gap: 15px; }
-.region-flag { border-radius: 6px; box-shadow: 0 2px 5px rgba(0,0,0,0.5); }
-.region-info div { display: flex; flex-direction: column; }
-.region-info strong { color: var(--text-light); }
-.region-info small { color: #10b981; }
+.region-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 8px 12px;
+}
+
+.region-flag {
+    border-radius: 6px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+}
+
+.region-info div {
+    display: flex;
+    flex-direction: column;
+}
+
+.region-info strong {
+    color: var(--text-light);
+}
+
+.region-info small {
+    color: #10b981;
+}
 
 /* 4. GÜNDEM (Sarı) */
 .agenda-item {
-    padding: 8px; background: var(--bg-main); border-radius: 6px;
-    font-weight: 600; color: #cbd5e1; font-size: 0.9rem;
-    display: flex; justify-content: space-between;
+    padding: 8px;
+    background: var(--bg-main);
+    border-radius: 6px;
+    font-weight: 600;
+    color: #cbd5e1;
+    font-size: 0.9rem;
+    display: flex;
+    justify-content: space-between;
 }
-.trend-up { color: #10b981; } .trend-down { color: #ef4444; }
+
+.trend-up {
+    color: #10b981;
+}
+
+.trend-down {
+    color: #ef4444;
+}
 
 /* 5. SOSYAL MEDYA (Kahverengi) */
 .social-item {
-    background: rgba(255,255,255,0.02); padding: 10px; border-radius: 6px;
+    background: rgba(255, 255, 255, 0.02);
+    padding: 10px;
+    border-radius: 6px;
     font-size: 0.8rem;
 }
-.social-head { display: flex; justify-content: space-between; margin-bottom: 5px; color: var(--primary); font-weight: 700; }
-.social-likes { color: var(--text-dim); font-size: 0.7rem; }
-.social-item p { color: #cbd5e1; font-style: italic; }
+
+.social-head {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 5px;
+    color: var(--primary);
+    font-weight: 700;
+}
+
+.social-likes {
+    color: var(--text-dim);
+    font-size: 0.7rem;
+}
+
+.social-item p {
+    color: #cbd5e1;
+    font-style: italic;
+}
 
 /* 6. MECLİS DURUMU (Pembe) */
-.parl-row { display: flex; align-items: center; gap: 10px; padding: 5px 0; font-size: 0.85rem; }
-.parl-color { width: 8px; height: 8px; border-radius: 50%; }
-.parl-name { flex: 1; color: var(--text-dim); }
-.parl-count { font-weight: 700; color: var(--text-light); }
-.parl-more { font-size: 0.7rem; color: var(--text-dim); text-align: center; margin-top: 5px; }
+.parl-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 5px 0;
+    font-size: 0.85rem;
+}
 
+.parl-color {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+}
+
+.parl-name {
+    flex: 1;
+    color: var(--text-dim);
+}
+
+.parl-count {
+    font-weight: 700;
+    color: var(--text-light);
+}
+
+.parl-more {
+    font-size: 0.7rem;
+    color: var(--text-dim);
+    text-align: center;
+    margin-top: 5px;
+}
+
+/* GÜNDEM/POPÜLER SEKMELİ WİDGET */
+.trending-tabs {
+    display: flex;
+    border-bottom: 1px solid var(--border);
+}
+
+.trending-tab {
+    flex: 1;
+    background: transparent;
+    border: none;
+    color: var(--text-dim);
+    padding: 8px 10px;
+    font-weight: 600;
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    transition: 0.2s;
+    font-size: 0.78rem;
+    font-family: inherit;
+}
+
+.trending-tab:hover {
+    color: var(--text-light);
+    background: rgba(255, 255, 255, 0.02);
+}
+
+.trending-tab.active {
+    color: var(--primary);
+    border-bottom-color: var(--primary);
+    background: rgba(59, 130, 246, 0.05);
+}
+
+.trending-body {
+    position: relative;
+    flex: 1;
+    overflow-y: auto;
+    min-height: 0;
+}
+
+.trending-body::-webkit-scrollbar {
+    width: 3px;
+}
+
+.trending-body::-webkit-scrollbar-thumb {
+    background: var(--border);
+    border-radius: 3px;
+}
+
+.trend-panel {
+    display: none;
+}
+
+.trend-panel.active {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+/* PİYASA & BORSA WİDGET */
+.market-widget {
+    margin-top: 0;
+}
+
+.market-news-item {
+    padding: 8px;
+    background: var(--bg-main);
+    border-radius: 6px;
+    border-left: 3px solid var(--primary);
+}
+
+.market-news-title {
+    font-size: 0.82rem;
+    color: #e2e8f0;
+    font-weight: 500;
+    display: block;
+}
+
+.market-news-meta {
+    font-size: 0.68rem;
+    color: var(--text-dim);
+    margin-top: 2px;
+    display: block;
+}
+
+/* Borsa Satırları */
+.stock-section {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.stock-section+.stock-section {
+    margin-top: 6px;
+}
+
+.stock-section-label {
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding-bottom: 4px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.stock-section-label.up {
+    color: #10b981;
+}
+
+.stock-section-label.down {
+    color: #ef4444;
+}
+
+.stock-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 5px 6px;
+    border-radius: 4px;
+    background: rgba(255, 255, 255, 0.015);
+    transition: background 0.15s;
+}
+
+.stock-row:hover {
+    background: rgba(255, 255, 255, 0.04);
+}
+
+.stock-info {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.stock-symbol {
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: var(--text-light);
+    min-width: 32px;
+}
+
+.stock-name {
+    font-size: 0.72rem;
+    color: var(--text-dim);
+}
+
+.stock-data {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    text-align: right;
+}
+
+.stock-price {
+    font-size: 0.78rem;
+    color: #cbd5e1;
+    font-weight: 500;
+    font-variant-numeric: tabular-nums;
+}
+
+.stock-change {
+    font-size: 0.72rem;
+    font-weight: 700;
+    min-width: 52px;
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+}
+
+.stock-change.up {
+    color: #10b981;
+}
+
+.stock-change.down {
+    color: #ef4444;
+}
 
 /* =========================================
    ORTA SÜTUN: CHAT (BEYAZ ALAN)
    ========================================= */
 .home-col-center {
-    display: flex; flex-direction: column; height: 100%; min-width: 0;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    min-width: 0;
 }
 
 .chat-container {
@@ -119,76 +466,212 @@
     border: 1px solid var(--border);
     border-radius: 12px;
     height: 100%;
-    display: flex; flex-direction: column; overflow: hidden;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
 }
 
 .chat-header-tabs {
-    display: flex; background: rgba(0,0,0,0.2); border-bottom: 1px solid var(--border);
+    display: flex;
+    background: rgba(0, 0, 0, 0.2);
+    border-bottom: 1px solid var(--border);
 }
+
 .chat-tab {
-    flex: 1; background: transparent; border: none; color: var(--text-dim);
-    padding: 15px; font-weight: 600; cursor: pointer; border-bottom: 3px solid transparent;
-    display: flex; align-items: center; justify-content: center; gap: 8px; transition: 0.2s;
+    flex: 1;
+    background: transparent;
+    border: none;
+    color: var(--text-dim);
+    padding: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    border-bottom: 3px solid transparent;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: 0.2s;
 }
-.chat-tab:hover { color: var(--text-light); background: rgba(255,255,255,0.02); }
-.chat-tab.active { color: var(--primary); border-bottom-color: var(--primary); background: rgba(59, 130, 246, 0.05); }
+
+.chat-tab:hover {
+    color: var(--text-light);
+    background: rgba(255, 255, 255, 0.02);
+}
+
+.chat-tab.active {
+    color: var(--primary);
+    border-bottom-color: var(--primary);
+    background: rgba(59, 130, 246, 0.05);
+}
 
 .chat-messages-area {
-    flex: 1; overflow-y: auto; padding: 20px;
-    display: flex; flex-direction: column; gap: 15px;
-    background-image: radial-gradient(rgba(255,255,255,0.03) 1px, transparent 1px);
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    background-image: radial-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px);
     background-size: 20px 20px;
 }
-.chat-messages-area::-webkit-scrollbar { width: 6px; }
-.chat-messages-area::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; }
+
+.chat-messages-area::-webkit-scrollbar {
+    width: 6px;
+}
+
+.chat-messages-area::-webkit-scrollbar-thumb {
+    background: var(--border);
+    border-radius: 10px;
+}
 
 /* Balonlar */
-.chat-msg { display: flex; gap: 10px; align-items: flex-end; max-width: 85%; }
-.chat-msg.me { align-self: flex-end; flex-direction: row-reverse; }
-.chat-msg.system { align-self: center; max-width: 100%; }
+.chat-msg {
+    display: flex;
+    gap: 10px;
+    align-items: flex-end;
+    max-width: 85%;
+}
+
+.chat-msg.me {
+    align-self: flex-end;
+    flex-direction: row-reverse;
+}
+
+.chat-msg.system {
+    align-self: center;
+    max-width: 100%;
+}
 
 .msg-avatar {
-    width: 32px; height: 32px; border-radius: 50%; background: var(--border);
-    color: var(--text-dim); display: flex; align-items: center; justify-content: center; font-weight: 700; flex-shrink: 0;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: var(--border);
+    color: var(--text-dim);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    flex-shrink: 0;
 }
-.msg-bubble {
-    background: rgba(255,255,255,0.05); padding: 10px 15px; border-radius: 12px;
-    border-bottom-left-radius: 2px; position: relative; border: 1px solid rgba(255,255,255,0.05);
-}
-.chat-msg.me .msg-bubble {
-    background: rgba(59, 130, 246, 0.2); border-color: rgba(59, 130, 246, 0.3);
-    border-bottom-left-radius: 12px; border-bottom-right-radius: 2px;
-}
-.chat-msg.system .msg-bubble { background: transparent; border: none; font-style: italic; color: var(--accent); }
 
-.msg-author { font-size: 0.75rem; color: var(--primary); font-weight: 700; margin-bottom: 2px; }
-.chat-msg.me .msg-author { display: none; }
-.msg-text { color: var(--text-light); font-size: 0.95rem; line-height: 1.4; word-break: break-word; }
-.msg-time { font-size: 0.65rem; color: var(--text-dim); text-align: right; margin-top: 4px; }
-.chat-img-preview { max-width: 100%; max-height: 150px; border-radius: 6px; margin-top: 5px; cursor: pointer; }
+.msg-bubble {
+    background: rgba(255, 255, 255, 0.05);
+    padding: 10px 15px;
+    border-radius: 12px;
+    border-bottom-left-radius: 2px;
+    position: relative;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.chat-msg.me .msg-bubble {
+    background: rgba(59, 130, 246, 0.2);
+    border-color: rgba(59, 130, 246, 0.3);
+    border-bottom-left-radius: 12px;
+    border-bottom-right-radius: 2px;
+}
+
+.chat-msg.system .msg-bubble {
+    background: transparent;
+    border: none;
+    font-style: italic;
+    color: var(--accent);
+}
+
+.msg-author {
+    font-size: 0.75rem;
+    color: var(--primary);
+    font-weight: 700;
+    margin-bottom: 2px;
+}
+
+.chat-msg.me .msg-author {
+    display: none;
+}
+
+.msg-text {
+    color: var(--text-light);
+    font-size: 0.95rem;
+    line-height: 1.4;
+    word-break: break-word;
+}
+
+.msg-time {
+    font-size: 0.65rem;
+    color: var(--text-dim);
+    text-align: right;
+    margin-top: 4px;
+}
+
+.chat-img-preview {
+    max-width: 100%;
+    max-height: 150px;
+    border-radius: 6px;
+    margin-top: 5px;
+    cursor: pointer;
+}
 
 /* Input */
 .chat-input-wrapper {
-    padding: 15px; background: var(--bg-card); border-top: 1px solid var(--border);
-    display: flex; gap: 10px;
+    padding: 15px;
+    background: var(--bg-card);
+    border-top: 1px solid var(--border);
+    display: flex;
+    gap: 10px;
 }
+
 #chat-input {
-    flex: 1; background: var(--bg-main); border: 1px solid var(--border);
-    border-radius: 8px; padding: 12px 15px; color: white; outline: none;
+    flex: 1;
+    background: var(--bg-main);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px 15px;
+    color: white;
+    outline: none;
 }
-#chat-input:focus { border-color: var(--primary); }
+
+#chat-input:focus {
+    border-color: var(--primary);
+}
+
 #chat-send-btn {
-    background: var(--primary); color: white; border: none; border-radius: 8px; width: 45px;
-    cursor: pointer; transition: 0.2s; display: flex; align-items: center; justify-content: center;
+    background: var(--primary);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    width: 45px;
+    cursor: pointer;
+    transition: 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
-#chat-send-btn:hover { background: #2563eb; }
+
+#chat-send-btn:hover {
+    background: #2563eb;
+}
 
 /* MOBİL */
 @media (max-width: 1000px) {
-    .home-layout-grid { grid-template-columns: 1fr; height: auto; overflow: visible; }
-    .chat-container { height: 500px; }
+    .home-layout-grid {
+        grid-template-columns: 1fr;
+        height: auto;
+        overflow: visible;
+    }
+
+    .chat-container {
+        height: 500px;
+    }
+
     /* Mobilde yan sütunları alta atalım */
-    .home-col-left, .home-col-right { order: 2; overflow: visible; }
-    .home-col-center { order: 1; }
+    .home-col-left,
+    .home-col-right {
+        order: 2;
+        overflow: visible;
+    }
+
+    .home-col-center {
+        order: 1;
+    }
 }
