@@ -3,11 +3,13 @@
 
 import { navigateTo, handleInitialLoad } from './router.js';
 import { loadState, startIncomeTicker } from './data/state.js';
+import { initSettingsPanel } from './settings.js';
 
 document.addEventListener('DOMContentLoaded', () => {
     console.log("NOMOS System Initialized.");
     loadState();
     startIncomeTicker();
+    initSettingsPanel();
 
     // --- GLOBAL EVENT DELEGATION ---
     document.body.addEventListener('click', (e) => {
