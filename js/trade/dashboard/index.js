@@ -143,46 +143,50 @@ function generateDashboardHTML() {
 function renderOverviewTab() {
     return `
         <div class="dashboard-grid overview-compact-v2">
-            <!-- Sol Sütun: Haberler + Son Yatırımlar -->
+            <!-- Sol Sütun: Piyasa/Yatırımlar Sekmeli + Kargo -->
             <div class="overview-column col-left">
-                <!-- Piyasa Haberleri (Kompakt) -->
-                <div class="widget-card news-widget-compact">
-                    <div class="widget-header">
-                        <h3><i class="fa-solid fa-newspaper"></i> Piyasa Haberleri</h3>
-                        <button class="btn-widget-action" data-action="view-news">Tümü</button>
+                <div class="widget-card trade-tabbed-widget" style="flex:1; min-height:0;">
+                    <div class="trade-widget-tabs">
+                        <button class="trade-widget-tab active" data-trade-tab="news">
+                            <i class="fa-solid fa-newspaper"></i> Piyasa
+                        </button>
+                        <button class="trade-widget-tab" data-trade-tab="investments">
+                            <i class="fa-solid fa-clock-rotate-left"></i> Yatırımlar
+                        </button>
                     </div>
-                    <div class="widget-body">
-                        ${renderCompactNews()}
+                    <div class="trade-tab-body">
+                        <div class="trade-tab-panel active" id="trade-panel-news">
+                            ${renderCompactNewsV2()}
+                        </div>
+                        <div class="trade-tab-panel" id="trade-panel-investments">
+                            ${renderCompactInvestmentsV2()}
+                        </div>
                     </div>
                 </div>
 
-                <!-- Son Yatırımlar -->
-                <div class="widget-card investments-widget-compact">
-                    <div class="widget-header">
-                        <h3><i class="fa-solid fa-clock-rotate-left"></i> Son Yatırımlar</h3>
-                        <button class="btn-widget-action" data-action="view-investments">Tümü</button>
+                <!-- Kargo Takip Mini -->
+                <div class="widget-card logistics-widget-compact">
+                    <div class="logistics-mini-header">
+                        <h3><i class="fa-solid fa-truck-fast"></i> Kargo Takip</h3>
                     </div>
-                    <div class="widget-body">
-                        ${renderCompactInvestments()}
+                    <div class="logistics-mini-body">
+                        ${renderMiniShipments()}
                     </div>
                 </div>
             </div>
 
-            <!-- Orta Sütun: Lojistik -->
+            <!-- Orta Sütun: Emtia Widget -->
             <div class="overview-column col-center">
-                <div class="widget-card logistics-widget-compact">
-                    ${renderShipmentTracker(dashboardState.shipments, true)}
+                <div class="widget-card" style="flex:1; display:flex; flex-direction:column; overflow:hidden;">
+                    ${renderCommodityExchangeWidget()}
                 </div>
             </div>
 
             <!-- Sağ Sütun: Şirket + Borsa -->
             <div class="overview-column col-right">
-                <!-- Şirketim Özeti -->
                 <div class="widget-card company-widget-compact">
                     ${renderMyCompanySection(dashboardState.companyData, true)}
                 </div>
-
-                <!-- Borsa Widget -->
                 <div class="widget-card exchange-widget-compact">
                     ${renderStockExchangeSection(true)}
                 </div>
@@ -191,13 +195,16 @@ function renderOverviewTab() {
     `;
 }
 
-// Kompakt Haberler
-function renderCompactNews() {
+// Kompakt Haberler v2
+function renderCompactNewsV2() {
     const news = [
         { type: 'breaking', title: 'Petrol Fiyatlarında Rekor Artış', time: '5 dk', impact: 'negative' },
         { type: 'market', title: 'Altın Güvenli Liman Olarak Parladı', time: '15 dk', impact: 'positive' },
         { type: 'trade', title: 'Türkiye-AB Ticaret Görüşmeleri', time: '1 saat', impact: 'positive' },
-        { type: 'economy', title: 'Merkez Bankası Faiz Kararı', time: '2 saat', impact: 'neutral' }
+        { type: 'economy', title: 'Merkez Bankası Faiz Kararı', time: '2 saat', impact: 'neutral' },
+        { type: 'market', title: 'Kripto Piyasası Toparlandı', time: '3 saat', impact: 'positive' },
+        { type: 'breaking', title: 'Enerji Krizi Derinleşiyor', time: '5 saat', impact: 'negative' },
+        { type: 'trade', title: 'Çin İhracatta Rekor Kırdı', time: '8 saat', impact: 'positive' }
     ];
 
     const icons = {
@@ -208,45 +215,72 @@ function renderCompactNews() {
     };
 
     return news.map(n => `
-        <div class="compact-news-item">
-            <div class="news-icon ${n.type}">
+        <div class="compact-news-item-v2">
+            <div class="news-icon-v2 ${n.type}">
                 <i class="fa-solid ${icons[n.type]}"></i>
             </div>
-            <div class="news-content">
-                <span class="news-title">${n.title}</span>
-                <span class="news-time">${n.time}</span>
+            <div class="news-content-v2">
+                <span class="news-title-v2">${n.title}</span>
+                <span class="news-time-v2">${n.time}</span>
             </div>
-            <div class="news-impact ${n.impact}">
+            <div class="news-impact-v2 ${n.impact}">
                 <i class="fa-solid fa-${n.impact === 'positive' ? 'arrow-up' : n.impact === 'negative' ? 'arrow-down' : 'minus'}"></i>
             </div>
         </div>
     `).join('');
 }
 
-// Kompakt Yatırımlar
-function renderCompactInvestments() {
+// Kompakt Yatırımlar v2
+function renderCompactInvestmentsV2() {
     const investments = [
         { type: 'buy', asset: 'TKN', amount: 500, price: 71250, time: '2 dk' },
         { type: 'sell', asset: 'ENP', amount: 200, price: 17840, time: '15 dk' },
         { type: 'dividend', asset: 'MNC', amount: null, price: 450, time: '1 saat' },
-        { type: 'buy', asset: 'NOMOS 100', amount: 1, price: 5000, time: '3 saat' }
+        { type: 'buy', asset: 'NOMOS 100', amount: 1, price: 5000, time: '3 saat' },
+        { type: 'sell', asset: 'GLD', amount: 100, price: 8750, time: '5 saat' },
+        { type: 'buy', asset: 'OIL', amount: 300, price: 18960, time: '8 saat' }
     ];
 
     return investments.map(inv => `
-        <div class="compact-investment-item ${inv.type}">
-            <div class="inv-type-icon">
+        <div class="compact-inv-item-v2 ${inv.type}">
+            <div class="inv-icon-v2 ${inv.type === 'buy' ? 'buy-icon' : inv.type === 'sell' ? 'sell-icon' : 'div-icon'}">
                 <i class="fa-solid fa-${inv.type === 'buy' ? 'arrow-down' : inv.type === 'sell' ? 'arrow-up' : 'coins'}"></i>
             </div>
-            <div class="inv-details">
-                <span class="inv-name">${inv.asset}</span>
-                <span class="inv-desc">${inv.type === 'buy' ? 'Alım' : inv.type === 'sell' ? 'Satım' : 'Temettü'}</span>
+            <div class="inv-details-v2">
+                <span class="inv-name-v2">${inv.asset}</span>
+                <span class="inv-desc-v2">${inv.type === 'buy' ? 'Alım' : inv.type === 'sell' ? 'Satım' : 'Temettü'}</span>
             </div>
-            <div class="inv-amount">
-                <span class="inv-price">${inv.price.toLocaleString()} ₳</span>
-                <span class="inv-time">${inv.time}</span>
+            <div class="inv-amount-v2">
+                <span class="inv-price-v2">${inv.price.toLocaleString()} ₳</span>
+                <span class="inv-time-v2">${inv.time}</span>
             </div>
         </div>
     `).join('');
+}
+
+// Mini Kargo
+function renderMiniShipments() {
+    const shipments = dashboardState.shipments;
+    if (!shipments || shipments.length === 0) {
+        return '<div style="color:var(--text-muted); font-size:0.72rem; padding:8px;">Aktif kargo yok</div>';
+    }
+
+    const statusIcons = {
+        in_transit: { icon: 'fa-truck', cls: 'transit', label: 'Yolda' },
+        delivered: { icon: 'fa-check', cls: 'delivered', label: 'Teslim' },
+        pending: { icon: 'fa-clock', cls: 'pending', label: 'Bekliyor' }
+    };
+
+    return shipments.slice(0, 6).map(s => {
+        const st = statusIcons[s.status] || statusIcons.pending;
+        return `
+            <div class="shipment-mini-item">
+                <i class="fa-solid ${st.icon} shipment-mini-icon ${st.cls}"></i>
+                <span class="shipment-mini-route">${s.origin || '?'} → ${s.destination || '?'}</span>
+                <span class="shipment-mini-status" style="color:var(--accent-${st.cls === 'transit' ? 'blue' : st.cls === 'delivered' ? 'green' : 'yellow'})">${st.label}</span>
+            </div>
+        `;
+    }).join('');
 }
 
 // === TAB RENDERERS ===
@@ -303,7 +337,18 @@ function setupTabSpecificEvents(container, tabId) {
     // Delegate to appropriate module based on tab
     switch (tabId) {
         case 'overview':
-            // Overview widget navigation handlers
+            // Sekmeli widget (Piyasa/Yatırımlar) tab switching
+            contentArea.querySelectorAll('.trade-widget-tab').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const widget = btn.closest('.trade-tabbed-widget');
+                    if (!widget) return;
+                    widget.querySelectorAll('.trade-widget-tab').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    widget.querySelectorAll('.trade-tab-panel').forEach(p => p.classList.remove('active'));
+                    const target = document.getElementById(`trade-panel-${btn.dataset.tradeTab}`);
+                    if (target) target.classList.add('active');
+                });
+            });
 
             // Borsa widget -> Borsa sekmesi
             contentArea.querySelectorAll('[data-action="view-exchange"], .exchange-widget-compact').forEach(el => {
@@ -330,11 +375,6 @@ function setupTabSpecificEvents(container, tabId) {
                     if (e.target.closest('[data-action]') && e.target.closest('[data-action]') !== el) return;
                     navigateToTab('logistics');
                 });
-            });
-
-            // Haberler/Yatırımlar -> Borsa sekmesi (haberler borsayla ilişkili)
-            contentArea.querySelectorAll('[data-action="view-news"], [data-action="view-investments"]').forEach(btn => {
-                btn.addEventListener('click', () => navigateToTab('exchange'));
             });
             break;
         case 'company':
