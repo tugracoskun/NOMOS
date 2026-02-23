@@ -116,18 +116,6 @@ function generateDashboardHTML() {
                 </div>
                 
                 <div class="header-right">
-                    <div class="quick-stat">
-                        <span class="stat-label">Şirket Değeri</span>
-                        <span class="stat-value text-gold">${(company?.totalValue || 0).toLocaleString()} ₳</span>
-                    </div>
-                    <div class="quick-stat">
-                        <span class="stat-label">Günlük Gelir</span>
-                        <span class="stat-value text-green">+${(company?.dailyIncome || 0).toLocaleString()} ₳</span>
-                    </div>
-                    <div class="quick-stat">
-                        <span class="stat-label">Aktif Kargo</span>
-                        <span class="stat-value text-blue">${dashboardState.shipments.filter(s => s.status === 'in_transit').length}</span>
-                    </div>
                 </div>
             </header>
 
