@@ -65,25 +65,39 @@
     align-items: center;
     padding: 10px 20px;
     background: linear-gradient(90deg,
-            rgba(15, 23, 42, 0.4) 0%,
-            rgba(30, 41, 59, 0.85) 15%,
-            rgba(15, 23, 42, 0.95) 50%,
-            rgba(30, 41, 59, 0.85) 85%,
-            rgba(15, 23, 42, 0.4) 100%);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+            #050A14 0%,
+            rgba(15, 23, 42, 0.95) 18%,
+            rgba(22, 33, 52, 0.98) 50%,
+            rgba(15, 23, 42, 0.95) 82%,
+            #050A14 100%);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.04);
     backdrop-filter: blur(20px);
     flex-shrink: 0;
     position: relative;
 }
 
+.dashboard-header::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    width: 60px;
+    background: linear-gradient(90deg, #050A14, transparent);
+    z-index: 1;
+    pointer-events: none;
+}
+
 .dashboard-header::after {
     content: '';
     position: absolute;
-    bottom: -1px;
-    left: 10%;
-    right: 10%;
-    height: 1px;
-    background: linear-gradient(90deg, transparent, rgba(59, 130, 246, 0.3) 30%, rgba(139, 92, 246, 0.2) 70%, transparent);
+    top: 0;
+    bottom: 0;
+    right: 0;
+    width: 60px;
+    background: linear-gradient(270deg, #050A14, transparent);
+    z-index: 1;
+    pointer-events: none;
 }
 
 .dashboard-title {
