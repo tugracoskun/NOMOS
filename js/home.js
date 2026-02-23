@@ -30,7 +30,10 @@ const marketNews = [
     { title: "Petrol fiyatları %3.2 düştü", source: "Reuters", time: "5dk" },
     { title: "Altın rekor kırdı: $2,450", source: "Bloomberg", time: "12dk" },
     { title: "Fed faiz kararı açıklandı", source: "CNBC", time: "1sa" },
-    { title: "EUR/USD paritesi düşüşte", source: "ForexLive", time: "2sa" }
+    { title: "EUR/USD paritesi düşüşte", source: "ForexLive", time: "2sa" },
+    { title: "Çin ihracatı beklentileri aştı", source: "Reuters", time: "4sa" },
+    { title: "Bitcoin $68,000'ı geçti", source: "CoinDesk", time: "6sa" },
+    { title: "OPEC üretim kısıtlaması", source: "Bloomberg", time: "8sa" }
 ];
 
 // Borsa Verileri
@@ -39,13 +42,17 @@ const stockMarket = {
         { symbol: "NMS", name: "Nomos Corp", change: +5.42, price: "142.30" },
         { symbol: "GLD", name: "Gold Mining", change: +3.18, price: "87.50" },
         { symbol: "OIL", name: "PetroEnergy", change: +2.75, price: "63.20" },
-        { symbol: "TEC", name: "TechVision", change: +1.92, price: "234.80" }
+        { symbol: "TEC", name: "TechVision", change: +1.92, price: "234.80" },
+        { symbol: "CRY", name: "CryptoFund", change: +1.45, price: "56.70" },
+        { symbol: "DEF", name: "DefenseCo", change: +0.89, price: "178.20" }
     ],
     fallers: [
         { symbol: "BNK", name: "MegaBank", change: -4.15, price: "28.40" },
         { symbol: "AIR", name: "SkyAirlines", change: -3.67, price: "15.90" },
         { symbol: "RET", name: "RetailMax", change: -2.83, price: "42.10" },
-        { symbol: "MED", name: "MedPharma", change: -1.54, price: "95.60" }
+        { symbol: "MED", name: "MedPharma", change: -1.54, price: "95.60" },
+        { symbol: "LOG", name: "LogiTrans", change: -1.22, price: "33.80" },
+        { symbol: "FUD", name: "FoodChain", change: -0.76, price: "67.40" }
     ]
 };
 
