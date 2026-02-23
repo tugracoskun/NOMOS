@@ -91,6 +91,10 @@ function renderExchangeWidget() {
                     <i class="fa-solid fa-coins"></i>
                     Fonlar
                 </button>
+                <button class="btn-exchange" data-action="view-world-stocks">
+                    <i class="fa-solid fa-globe"></i>
+                    Dünya Hisseleri
+                </button>
             </div>
         </div>
     `;
@@ -123,6 +127,10 @@ function renderFullExchangeView() {
                         <button class="exchange-nav-btn" data-view="funds">
                             <i class="fa-solid fa-coins"></i>
                             <span>Fonlar</span>
+                        </button>
+                        <button class="exchange-nav-btn" data-view="world-stocks">
+                            <i class="fa-solid fa-globe"></i>
+                            <span>Dünya Hisseleri</span>
                         </button>
                     </div>
                 </div>
@@ -218,6 +226,39 @@ function renderFullExchangeView() {
                             </div>
                             <div class="funds-grid">
                                 ${STOCK_DATA.funds.map(fund => renderFundCard(fund)).join('')}
+                            </div>
+                        </section>
+                    </div>
+
+                    <!-- VIEW: World Stocks -->
+                    <div class="exchange-view-panel" id="view-world-stocks">
+                        <section class="world-stocks-section">
+                            <div class="section-header">
+                                <h2><i class="fa-solid fa-globe" style="color:#60a5fa;margin-right:8px;"></i>Dünya Hisseleri</h2>
+                                <div class="section-controls">
+                                    <input type="text" class="search-input" placeholder="Şirket ara..." id="world-stock-search">
+                                    <div class="filter-tabs">
+                                        <button class="filter-tab active" data-filter="all">Tümü</button>
+                                        <button class="filter-tab" data-filter="tech">Teknoloji</button>
+                                        <button class="filter-tab" data-filter="finance">Finans</button>
+                                        <button class="filter-tab" data-filter="energy">Enerji</button>
+                                        <button class="filter-tab" data-filter="auto">Otomotiv</button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="stocks-table world-stocks-table">
+                                <div class="table-header">
+                                    <div class="col-ticker">Sembol</div>
+                                    <div class="col-name">Şirket</div>
+                                    <div class="col-price">Fiyat</div>
+                                    <div class="col-change">Değişim</div>
+                                    <div class="col-mcap">Piyasa Değeri</div>
+                                    <div class="col-country">Ülke</div>
+                                    <div class="col-actions">İşlem</div>
+                                </div>
+                                <div class="table-body" id="world-stocks-table-body">
+                                    ${renderWorldStocks()}
+                                </div>
                             </div>
                         </section>
                     </div>
@@ -919,4 +960,67 @@ export function getStockById(stockId) {
 
 export function getFundById(fundId) {
     return STOCK_DATA.funds.find(f => f.id === fundId);
+}
+
+// === DÜNYA HİSELERİ ===
+const WORLD_STOCKS = [
+    { ticker: 'AAPL', name: 'Apple Inc.', price: 189.84, change: 1.42, mcap: '2.95T', country: 'ABD', flag: '🇺🇸', sector: 'tech' },
+    { ticker: 'MSFT', name: 'Microsoft Corp.', price: 378.91, change: 0.87, mcap: '2.81T', country: 'ABD', flag: '🇺🇸', sector: 'tech' },
+    { ticker: 'GOOG', name: 'Alphabet Inc.', price: 141.80, change: -0.34, mcap: '1.75T', country: 'ABD', flag: '🇺🇸', sector: 'tech' },
+    { ticker: 'AMZN', name: 'Amazon.com Inc.', price: 178.25, change: 2.15, mcap: '1.86T', country: 'ABD', flag: '🇺🇸', sector: 'tech' },
+    { ticker: 'NVDA', name: 'NVIDIA Corp.', price: 875.30, change: 3.82, mcap: '2.16T', country: 'ABD', flag: '🇺🇸', sector: 'tech' },
+    { ticker: 'META', name: 'Meta Platforms', price: 484.10, change: 1.96, mcap: '1.23T', country: 'ABD', flag: '🇺🇸', sector: 'tech' },
+    { ticker: 'TSLA', name: 'Tesla Inc.', price: 193.57, change: -2.41, mcap: '615B', country: 'ABD', flag: '🇺🇸', sector: 'auto' },
+    { ticker: 'TSM', name: 'Taiwan Semiconductor', price: 142.56, change: 1.18, mcap: '738B', country: 'Tayvan', flag: '🇹🇼', sector: 'tech' },
+    { ticker: 'V', name: 'Visa Inc.', price: 279.32, change: 0.56, mcap: '572B', country: 'ABD', flag: '🇺🇸', sector: 'finance' },
+    { ticker: 'JPM', name: 'JPMorgan Chase', price: 196.20, change: -0.72, mcap: '564B', country: 'ABD', flag: '🇺🇸', sector: 'finance' },
+    { ticker: 'SAP', name: 'SAP SE', price: 187.42, change: 0.93, mcap: '229B', country: 'Almanya', flag: '🇩🇪', sector: 'tech' },
+    { ticker: 'SHEL', name: 'Shell plc', price: 64.85, change: -1.12, mcap: '206B', country: 'İngiltere', flag: '🇬🇧', sector: 'energy' },
+    { ticker: 'TM', name: 'Toyota Motor Corp.', price: 214.30, change: 0.41, mcap: '310B', country: 'Japonya', flag: '🇯🇵', sector: 'auto' },
+    { ticker: 'NESN', name: 'Nestlé S.A.', price: 98.16, change: -0.28, mcap: '265B', country: 'İsviçre', flag: '🇨🇭', sector: 'consumer' },
+    { ticker: 'MC', name: 'LVMH', price: 842.70, change: 1.34, mcap: '423B', country: 'Fransa', flag: '🇫🇷', sector: 'consumer' },
+    { ticker: 'BABA', name: 'Alibaba Group', price: 73.82, change: -1.87, mcap: '187B', country: 'Çin', flag: '🇨🇳', sector: 'tech' },
+    { ticker: 'ASML', name: 'ASML Holding', price: 924.50, change: 2.63, mcap: '370B', country: 'Hollanda', flag: '🇳🇱', sector: 'tech' },
+    { ticker: 'XOM', name: 'Exxon Mobil Corp.', price: 105.72, change: -0.45, mcap: '442B', country: 'ABD', flag: '🇺🇸', sector: 'energy' },
+    { ticker: 'RY', name: 'Royal Bank of Canada', price: 124.88, change: 0.31, mcap: '175B', country: 'Kanada', flag: '🇨🇦', sector: 'finance' },
+    { ticker: 'SMSN', name: 'Samsung Electronics', price: 1420.00, change: -0.92, mcap: '348B', country: 'G. Kore', flag: '🇰🇷', sector: 'tech' },
+];
+
+function renderWorldStocks() {
+    return WORLD_STOCKS.map(stock => {
+        const isPositive = stock.change >= 0;
+        const changeClass = isPositive ? 'positive' : 'negative';
+        const changeIcon = isPositive ? 'fa-caret-up' : 'fa-caret-down';
+        const changeSign = isPositive ? '+' : '';
+
+        return `
+            <div class="table-row world-stock-row" data-sector="${stock.sector}">
+                <div class="col-ticker">
+                    <span class="ticker-badge">${stock.ticker}</span>
+                </div>
+                <div class="col-name">
+                    <span class="stock-company-name">${stock.name}</span>
+                </div>
+                <div class="col-price">$${stock.price.toLocaleString('en-US', { minimumFractionDigits: 2 })}</div>
+                <div class="col-change ${changeClass}">
+                    <i class="fa-solid ${changeIcon}"></i>
+                    ${changeSign}${stock.change}%
+                </div>
+                <div class="col-mcap">$${stock.mcap}</div>
+                <div class="col-country">
+                    <span class="country-flag">${stock.flag}</span>
+                    <span class="country-name">${stock.country}</span>
+                </div>
+                <div class="col-actions">
+                    <button class="btn-trade-sm btn-buy-sm" title="Satın Al">
+                        <i class="fa-solid fa-cart-plus"></i>
+                    </button>
+                </div>
+            </div>
+        `;
+    }).join('');
+}
+
+export function getWorldStocks() {
+    return WORLD_STOCKS;
 }

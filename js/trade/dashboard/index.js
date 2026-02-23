@@ -441,6 +441,14 @@ function setupTabSpecificEvents(container, tabId) {
                 });
             });
 
+            // Dünya Hisseleri butonu -> Borsa sekmesi + Dünya Hisseleri view
+            contentArea.querySelectorAll('[data-action="view-world-stocks"]').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    navigateToTab('exchange', 'world-stocks');
+                });
+            });
+
             // Portföy popup
             contentArea.querySelectorAll('[data-action="open-portfolio"]').forEach(el => {
                 el.addEventListener('click', () => {
