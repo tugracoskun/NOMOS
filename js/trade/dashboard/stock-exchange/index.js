@@ -242,7 +242,7 @@ function renderFullExchangeView() {
                                         <button class="filter-tab" data-filter="giants">Piyasa Devleri</button>
                                         <button class="filter-tab" data-filter="trendy">Popüler</button>
                                         <button class="filter-tab" data-filter="global">Global Yıldızlar</button>
-                                        <button class="filter-tab" data-filter="stable">Güvenli Liman</button>
+                                        <button class="filter-tab" data-filter="newcomers">Yeniler</button>
                                     </div>
                                 </div>
                             </div>
@@ -1016,16 +1016,16 @@ const WORLD_STOCKS = [
     { ticker: 'META', name: 'Meta Platforms', price: 484.10, change: 1.96, mcap: '1.23T', country: 'ABD', flag: '🇺🇸', category: 'trendy' },
     { ticker: 'TSLA', name: 'Tesla Inc.', price: 193.57, change: -2.41, mcap: '615B', country: 'ABD', flag: '🇺🇸', category: 'trendy' },
     { ticker: 'TSM', name: 'Taiwan Semiconductor', price: 142.56, change: 1.18, mcap: '738B', country: 'Tayvan', flag: '🇹🇼', category: 'global' },
-    { ticker: 'V', name: 'Visa Inc.', price: 279.32, change: 0.56, mcap: '572B', country: 'ABD', flag: '🇺🇸', category: 'stable' },
-    { ticker: 'JPM', name: 'JPMorgan Chase', price: 196.20, change: -0.72, mcap: '564B', country: 'ABD', flag: '🇺🇸', category: 'stable' },
+    { ticker: 'V', name: 'Visa Inc.', price: 279.32, change: 0.56, mcap: '572B', country: 'ABD', flag: '🇺🇸', category: 'newcomers' },
+    { ticker: 'JPM', name: 'JPMorgan Chase', price: 196.20, change: -0.72, mcap: '564B', country: 'ABD', flag: '🇺🇸', category: 'newcomers' },
     { ticker: 'SAP', name: 'SAP SE', price: 187.42, change: 0.93, mcap: '229B', country: 'Almanya', flag: '🇩🇪', category: 'global' },
-    { ticker: 'SHEL', name: 'Shell plc', price: 64.85, change: -1.12, mcap: '206B', country: 'İngiltere', flag: '🇬🇧', category: 'stable' },
+    { ticker: 'SHEL', name: 'Shell plc', price: 64.85, change: -1.12, mcap: '206B', country: 'İngiltere', flag: '🇬🇧', category: 'newcomers' },
     { ticker: 'TM', name: 'Toyota Motor Corp.', price: 214.30, change: 0.41, mcap: '310B', country: 'Japonya', flag: '🇯🇵', category: 'global' },
-    { ticker: 'NESN', name: 'Nestlé S.A.', price: 98.16, change: -0.28, mcap: '265B', country: 'İsviçre', flag: '🇨🇭', category: 'stable' },
+    { ticker: 'NESN', name: 'Nestlé S.A.', price: 98.16, change: -0.28, mcap: '265B', country: 'İsviçre', flag: '🇨🇭', category: 'newcomers' },
     { ticker: 'MC', name: 'LVMH', price: 842.70, change: 1.34, mcap: '423B', country: 'Fransa', flag: '🇫🇷', category: 'global' },
     { ticker: 'BABA', name: 'Alibaba Group', price: 73.82, change: -1.87, mcap: '187B', country: 'Çin', flag: '🇨🇳', category: 'trendy' },
     { ticker: 'ASML', name: 'ASML Holding', price: 924.50, change: 2.63, mcap: '370B', country: 'Hollanda', flag: '🇳🇱', category: 'global' },
-    { ticker: 'XOM', name: 'Exxon Mobil Corp.', price: 105.72, change: -0.45, mcap: '442B', country: 'ABD', flag: '🇺🇸', category: 'stable' },
+    { ticker: 'XOM', name: 'Exxon Mobil Corp.', price: 105.72, change: -0.45, mcap: '442B', country: 'ABD', flag: '🇺🇸', category: 'newcomers' },
     { ticker: 'RY', name: 'Royal Bank of Canada', price: 124.88, change: 0.31, mcap: '175B', country: 'Kanada', flag: '🇨🇦', category: 'global' },
     { ticker: 'SMSN', name: 'Samsung Electronics', price: 1420.00, change: -0.92, mcap: '348B', country: 'G. Kore', flag: '🇰🇷', category: 'global' },
 ];
