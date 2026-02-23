@@ -239,10 +239,10 @@ function renderFullExchangeView() {
                                     <input type="text" class="search-input" placeholder="Şirket ara..." id="world-stock-search">
                                     <div class="filter-tabs">
                                         <button class="filter-tab active" data-filter="all">Tümü</button>
-                                        <button class="filter-tab" data-filter="tech">Teknoloji</button>
-                                        <button class="filter-tab" data-filter="finance">Finans</button>
-                                        <button class="filter-tab" data-filter="energy">Enerji</button>
-                                        <button class="filter-tab" data-filter="auto">Otomotiv</button>
+                                        <button class="filter-tab" data-filter="giants">Piyasa Devleri</button>
+                                        <button class="filter-tab" data-filter="trendy">Popüler</button>
+                                        <button class="filter-tab" data-filter="global">Global Yıldızlar</button>
+                                        <button class="filter-tab" data-filter="stable">Güvenli Liman</button>
                                     </div>
                                 </div>
                             </div>
@@ -321,6 +321,50 @@ export function setupExchangeViewNav() {
             }
         });
     });
+
+    // Initialize specific view event handlers
+    setupWorldStockFilters();
+}
+
+/**
+ * Dünya hisseleri için filtreleme ve arama olaylarını ayarlar
+ */
+function setupWorldStockFilters() {
+    const filterTabs = document.querySelectorAll('.world-stocks-section .filter-tab');
+    const searchInput = document.getElementById('world-stock-search');
+    const rows = document.querySelectorAll('.world-stock-row');
+
+    const applyFilters = () => {
+        const activeFilter = document.querySelector('.world-stocks-section .filter-tab.active')?.dataset.filter || 'all';
+        const searchTerm = searchInput?.value.toLowerCase() || '';
+
+        rows.forEach(row => {
+            const category = row.dataset.category;
+            const ticker = row.querySelector('.ticker-badge')?.textContent.toLowerCase() || '';
+            const name = row.querySelector('.stock-company-name')?.textContent.toLowerCase() || '';
+
+            const matchesFilter = activeFilter === 'all' || category === activeFilter;
+            const matchesSearch = ticker.includes(searchTerm) || name.includes(searchTerm);
+
+            if (matchesFilter && matchesSearch) {
+                row.style.display = 'grid';
+            } else {
+                row.style.display = 'none';
+            }
+        });
+    };
+
+    filterTabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+            filterTabs.forEach(t => t.classList.remove('active'));
+            tab.classList.add('active');
+            applyFilters();
+        });
+    });
+
+    if (searchInput) {
+        searchInput.addEventListener('input', applyFilters);
+    }
 }
 
 // === ADVANCED CHART (TradingView Style - Interactive Canvas) ===
@@ -964,26 +1008,26 @@ export function getFundById(fundId) {
 
 // === DÜNYA HİSELERİ ===
 const WORLD_STOCKS = [
-    { ticker: 'AAPL', name: 'Apple Inc.', price: 189.84, change: 1.42, mcap: '2.95T', country: 'ABD', flag: '🇺🇸', sector: 'tech' },
-    { ticker: 'MSFT', name: 'Microsoft Corp.', price: 378.91, change: 0.87, mcap: '2.81T', country: 'ABD', flag: '🇺🇸', sector: 'tech' },
-    { ticker: 'GOOG', name: 'Alphabet Inc.', price: 141.80, change: -0.34, mcap: '1.75T', country: 'ABD', flag: '🇺🇸', sector: 'tech' },
-    { ticker: 'AMZN', name: 'Amazon.com Inc.', price: 178.25, change: 2.15, mcap: '1.86T', country: 'ABD', flag: '🇺🇸', sector: 'tech' },
-    { ticker: 'NVDA', name: 'NVIDIA Corp.', price: 875.30, change: 3.82, mcap: '2.16T', country: 'ABD', flag: '🇺🇸', sector: 'tech' },
-    { ticker: 'META', name: 'Meta Platforms', price: 484.10, change: 1.96, mcap: '1.23T', country: 'ABD', flag: '🇺🇸', sector: 'tech' },
-    { ticker: 'TSLA', name: 'Tesla Inc.', price: 193.57, change: -2.41, mcap: '615B', country: 'ABD', flag: '🇺🇸', sector: 'auto' },
-    { ticker: 'TSM', name: 'Taiwan Semiconductor', price: 142.56, change: 1.18, mcap: '738B', country: 'Tayvan', flag: '🇹🇼', sector: 'tech' },
-    { ticker: 'V', name: 'Visa Inc.', price: 279.32, change: 0.56, mcap: '572B', country: 'ABD', flag: '🇺🇸', sector: 'finance' },
-    { ticker: 'JPM', name: 'JPMorgan Chase', price: 196.20, change: -0.72, mcap: '564B', country: 'ABD', flag: '🇺🇸', sector: 'finance' },
-    { ticker: 'SAP', name: 'SAP SE', price: 187.42, change: 0.93, mcap: '229B', country: 'Almanya', flag: '🇩🇪', sector: 'tech' },
-    { ticker: 'SHEL', name: 'Shell plc', price: 64.85, change: -1.12, mcap: '206B', country: 'İngiltere', flag: '🇬🇧', sector: 'energy' },
-    { ticker: 'TM', name: 'Toyota Motor Corp.', price: 214.30, change: 0.41, mcap: '310B', country: 'Japonya', flag: '🇯🇵', sector: 'auto' },
-    { ticker: 'NESN', name: 'Nestlé S.A.', price: 98.16, change: -0.28, mcap: '265B', country: 'İsviçre', flag: '🇨🇭', sector: 'consumer' },
-    { ticker: 'MC', name: 'LVMH', price: 842.70, change: 1.34, mcap: '423B', country: 'Fransa', flag: '🇫🇷', sector: 'consumer' },
-    { ticker: 'BABA', name: 'Alibaba Group', price: 73.82, change: -1.87, mcap: '187B', country: 'Çin', flag: '🇨🇳', sector: 'tech' },
-    { ticker: 'ASML', name: 'ASML Holding', price: 924.50, change: 2.63, mcap: '370B', country: 'Hollanda', flag: '🇳🇱', sector: 'tech' },
-    { ticker: 'XOM', name: 'Exxon Mobil Corp.', price: 105.72, change: -0.45, mcap: '442B', country: 'ABD', flag: '🇺🇸', sector: 'energy' },
-    { ticker: 'RY', name: 'Royal Bank of Canada', price: 124.88, change: 0.31, mcap: '175B', country: 'Kanada', flag: '🇨🇦', sector: 'finance' },
-    { ticker: 'SMSN', name: 'Samsung Electronics', price: 1420.00, change: -0.92, mcap: '348B', country: 'G. Kore', flag: '🇰🇷', sector: 'tech' },
+    { ticker: 'AAPL', name: 'Apple Inc.', price: 189.84, change: 1.42, mcap: '2.95T', country: 'ABD', flag: '🇺🇸', category: 'giants' },
+    { ticker: 'MSFT', name: 'Microsoft Corp.', price: 378.91, change: 0.87, mcap: '2.81T', country: 'ABD', flag: '🇺🇸', category: 'giants' },
+    { ticker: 'GOOG', name: 'Alphabet Inc.', price: 141.80, change: -0.34, mcap: '1.75T', country: 'ABD', flag: '🇺🇸', category: 'giants' },
+    { ticker: 'AMZN', name: 'Amazon.com Inc.', price: 178.25, change: 2.15, mcap: '1.86T', country: 'ABD', flag: '🇺🇸', category: 'trendy' },
+    { ticker: 'NVDA', name: 'NVIDIA Corp.', price: 875.30, change: 3.82, mcap: '2.16T', country: 'ABD', flag: '🇺🇸', category: 'trendy' },
+    { ticker: 'META', name: 'Meta Platforms', price: 484.10, change: 1.96, mcap: '1.23T', country: 'ABD', flag: '🇺🇸', category: 'trendy' },
+    { ticker: 'TSLA', name: 'Tesla Inc.', price: 193.57, change: -2.41, mcap: '615B', country: 'ABD', flag: '🇺🇸', category: 'trendy' },
+    { ticker: 'TSM', name: 'Taiwan Semiconductor', price: 142.56, change: 1.18, mcap: '738B', country: 'Tayvan', flag: '🇹🇼', category: 'global' },
+    { ticker: 'V', name: 'Visa Inc.', price: 279.32, change: 0.56, mcap: '572B', country: 'ABD', flag: '🇺🇸', category: 'stable' },
+    { ticker: 'JPM', name: 'JPMorgan Chase', price: 196.20, change: -0.72, mcap: '564B', country: 'ABD', flag: '🇺🇸', category: 'stable' },
+    { ticker: 'SAP', name: 'SAP SE', price: 187.42, change: 0.93, mcap: '229B', country: 'Almanya', flag: '🇩🇪', category: 'global' },
+    { ticker: 'SHEL', name: 'Shell plc', price: 64.85, change: -1.12, mcap: '206B', country: 'İngiltere', flag: '🇬🇧', category: 'stable' },
+    { ticker: 'TM', name: 'Toyota Motor Corp.', price: 214.30, change: 0.41, mcap: '310B', country: 'Japonya', flag: '🇯🇵', category: 'global' },
+    { ticker: 'NESN', name: 'Nestlé S.A.', price: 98.16, change: -0.28, mcap: '265B', country: 'İsviçre', flag: '🇨🇭', category: 'stable' },
+    { ticker: 'MC', name: 'LVMH', price: 842.70, change: 1.34, mcap: '423B', country: 'Fransa', flag: '🇫🇷', category: 'global' },
+    { ticker: 'BABA', name: 'Alibaba Group', price: 73.82, change: -1.87, mcap: '187B', country: 'Çin', flag: '🇨🇳', category: 'trendy' },
+    { ticker: 'ASML', name: 'ASML Holding', price: 924.50, change: 2.63, mcap: '370B', country: 'Hollanda', flag: '🇳🇱', category: 'global' },
+    { ticker: 'XOM', name: 'Exxon Mobil Corp.', price: 105.72, change: -0.45, mcap: '442B', country: 'ABD', flag: '🇺🇸', category: 'stable' },
+    { ticker: 'RY', name: 'Royal Bank of Canada', price: 124.88, change: 0.31, mcap: '175B', country: 'Kanada', flag: '🇨🇦', category: 'global' },
+    { ticker: 'SMSN', name: 'Samsung Electronics', price: 1420.00, change: -0.92, mcap: '348B', country: 'G. Kore', flag: '🇰🇷', category: 'global' },
 ];
 
 function renderWorldStocks() {
@@ -994,7 +1038,7 @@ function renderWorldStocks() {
         const changeSign = isPositive ? '+' : '';
 
         return `
-            <div class="table-row world-stock-row" data-sector="${stock.sector}">
+            <div class="table-row world-stock-row" data-category="${stock.category}">
                 <div class="col-ticker">
                     <span class="ticker-badge">${stock.ticker}</span>
                 </div>
