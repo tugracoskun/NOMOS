@@ -376,6 +376,14 @@ function setupTabSpecificEvents(container, tabId) {
                     navigateToTab('logistics');
                 });
             });
+
+            // Emtia widget -> Emtia sekmesi
+            contentArea.querySelectorAll('.col-center .widget-card').forEach(el => {
+                el.style.cursor = 'pointer';
+                el.addEventListener('click', () => {
+                    navigateToTab('commodity');
+                });
+            });
             break;
         case 'company':
             // Setup company management event handlers
