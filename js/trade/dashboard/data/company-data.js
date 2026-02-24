@@ -212,7 +212,17 @@ const ACTIVE_COMPANY_KEY = 'nomos_active_company_id';
 
 // === DEFAULT COMPANY TEMPLATE ===
 function createDefaultCompany(professionType = 'CLOTHING') {
-    const profession = PROFESSION_TYPES[professionType] || PROFESSION_TYPES.CLOTHING;
+    // Hem Key (BANKING) hem de ID (banking) kontrolü yap
+    let profession = PROFESSION_TYPES[professionType];
+
+    if (!profession) {
+        profession = Object.values(PROFESSION_TYPES).find(p => p.id === professionType);
+    }
+
+    // Hala bulunamadıysa varsayılan
+    if (!profession) {
+        profession = PROFESSION_TYPES.CLOTHING;
+    }
 
     return {
         id: `company_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
@@ -272,13 +282,36 @@ function createDefaultCompany(professionType = 'CLOTHING') {
 // === LOAD PLAYER COMPANY ===
 export function loadPlayerCompany() {
     try {
+        // 1. Önce aktif ID'yi al
+        const activeId = localStorage.getItem(ACTIVE_COMPANY_KEY);
+
+        // 2. Tüm listeyi al (loadPlayerCompany'yi tekrar çağırmayan basit bir okuma)
+        const rawList = localStorage.getItem(COMPANIES_STORAGE_KEY);
+        const allCompanies = rawList ? JSON.parse(rawList) : [];
+
+        // 3. Aktif ID listede varsa onu dön
+        if (activeId && allCompanies.length > 0) {
+            const activeComp = allCompanies.find(c => c.id === activeId);
+            if (activeComp) return activeComp;
+        }
+
+        // 4. Yoksa cache key'e bak
         const raw = localStorage.getItem(COMPANY_STORAGE_KEY);
         if (raw) {
-            return JSON.parse(raw);
+            const company = JSON.parse(raw);
+            // Listeyi de güncelle
+            if (allCompanies.length === 0) {
+                localStorage.setItem(COMPANIES_STORAGE_KEY, JSON.stringify([company]));
+                localStorage.setItem(ACTIVE_COMPANY_KEY, company.id);
+            }
+            return company;
         }
-        // Create default if not exists
+
+        // 5. Hiçbir şey yoksa varsayılan oluştur
         const defaultCompany = createDefaultCompany('CLOTHING');
+        // savePlayerCompany listeye eklemeyi ve cache yapmayı halleder
         savePlayerCompany(defaultCompany);
+        localStorage.setItem(ACTIVE_COMPANY_KEY, defaultCompany.id);
         return defaultCompany;
     } catch (e) {
         console.error('Company load error:', e);
@@ -288,8 +321,31 @@ export function loadPlayerCompany() {
 
 // === SAVE PLAYER COMPANY ===
 export function savePlayerCompany(companyData) {
+    if (!companyData) return;
+
     companyData.lastUpdated = Date.now();
+
+    // 1. Aktif Cache/Key'i güncelle
     localStorage.setItem(COMPANY_STORAGE_KEY, JSON.stringify(companyData));
+
+    // 2. Tüm şirketler listesini güncelle
+    const rawList = localStorage.getItem(COMPANIES_STORAGE_KEY);
+    let allCompanies = rawList ? JSON.parse(rawList) : [];
+
+    const index = allCompanies.findIndex(c => c.id === companyData.id);
+    if (index !== -1) {
+        allCompanies[index] = companyData;
+    } else {
+        // Eğer bu şirket listede yoksa ekle (yeni kurulmuş olabilir)
+        allCompanies.push(companyData);
+    }
+
+    localStorage.setItem(COMPANIES_STORAGE_KEY, JSON.stringify(allCompanies));
+
+    // 3. Aktif ID'yi senkronize et (Eğer ilk kez kaydediliyorsa veya aktif olan buysa)
+    if (!getActiveCompanyId()) {
+        localStorage.setItem(ACTIVE_COMPANY_KEY, companyData.id);
+    }
 }
 
 // === GET PLAYER COMPANY (Read-only) ===
@@ -474,52 +530,30 @@ export function deleteOrder(orderId) {
     return company;
 }
 
-// === CREATE NEW COMPANY (Full Reset) ===
+// === CREATE NEW COMPANY (Empire Addition) ===
 export function createNewCompany(companyData) {
-    const profession = PROFESSION_TYPES[companyData.professionKey] || PROFESSION_TYPES.CLOTHING;
+    const professionKey = companyData.professionKey || 'CLOTHING';
+    const baseCompany = createDefaultCompany(professionKey);
 
     const newCompany = {
+        ...baseCompany,
         id: `company_${Date.now()}`,
         name: companyData.name || 'Yeni Şirket',
-        profession: profession.id,
-        level: 1,
-        experience: 0,
-
-        // Finansal
-        totalValue: companyData.startingCapital || 10000,
-        dailyIncome: 0,
-        weeklyGrowth: 0,
-        cash: companyData.startingCapital || 10000,
-        debt: 0,
-
-        // Operasyonel
+        cash: companyData.startingCapital || 5000,
+        totalValue: (companyData.startingCapital || 5000) * 2,
         employees: companyData.initialEmployees || 3,
-        maxEmployees: 10,
-        reputation: 30,
-        customerSatisfaction: 50,
-
-        // Ürünler
-        products: profession.defaultProducts.slice(0, 3).map((name, i) => ({
-            id: `prod_${Date.now()}_${i}`,
-            name: name,
-            stock: 50,
-            price: Math.floor(Math.random() * 300) + 100,
-            demand: 50,
-            quality: 60
-        })),
-
-        // Siparişler
-        orders: [],
-
-        // Yatırımlar
-        investments: [],
-
-        // Zaman damgaları
-        createdAt: Date.now(),
-        lastUpdated: Date.now()
+        prestige: 0,
+        worldRank: 15000 + Math.floor(Math.random() * 5000),
+        nationalRank: 500 + Math.floor(Math.random() * 500),
+        sectorRank: 100 + Math.floor(Math.random() * 100)
     };
 
+    // savePlayerCompany listeye eklemeyi zaten yapıyor
     savePlayerCompany(newCompany);
+
+    // Yeni kurulan şirketi aktif yap
+    setActiveCompany(newCompany.id);
+
     return newCompany;
 }
 
@@ -708,12 +742,13 @@ export function getAllCompanies() {
         if (raw) {
             return JSON.parse(raw);
         }
-        // İlk şirketi ana şirketlerden al
-        const mainCompany = loadPlayerCompany();
-        if (mainCompany) {
-            const companies = [mainCompany];
-            saveAllCompanies(companies);
-            return companies;
+        // Eğer liste boşsa mevcut aktif şirketi içeren bir liste oluştur
+        const rawActive = localStorage.getItem(COMPANY_STORAGE_KEY);
+        if (rawActive) {
+            const active = JSON.parse(rawActive);
+            const list = [active];
+            localStorage.setItem(COMPANIES_STORAGE_KEY, JSON.stringify(list));
+            return list;
         }
         return [];
     } catch (e) {
