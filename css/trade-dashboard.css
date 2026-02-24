@@ -11665,3 +11665,287 @@
     display: none;
     /* Artık nav tab üzerinden yönetiliyor */
 }
+
+/* === CONSOLIDATED TRADE TABS === */
+.consolidated-trade-tabs {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 400px;
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    transition: all var(--transition-normal);
+}
+
+.consolidated-trade-tabs .tabs-navigation {
+    display: flex;
+    gap: 4px;
+    padding: 12px 16px;
+    background: rgba(0, 0, 0, 0.2);
+    border-bottom: 1px solid var(--card-border);
+}
+
+.trade-sub-tab {
+    padding: 8px 16px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: var(--radius-md);
+    color: var(--text-secondary);
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all var(--transition-normal);
+}
+
+.trade-sub-tab i {
+    margin-right: 8px;
+    font-size: 0.9rem;
+}
+
+.trade-sub-tab:hover {
+    background: rgba(255, 255, 255, 0.08);
+    color: var(--text-primary);
+}
+
+.trade-sub-tab.active {
+    background: var(--gradient-primary);
+    border-color: transparent;
+    color: white;
+    box-shadow: var(--shadow-glow-blue);
+}
+
+.tabs-content {
+    flex: 1;
+    position: relative;
+    overflow: hidden;
+}
+
+.tab-pane {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    pointer-events: none;
+    transition: all 0.3s ease;
+    transform: translateY(10px);
+    overflow-y: auto;
+}
+
+.tab-pane.active {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translateY(0);
+}
+
+/* Tab içindeki kart başlıklarını gizle (Çünkü sekme adı zaten var) */
+.tab-pane .sidebar-card .card-header {
+    display: none;
+}
+
+.tab-pane .sidebar-card {
+    background: transparent;
+    border: none;
+    box-shadow: none;
+}
+
+/* === PREMIUM INDICES DESIGN === */
+.indices-container-premium {
+    padding: 24px 0;
+}
+
+.indices-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 20px;
+    padding: 0 4px;
+}
+
+.title-with-desc h3 {
+    margin: 0;
+    font-size: 1.25rem;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+    color: var(--text-primary);
+}
+
+.title-with-desc p {
+    margin: 4px 0 0 0;
+    font-size: 0.8rem;
+    color: var(--text-muted);
+}
+
+.market-badge {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 12px;
+    background: rgba(34, 197, 94, 0.1);
+    border: 1px solid rgba(34, 197, 94, 0.2);
+    border-radius: 20px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: var(--accent-green);
+}
+
+.dot.pulse {
+    width: 6px;
+    height: 6px;
+    background: var(--accent-green);
+    border-radius: 50%;
+    box-shadow: 0 0 8px var(--accent-green);
+    animation: dot-pulse 2s infinite;
+}
+
+@keyframes dot-pulse {
+    0% {
+        transform: scale(1);
+        opacity: 1;
+    }
+
+    50% {
+        transform: scale(1.5);
+        opacity: 0.5;
+    }
+
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+.indices-grid-modern {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+}
+
+.premium-index-card {
+    position: relative;
+    background: rgba(30, 41, 59, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: var(--radius-lg);
+    padding: 20px;
+    overflow: hidden;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.premium-index-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 4px;
+    transition: all 0.3s ease;
+}
+
+.premium-index-card.bullish::before {
+    background: var(--gradient-success);
+}
+
+.premium-index-card.bearish::before {
+    background: var(--gradient-danger);
+}
+
+.premium-index-card:hover {
+    transform: translateY(-8px);
+    background: rgba(30, 41, 59, 0.8);
+    border-color: rgba(255, 255, 255, 0.2);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+}
+
+.premium-index-card:hover.bullish {
+    box-shadow: 0 12px 30px rgba(34, 197, 94, 0.1);
+}
+
+.premium-index-card:hover.bearish {
+    box-shadow: 0 12px 30px rgba(239, 68, 68, 0.1);
+}
+
+.glass-reflection {
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.03), transparent);
+    transform: rotate(45deg);
+    pointer-events: none;
+    transition: all 0.6s ease;
+}
+
+.premium-index-card:hover .glass-reflection {
+    top: -20%;
+    left: -20%;
+}
+
+.card-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+}
+
+.index-ticker {
+    font-size: 0.75rem;
+    font-weight: 800;
+    color: var(--text-muted);
+    letter-spacing: 1px;
+}
+
+.index-badge {
+    padding: 2px 6px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 4px;
+    font-size: 0.6rem;
+    font-weight: 600;
+}
+
+.card-middle {
+    margin-bottom: 12px;
+}
+
+.index-value-container {
+    display: flex;
+    flex-direction: column;
+}
+
+.current-value {
+    font-size: 1.8rem;
+    font-weight: 800;
+    color: var(--text-primary);
+    line-height: 1;
+}
+
+.change-info {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 8px;
+    font-size: 0.9rem;
+    font-weight: 700;
+}
+
+.bullish .change-info {
+    color: var(--accent-green);
+}
+
+.bearish .change-info {
+    color: var(--accent-red);
+}
+
+.card-bottom {
+    margin-top: 10px;
+}
+
+.index-visual {
+    height: 40px;
+    width: 100%;
+    filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.1));
+}
+
+@media (max-width: 992px) {
+    .indices-grid-modern {
+        grid-template-columns: 1fr;
+    }
+}

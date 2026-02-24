@@ -164,34 +164,76 @@ function renderFullExchangeView() {
                     <div class="exchange-view-panel active" id="view-overview">
                         <div class="exchange-dashboard-grid">
                             <div class="dashboard-top-row">
-                                ${renderRecentInvestments()}
-                                ${renderCountryEconomies()}
+                                <div class="consolidated-trade-tabs widget-card">
+                                    <div class="tabs-navigation">
+                                        <button class="trade-sub-tab active" data-sub-tab="investments">
+                                            <i class="fa-solid fa-clock-rotate-left"></i> Son Yatırımlar
+                                        </button>
+                                        <button class="trade-sub-tab" data-sub-tab="agreements">
+                                            <i class="fa-solid fa-handshake"></i> Ticari Antlaşmalar
+                                        </button>
+                                        <button class="trade-sub-tab" data-sub-tab="economies">
+                                            <i class="fa-solid fa-globe"></i> Ülke Ekonomileri
+                                        </button>
+                                    </div>
+                                    <div class="tabs-content">
+                                        <div class="tab-pane active" id="pane-investments">
+                                            ${renderRecentInvestments()}
+                                        </div>
+                                        <div class="tab-pane" id="pane-agreements">
+                                            ${renderTradeAgreements()}
+                                        </div>
+                                        <div class="tab-pane" id="pane-economies">
+                                            ${renderCountryEconomies()}
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="dashboard-middle-row">
-                                ${renderTradeAgreements()}
-                            </div>
+
                             <div class="dashboard-indices-row">
-                                <div class="indices-container-full">
-                                    <h3>Piyasa Endeksleri</h3>
-                                    <div class="indices-grid-mega">
+                                <div class="indices-container-premium">
+                                    <div class="indices-header">
+                                        <div class="title-with-desc">
+                                            <h3>Piyasa Endeksleri</h3>
+                                            <p>Küresel piyasaların anlık performans verileri</p>
+                                        </div>
+                                        <div class="market-badge">
+                                            <span class="dot pulse"></span>
+                                            CANLI PİYASA
+                                        </div>
+                                    </div>
+                                    <div class="indices-grid-modern">
                                         ${STOCK_DATA.indices.map(index => `
-                                            <div class="index-card-detailed ${index.change >= 0 ? 'positive' : 'negative'}">
-                                                <div class="index-card-header">
-                                                    <span class="index-name">${index.name}</span>
-                                                    <span class="index-tag">Endeks</span>
-                                                </div>
-                                                <div class="index-card-body">
-                                                    <div class="index-value">${index.value.toLocaleString()}</div>
-                                                    <div class="index-change">
-                                                        <i class="fa-solid fa-${index.change >= 0 ? 'caret-up' : 'caret-down'}"></i>
-                                                        ${index.change >= 0 ? '+' : ''}${index.change}%
+                                            <div class="premium-index-card ${index.change >= 0 ? 'bullish' : 'bearish'}">
+                                                <div class="glass-reflection"></div>
+                                                <div class="card-content">
+                                                    <div class="card-top">
+                                                        <span class="index-ticker">${index.name}</span>
+                                                        <span class="index-badge">GLOBAL</span>
                                                     </div>
-                                                </div>
-                                                <div class="index-mini-chart">
-                                                    <svg viewBox="0 0 100 30">
-                                                        <path d="M0,25 Q15,${20 - index.change * 2} 30,${22 + index.change} T60,${20 - index.change} T100,20" 
-                                                              fill="none" stroke="${index.change >= 0 ? '#4ade80' : '#f87171'}" stroke-width="2" />
-                                                    </svg>
+                                                    <div class="card-middle">
+                                                        <div class="index-value-container">
+                                                            <span class="current-value">${index.value.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                                                            <div class="change-info">
+                                                                <i class="fa-solid fa-arrow-${index.change >= 0 ? 'up-right' : 'down-left'}"></i>
+                                                                <span>${index.change >= 0 ? '+' : ''}${index.change}%</span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="card-bottom">
+                                                        <div class="index-visual">
+                                                            <svg width="100%" height="40" viewBox="0 0 100 40" preserveAspectRatio="none">
+                                                                <path d="M0,35 Q15,${30 - index.change * 5} 30,${35 + index.change * 3} T60,${30 - index.change * 2} T100,25" 
+                                                                      fill="none" stroke="url(#indexGrad_${index.name.replace(/\s+/g, '')})" stroke-width="2.5" stroke-linecap="round"/>
+                                                                <defs>
+                                                                    <linearGradient id="indexGrad_${index.name.replace(/\s+/g, '')}" x1="0%" y1="0%" x2="100%" y2="0%">
+                                                                        <stop offset="0%" stop-color="${index.change >= 0 ? '#4ade80' : '#f87171'}" stop-opacity="0.3"/>
+                                                                        <stop offset="100%" stop-color="${index.change >= 0 ? '#4ade80' : '#f87171'}" stop-opacity="1"/>
+                                                                    </linearGradient>
+                                                                </defs>
+                                                            </svg>
+                                                        </div>
+                                                    </div>
                                                 </div>
                                             </div>
                                         `).join('')}
@@ -329,6 +371,31 @@ export function setupExchangeViewNav() {
     // Initialize specific view event handlers
     setupWorldStockFilters();
     setupFundEvents(); // Initial load
+    setupSubTabs(); // Handle sub-tabs in overview
+}
+
+// === CONSOLIDATED SUB-TABS HANDLER ===
+function setupSubTabs() {
+    const navButtons = document.querySelectorAll('.trade-sub-tab');
+    const panes = document.querySelectorAll('.tab-pane');
+
+    navButtons.forEach(btn => {
+        btn.addEventListener('click', () => {
+            const targetId = btn.dataset.subTab;
+
+            // Remove active from all btns
+            navButtons.forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+
+            // Show active pane
+            panes.forEach(pane => {
+                pane.classList.remove('active');
+                if (pane.id === `pane-${targetId}`) {
+                    pane.classList.add('active');
+                }
+            });
+        });
+    });
 }
 
 // === FUND EVENTS HANDLER ===
