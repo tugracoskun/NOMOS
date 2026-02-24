@@ -2233,10 +2233,15 @@ function handleCompanyClick(e) {
     const action = e.target.closest('[data-action]')?.dataset.action;
     const companyId = e.target.closest('[data-company-id]')?.dataset.companyId;
 
-    // Handle company switching from mini dots or list
-    if (companyId && !action) {
+    // Handle company switching (from dropdown or mini dots)
+    const switchingElement = e.target.closest('.switcher-item') || e.target.closest('.mini-comp-dot');
+    if (companyId && (switchingElement || !action)) {
         import('../data/company-data.js').then(module => {
             module.setActiveCompany(companyId);
+            // Close dropdown if it's open
+            const dropdown = document.getElementById('company-switcher');
+            if (dropdown) dropdown.classList.remove('show');
+
             // Re-render the section
             const updatedCompany = module.loadPlayerCompany();
             const root = document.querySelector('.dashboard-content');
