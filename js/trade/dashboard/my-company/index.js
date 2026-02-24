@@ -368,8 +368,8 @@ function renderFullCompanyView(company, profession, metrics) {
                             </div>
                         </div>
 
-                        <!-- Stat 4: Reputation -->
-                        ${renderReputationCard(company)}
+                        <!-- Stat 4: Prestige & Rank -->
+                        ${renderPrestigeCard(company)}
                     </div>
                 </div>
 
@@ -422,6 +422,9 @@ function renderFullCompanyView(company, profession, metrics) {
     `;
 }
 
+
+
+
 // === COMPANY HEADER ===
 function renderCompanyHeader(company, profession) {
     return `
@@ -431,7 +434,28 @@ function renderCompanyHeader(company, profession) {
                     <i class="${profession.icon}" style="color: ${profession.color}"></i>
                 </div>
                 <div class="company-details">
-                    <h1 class="company-name">${company.name}</h1>
+                    <div class="company-name-wrapper" data-action="toggle-company-switcher">
+                        <h1 class="company-name">${company.name} <i class="fa-solid fa-chevron-down"></i></h1>
+                        <div class="company-switcher-dropdown" id="company-switcher">
+                            ${getAllCompanies().map(c => `
+                                <div class="switcher-item ${c.id === company.id ? 'active' : ''}" data-company-id="${c.id}">
+                                    <div class="item-icon"><i class="${getProfessionInfo(c.profession).icon}"></i></div>
+                                    <div class="item-info">
+                                        <span class="name">${c.name}</span>
+                                        <span class="desc">${getProfessionInfo(c.profession).name} • Seviye ${c.level}</span>
+                                    </div>
+                                    ${c.id === company.id ? '<i class="fa-solid fa-check"></i>' : ''}
+                                </div>
+                            `).join('')}
+                            <div class="switcher-divider"></div>
+                            <div class="switcher-item add-new" data-action="create-company">
+                                <div class="item-icon"><i class="fa-solid fa-plus"></i></div>
+                                <div class="item-info">
+                                    <span class="name">Yeni Şirket Kur</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                     <div class="company-meta">
                         <span class="company-type"><i class="${profession.icon}"></i> ${profession.name}</span>
                         <span class="company-level">Seviye ${company.level}</span>
@@ -554,44 +578,53 @@ function renderOperationalStats(company, metrics) {
         `;
 }
 
-// === REPUTATION CARD ===
-function renderReputationCard(company) {
-    const reputationLevel = company.reputation >= 80 ? 'Mükemmel' :
-        company.reputation >= 60 ? 'İyi' :
-            company.reputation >= 40 ? 'Orta' : 'Gelişmeli';
-    const satisfactionLevel = company.customerSatisfaction >= 80 ? 'Çok Memnun' :
-        company.customerSatisfaction >= 60 ? 'Memnun' :
-            company.customerSatisfaction >= 40 ? 'Nötr' : 'Memnun Değil';
+// === PRESTIGE & RANKING CARD ===
+function renderPrestigeCard(company) {
+    const prestigeMax = 1000;
+    const prestigePercent = (company.prestige || 0) / prestigeMax * 100;
+
+    const prestigeLevel = company.prestige >= 800 ? 'Küresel Güç' :
+        company.prestige >= 500 ? 'Bölgesel Lider' :
+            company.prestige >= 200 ? 'Yükselen Yıldız' : 'Yerel Oyuncu';
 
     return `
-        <div class="stats-card reputation">
+        <div class="stats-card prestige">
             <div class="card-header">
-                <h3><i class="fa-solid fa-star"></i> İtibar & Memnuniyet</h3>
+                <h3><i class="fa-solid fa-crown text-gold"></i> Prestij & Konum</h3>
             </div>
             <div class="card-content">
-                <div class="reputation-gauge">
-                    <svg viewBox="0 0 100 50" class="gauge-svg">
-                        <path class="gauge-bg" d="M 10 45 A 35 35 0 1 1 90 45" fill="none" stroke="#1e293b" stroke-width="8"/>
-                        <path class="gauge-fill" d="M 10 45 A 35 35 0 1 1 90 45" fill="none" stroke="url(#reputationGradient)" stroke-width="8" 
-                              stroke-dasharray="${company.reputation * 1.1} 110"/>
-                        <defs>
-                            <linearGradient id="reputationGradient">
-                                <stop offset="0%" stop-color="#ef4444"/>
-                                <stop offset="50%" stop-color="#fbbf24"/>
-                                <stop offset="100%" stop-color="#22c55e"/>
-                            </linearGradient>
-                        </defs>
-                    </svg>
-                    <div class="gauge-value">${company.reputation}</div>
-                    <div class="gauge-label">${reputationLevel}</div>
-                </div>
-                <div class="satisfaction-bar">
-                    <div class="bar-header">
-                        <span>Müşteri Memnuniyeti</span>
-                        <span class="bar-value">${company.customerSatisfaction}% - ${satisfactionLevel}</span>
+                <div class="prestige-display">
+                    <div class="prestige-val-box">
+                        <span class="p-value">${company.prestige || 0}</span>
+                        <span class="p-max">/ ${prestigeMax}</span>
                     </div>
-                    <div class="bar-track">
-                        <div class="bar-fill satisfaction" style="width: ${company.customerSatisfaction}%"></div>
+                    <div class="prestige-bar-container">
+                        <div class="prestige-bar-fill" style="width: ${prestigePercent}%"></div>
+                    </div>
+                    <div class="prestige-label">${prestigeLevel}</div>
+                </div>
+
+                <div class="ranking-grid">
+                    <div class="rank-item">
+                        <div class="rank-icon"><i class="fa-solid fa-earth-americas"></i></div>
+                        <div class="rank-info">
+                            <span class="rank-label">DÜNYA SIRALAMASI</span>
+                            <span class="rank-value">#${(company.worldRank || 15420).toLocaleString()}</span>
+                        </div>
+                    </div>
+                    <div class="rank-item">
+                        <div class="rank-icon national"><i class="fa-solid fa-flag"></i></div>
+                        <div class="rank-info">
+                            <span class="rank-label">ÜLKE SIRALAMASI</span>
+                            <span class="rank-value">#${(company.nationalRank || 840).toLocaleString()}</span>
+                        </div>
+                    </div>
+                    <div class="rank-item">
+                        <div class="rank-icon sector"><i class="fa-solid fa-tag"></i></div>
+                        <div class="rank-info">
+                            <span class="rank-label">SEKTÖR SIRALAMASI</span>
+                            <span class="rank-value">#${(company.sectorRank || 120).toLocaleString()}</span>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -2255,6 +2288,10 @@ function handleCompanyClick(e) {
             showModal(renderEmployeeModal(loadPlayerCompany()));
             setupEmployeeModalHandlers();
             setupModalCloseHandlers();
+            break;
+        case 'toggle-company-switcher':
+            const dropdown = document.getElementById('company-switcher');
+            if (dropdown) dropdown.classList.toggle('show');
             break;
         case 'company-settings':
             showModal(renderCompanySettingsModal(loadPlayerCompany()));

@@ -239,6 +239,10 @@ function createDefaultCompany(professionType = 'CLOTHING') {
         maxEmployees: 10,
         reputation: 50, // 0-100
         customerSatisfaction: 75,
+        prestige: 10, // Yeni: 0-1000
+        worldRank: 15420, // Yeni: Global sıralama
+        nationalRank: 840, // Yeni: Ülke sıralaması
+        sectorRank: 120, // Yeni: Sektör sıralaması
 
         // Yönetim Ekibi (Staff)
         staff: [], // [{id: 'cfo', hiredAt: Date, salary: 500}]

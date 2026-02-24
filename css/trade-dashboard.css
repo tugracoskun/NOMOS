@@ -2081,6 +2081,229 @@
     border-color: rgba(255, 255, 255, 0.2);
 }
 
+/* === PRESTIGE & RANK CARD === */
+.prestige-display {
+    text-align: center;
+    padding: 10px 0;
+    margin-bottom: 20px;
+}
+
+.prestige-val-box {
+    margin-bottom: 8px;
+}
+
+.prestige-val-box .p-value {
+    font-size: 2rem;
+    font-weight: 800;
+    color: #fbbf24;
+    /* gold */
+}
+
+.prestige-val-box .p-max {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+}
+
+.prestige-bar-container {
+    height: 8px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: 12px;
+}
+
+.prestige-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #f59e0b, #fbbf24);
+    border-radius: 4px;
+}
+
+.prestige-label {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.ranking-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+
+.rank-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: rgba(0, 0, 0, 0.2);
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.rank-icon {
+    width: 32px;
+    height: 32px;
+    background: rgba(59, 130, 246, 0.1);
+    color: #3b82f6;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.9rem;
+}
+
+.rank-icon.national {
+    background: rgba(239, 68, 68, 0.1);
+    color: #ef4444;
+}
+
+.rank-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.rank-label {
+    font-size: 0.55rem;
+    color: var(--text-muted);
+}
+
+.rank-value {
+    font-size: 0.85rem;
+    font-weight: 700;
+}
+
+/* === COMPANY SWITCHER & HEADER === */
+.company-name-wrapper {
+    position: relative;
+    cursor: pointer;
+    display: inline-block;
+}
+
+.company-name-wrapper:hover .company-name {
+    color: var(--accent-blue);
+}
+
+.company-name i {
+    font-size: 0.9rem;
+    margin-left: 8px;
+    opacity: 0.6;
+    transition: transform 0.2s;
+}
+
+.company-name-wrapper .company-name {
+    display: flex;
+    align-items: center;
+    transition: color 0.2s;
+}
+
+.company-switcher-dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 280px;
+    background: rgba(15, 23, 42, 0.95);
+    backdrop-filter: blur(15px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    padding: 8px;
+    margin-top: 10px;
+    z-index: 1000;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    display: none;
+    animation: dropdownFade 0.2s ease-out;
+}
+
+.company-switcher-dropdown.show {
+    display: block;
+}
+
+@keyframes dropdownFade {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.switcher-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 12px;
+    border-radius: 8px;
+    transition: all 0.2s;
+    position: relative;
+}
+
+.switcher-item:hover {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.switcher-item.active {
+    background: rgba(59, 130, 246, 0.1);
+}
+
+.switcher-item .item-icon {
+    width: 36px;
+    height: 36px;
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    color: var(--text-secondary);
+}
+
+.switcher-item.active .item-icon {
+    color: var(--accent-blue);
+    border: 1px solid rgba(59, 130, 246, 0.3);
+}
+
+.switcher-item .item-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.switcher-item .item-info .name {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.switcher-item .item-info .desc {
+    font-size: 0.65rem;
+    color: var(--text-muted);
+}
+
+.switcher-item .fa-check {
+    color: var(--accent-blue);
+    font-size: 0.8rem;
+}
+
+.switcher-divider {
+    height: 1px;
+    background: rgba(255, 255, 255, 0.06);
+    margin: 8px 12px;
+}
+
+.switcher-item.add-new .item-icon {
+    color: var(--accent-green);
+    border: 1px dashed rgba(34, 197, 94, 0.4);
+}
+
+.rank-icon.sector {
+    background: rgba(165, 180, 252, 0.1);
+    color: #a5b4fc;
+}
+
 .financial-summary-bar {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
