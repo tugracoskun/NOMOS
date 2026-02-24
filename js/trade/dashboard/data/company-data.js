@@ -258,14 +258,31 @@ function createDefaultCompany(professionType = 'CLOTHING') {
         staff: [], // [{id: 'cfo', hiredAt: Date, salary: 500}]
 
         // Ürünler
-        products: profession.defaultProducts.map((name, i) => ({
-            id: `prod_${i}`,
-            name: name,
-            stock: Math.floor(Math.random() * 100) + 10,
-            price: Math.floor(Math.random() * 500) + 100,
-            demand: Math.floor(Math.random() * 100),
-            quality: Math.floor(Math.random() * 50) + 50
-        })),
+        products: profession.defaultProducts.map((name, i) => {
+            const product = {
+                id: `prod_${i}`,
+                name: name,
+                stock: Math.floor(Math.random() * 100) + 10,
+                price: Math.floor(Math.random() * 500) + 100,
+                demand: Math.floor(Math.random() * 100),
+                quality: Math.floor(Math.random() * 50) + 50
+            };
+
+            // Finans sektörü için özel varlık dağılımı
+            if (profession.category === 'finance') {
+                product.assetDistribution = {
+                    'Hisse Senedi': Math.floor(Math.random() * 40) + 20,
+                    'Tahvil': Math.floor(Math.random() * 30) + 10,
+                    'Emtia': Math.floor(Math.random() * 20) + 5,
+                    'Kripto': Math.floor(Math.random() * 15),
+                    'Nakit': Math.floor(Math.random() * 25) + 5
+                };
+                product.riskScore = Math.floor(Math.random() * 9) + 1;
+                product.volatility = product.riskScore > 7 ? 'Yüksek' : product.riskScore > 4 ? 'Orta' : 'Düşük';
+            }
+
+            return product;
+        }),
 
         // Siparişler
         orders: [],

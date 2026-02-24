@@ -2497,6 +2497,308 @@
     color: var(--text-muted);
 }
 
+/* === FUND VISUALIZATION === */
+.fund-visualization-box {
+    background: rgba(0, 0, 0, 0.15);
+    border-radius: 12px;
+    padding: 15px;
+    margin: 15px 0;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.fund-radar-container {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.fund-radar-container svg {
+    filter: drop-shadow(0 0 10px rgba(59, 130, 246, 0.2));
+}
+
+.fund-summary-list {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.fund-summary-item {
+    display: flex;
+    align-items: center;
+    font-size: 0.7rem;
+    gap: 8px;
+}
+
+.fund-summary-item .dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--accent-blue);
+}
+
+.fund-summary-item .label {
+    color: var(--text-muted);
+    flex: 1;
+}
+
+.fund-summary-item .val {
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+/* Risk Badges */
+.product-name-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+.risk-badge {
+    font-size: 0.6rem;
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-weight: 700;
+    text-transform: uppercase;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.risk-low {
+    background: rgba(34, 197, 94, 0.1);
+    color: #4ade80;
+    border: 1px solid rgba(34, 197, 94, 0.2);
+}
+
+.risk-mid {
+    background: rgba(251, 191, 36, 0.1);
+    color: #fbbf24;
+    border: 1px solid rgba(251, 191, 36, 0.2);
+}
+
+.risk-high {
+    background: rgba(239, 68, 68, 0.1);
+    color: #f87171;
+    border: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+.volatility-text {
+    font-size: 0.65rem;
+    color: var(--text-muted);
+    margin-left: 10px;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+/* === DETAIL MODAL STYLES === */
+.detail-modal {
+    max-width: 800px;
+    width: 90%;
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 20px;
+    overflow: hidden;
+    backdrop-filter: blur(20px);
+}
+
+.header-main-info {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.sector-icon-box {
+    width: 50px;
+    height: 50px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+}
+
+.header-texts h2 {
+    margin: 0;
+    font-size: 1.4rem;
+    font-weight: 800;
+}
+
+.sector-badge {
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.detail-content-grid {
+    display: grid;
+    grid-template-columns: 1.2fr 1fr;
+    gap: 30px;
+    padding: 10px;
+}
+
+.large-radar-container {
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 15px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.visual-title {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    margin-bottom: 20px;
+    font-weight: 600;
+}
+
+.product-preview-big {
+    height: 300px;
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 15px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    color: var(--text-muted);
+}
+
+.product-preview-big i {
+    font-size: 5rem;
+    opacity: 0.2;
+}
+
+.detail-stats-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.detail-stat-row {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.detail-stat-row .lbl {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.detail-stat-row .val {
+    font-size: 1.2rem;
+    font-weight: 700;
+}
+
+.val-bar-group {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.mini-bar-bg {
+    flex: 1;
+    height: 6px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 3px;
+    overflow: hidden;
+}
+
+.mini-bar-fill {
+    height: 100%;
+    background: var(--accent-blue);
+    border-radius: 3px;
+    transition: width 1s ease-out;
+}
+
+.finance-risk-card {
+    background: rgba(0, 0, 0, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 15px;
+    padding: 20px;
+    margin-top: 10px;
+}
+
+.risk-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.risk-title {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+}
+
+.risk-score-val {
+    font-size: 1.2rem;
+    font-weight: 800;
+}
+
+.volatility-info {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+}
+
+.volatility-info strong {
+    color: var(--text-primary);
+}
+
+.volatility-info strong {
+    color: var(--text-primary);
+}
+
+/* === BORSA FUND MODAL EXTRA STYLES === */
+.fund-ticker-box {
+    width: 50px;
+    height: 50px;
+    background: var(--accent-blue);
+    color: white;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    font-size: 1.1rem;
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+.fund-radar-container-big {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+}
+
+.fund-summary-list-big {
+    width: 100%;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.risk-score-val.risk-low {
+    color: #4ade80;
+}
+
+.risk-score-val.risk-medium {
+    color: #fbbf24;
+}
+
+.risk-score-val.risk-high {
+    color: #f87171;
+}
+
 .stat-row .stat-value {
     font-size: 0.9rem;
     font-weight: 600;

@@ -632,6 +632,62 @@ function renderPrestigeCard(company) {
         `;
 }
 
+// === RENDER FUND RADAR CHART (SVG) ===
+function renderFundRadar(distribution) {
+    if (!distribution) return '';
+
+    const size = 120;
+    const center = size / 2;
+    const radius = size * 0.4;
+    const keys = Object.keys(distribution);
+    const count = keys.length;
+
+    // Create polygon points
+    const points = keys.map((key, i) => {
+        const val = distribution[key]; // 0-100 base
+        const angle = (i * 2 * Math.PI) / count - Math.PI / 2;
+        const x = center + (radius * val / 100) * Math.cos(angle);
+        const y = center + (radius * val / 100) * Math.sin(angle);
+        return `${x},${y}`;
+    }).join(' ');
+
+    // Create background circles/web
+    const webPaths = [0.2, 0.4, 0.6, 0.8, 1].map(r => {
+        let p = "";
+        for (let i = 0; i <= count; i++) {
+            const angle = (i * 2 * Math.PI) / count - Math.PI / 2;
+            const x = center + (radius * r) * Math.cos(angle);
+            const y = center + (radius * r) * Math.sin(angle);
+            p += (i === 0 ? "M" : "L") + x + "," + y;
+        }
+        return `<path d="${p}" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="1"/>`;
+    }).join('');
+
+    return `
+        <div class="fund-radar-container">
+            <svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">
+                ${webPaths}
+                <polygon points="${points}" fill="rgba(59, 130, 246, 0.2)" stroke="var(--accent-blue)" stroke-width="2"/>
+                ${keys.map((key, i) => {
+        const angle = (i * 2 * Math.PI) / count - Math.PI / 2;
+        const x = center + (radius + 15) * Math.cos(angle);
+        const y = center + (radius + 15) * Math.sin(angle);
+        return `<text x="${x}" y="${y}" font-size="8" fill="var(--text-muted)" text-anchor="middle" dominant-baseline="middle">${key.substring(0, 3)}</text>`;
+    }).join('')}
+            </svg>
+            <div class="fund-summary-list">
+                ${keys.map(key => `
+                    <div class="fund-summary-item">
+                        <span class="dot"></span>
+                        <span class="label">${key}</span>
+                        <span class="val">%${distribution[key]}</span>
+                    </div>
+                `).join('')}
+            </div>
+        </div>
+    `;
+}
+
 // === GET SECTOR CONFIGURATION ===
 function getSectorConfig(category, professionId) {
     const configs = {
@@ -734,17 +790,29 @@ function renderProductCard(product, profession, config) {
     const demandColor = product.demand >= 70 ? '#22c55e' : product.demand >= 40 ? '#fbbf24' : '#ef4444';
 
     return `
-        <div class="product-card" data-product-id="${product.id}">
+        <div class="product-card" data-action="view-product-details" data-product-id="${product.id}">
             <div class="product-header">
                 <div class="product-icon" style="background: ${profession.color}20; color: ${profession.color}">
                     <i class="${profession.icon}"></i>
                 </div>
                 <div class="product-info">
-                    <h4 class="product-name">${product.name}</h4>
+                    <div class="product-name-row">
+                        <h4 class="product-name">${product.name}</h4>
+                        ${profession.category === 'finance' ? `
+                            <span class="risk-badge risk-${product.riskScore > 7 ? 'high' : product.riskScore > 4 ? 'mid' : 'low'}">
+                                <i class="fa-solid fa-shield-virus"></i> Risk: ${product.riskScore}/10
+                            </span>
+                        ` : ''}
+                    </div>
                     <div class="product-meta">
                         <span class="quality-badge" title="Kalite/Etki">
                             <i class="fa-solid fa-medal"></i> ${product.quality}%
                         </span>
+                        ${profession.category === 'finance' ? `
+                             <span class="volatility-text">
+                                <i class="fa-solid fa-wave-square"></i> ${product.volatility} Oynaklık
+                            </span>
+                        ` : ''}
                     </div>
                 </div>
                 <div class="product-menu">
@@ -763,6 +831,13 @@ function renderProductCard(product, profession, config) {
                     <span class="value text-gold">${product.price} ₳</span>
                 </div>
             </div>
+
+            ${profession.category === 'finance' && product.assetDistribution ? `
+                <div class="fund-visualization-box">
+                    ${renderFundRadar(product.assetDistribution)}
+                </div>
+            ` : ''}
+
             <div class="product-demand">
                 <div class="demand-header">
                     <span class="demand-label" style="color: ${demandColor}">${sectorConfig.demandLabel}</span>
@@ -2381,6 +2456,44 @@ function handleCompanyClick(e) {
         case 'close-modal':
             tryCloseModal();
             break;
+        case 'view-product-details': {
+            const productId = e.target.closest('[data-product-id]')?.dataset.productId;
+            if (productId) {
+                const comp = loadPlayerCompany();
+                const product = comp.products.find(p => p.id === productId);
+                const prof = getProfessionInfo(comp.profession);
+                if (product) {
+                    showModal(renderProductDetailsModal(product, prof));
+                    setupModalCloseHandlers();
+                }
+            }
+            break;
+        }
+        case 'sell-product': {
+            const pIdToSell = e.target.closest('[data-product]')?.dataset.product;
+            if (pIdToSell) {
+                showConfirmDialog(
+                    'İşlem Onayı',
+                    'Bu kalemi nakde çevirmek veya işleme koymak istediğinize emin misiniz?',
+                    () => {
+                        const company = loadPlayerCompany();
+                        const prodIndex = company.products.findIndex(p => p.id === pIdToSell);
+                        if (prodIndex !== -1) {
+                            const prod = company.products[prodIndex];
+                            // Basit kazanç mantığı
+                            const gain = prod.price * (prod.stock > 0 ? 1 : 0.5);
+                            company.cash += gain;
+
+                            import('../data/company-data.js').then(module => {
+                                module.savePlayerCompany(company);
+                                window.location.reload();
+                            });
+                        }
+                    }
+                );
+            }
+            break;
+        }
         case 'save-company-edit':
             saveCompanyEdit();
             break;
@@ -2388,6 +2501,84 @@ function handleCompanyClick(e) {
             confirmAddProduct();
             break;
     }
+}
+
+// === RENDER PRODUCT DETAILS MODAL ===
+function renderProductDetailsModal(product, profession) {
+    const config = getSectorConfig(profession.category, profession.id);
+    const isFinance = profession.category === 'finance';
+
+    return `
+        <div class="modal-overlay" id="product-details-modal">
+            <div class="modal-container detail-modal">
+                <div class="modal-header">
+                    <div class="header-main-info">
+                        <div class="sector-icon-box" style="background: ${profession.color}20; color: ${profession.color}">
+                            <i class="${profession.icon}"></i>
+                        </div>
+                        <div class="header-texts">
+                            <h2>${product.name}</h2>
+                            <span class="sector-badge">${profession.name}</span>
+                        </div>
+                    </div>
+                    <button class="modal-close" data-action="close-modal">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="detail-content-grid">
+                        <div class="detail-visual">
+                            ${isFinance ? `
+                                <div class="large-radar-container">
+                                    <h4 class="visual-title">Varlık Dağılım Analizi</h4>
+                                    ${renderFundRadar(product.assetDistribution)}
+                                </div>
+                            ` : `
+                                <div class="product-preview-big">
+                                    <i class="${profession.icon}"></i>
+                                    <span class="placeholder-text">${product.name} Görseli</span>
+                                </div>
+                            `}
+                        </div>
+                        <div class="detail-stats-panel">
+                            <div class="detail-stat-row">
+                                <span class="lbl"><i class="fa-solid fa-layer-group"></i> Mevcut ${config.unit}:</span>
+                                <span class="val">${product.stock.toLocaleString()} ${config.unitSuffix}</span>
+                            </div>
+                            <div class="detail-stat-row">
+                                <span class="lbl"><i class="fa-solid fa-coins"></i> Birim Değer:</span>
+                                <span class="val text-gold">${product.price.toLocaleString()} ₳</span>
+                            </div>
+                            <div class="detail-stat-row">
+                                <span class="lbl"><i class="fa-solid fa-star"></i> Kalite/Güven:</span>
+                                <div class="val-bar-group">
+                                    <div class="mini-bar-bg"><div class="mini-bar-fill" style="width: ${product.quality}%"></div></div>
+                                    <span class="bar-val">%${product.quality}</span>
+                                </div>
+                            </div>
+                            ${isFinance ? `
+                                <div class="finance-risk-card">
+                                    <div class="risk-info">
+                                        <span class="risk-title">Risk Profili</span>
+                                        <span class="risk-score-val risk-${product.riskScore > 7 ? 'high' : product.riskScore > 4 ? 'mid' : 'low'}">${product.riskScore}/10</span>
+                                    </div>
+                                    <div class="volatility-info">
+                                        <i class="fa-solid fa-wave-square"></i> Oynaklık: <strong>${product.volatility}</strong>
+                                    </div>
+                                </div>
+                            ` : ''}
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn-modal secondary" data-action="close-modal">Kapat</button>
+                    <button class="btn-modal primary" data-action="sell-product" data-product="${product.id}">
+                        <i class="fa-solid ${config.actionPrimaryIcon}"></i> ${config.actionPrimary}
+                    </button>
+                </div>
+            </div>
+        </div>
+    `;
 }
 
 // Track if form has been modified

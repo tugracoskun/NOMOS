@@ -18,10 +18,22 @@ const STOCK_DATA = {
         { id: 'agro_harvest', name: 'Agro Hasat', ticker: 'AGH', sector: 'agriculture', price: 650, change: -2.5, volume: 65000, marketCap: 6500000 }
     ],
     funds: [
-        { id: 'growth_fund', name: 'Büyüme Fonu', ticker: 'BYF', type: 'growth', price: 150, change: 2.8, aum: 5000000, risk: 'medium' },
-        { id: 'stable_fund', name: 'Sabit Getiri', ticker: 'SGF', type: 'stable', price: 105, change: 0.5, aum: 8000000, risk: 'low' },
-        { id: 'tech_fund', name: 'Teknoloji Fonu', ticker: 'TKF', type: 'sector', price: 280, change: 6.2, aum: 3000000, risk: 'high' },
-        { id: 'diversified_fund', name: 'Çeşitlendirilmiş', ticker: 'DVF', type: 'diversified', price: 125, change: 1.8, aum: 12000000, risk: 'low' }
+        {
+            id: 'growth_fund', name: 'Büyüme Fonu', ticker: 'BYF', type: 'growth', price: 150, change: 2.8, aum: 5000000, risk: 'medium',
+            distribution: { 'Hisse Senedi': 65, 'Tahvil': 15, 'Emtia': 10, 'Kripto': 5, 'Nakit': 5 }
+        },
+        {
+            id: 'stable_fund', name: 'Sabit Getiri', ticker: 'SGF', type: 'stable', price: 105, change: 0.5, aum: 8000000, risk: 'low',
+            distribution: { 'Hisse Senedi': 10, 'Tahvil': 70, 'Emtia': 5, 'Kripto': 0, 'Nakit': 15 }
+        },
+        {
+            id: 'tech_fund', name: 'Teknoloji Fonu', ticker: 'TKF', type: 'sector', price: 280, change: 6.2, aum: 3000000, risk: 'high',
+            distribution: { 'Hisse Senedi': 85, 'Tahvil': 5, 'Emtia': 0, 'Kripto': 5, 'Nakit': 5 }
+        },
+        {
+            id: 'diversified_fund', name: 'Çeşitlendirilmiş', ticker: 'DVF', type: 'diversified', price: 125, change: 1.8, aum: 12000000, risk: 'low',
+            distribution: { 'Hisse Senedi': 35, 'Tahvil': 35, 'Emtia': 20, 'Kripto': 2, 'Nakit': 8 }
+        }
     ],
     indices: [
         { name: 'NOMOS 100', value: 12458.32, change: 1.24 },
@@ -306,11 +318,210 @@ export function setupExchangeViewNav() {
             if (viewId === 'chart') {
                 setTimeout(() => initInteractiveChart(), 50);
             }
+
+            // Setup fund events if switching to funds view
+            if (viewId === 'funds') {
+                setTimeout(() => setupFundEvents(), 50);
+            }
         });
     });
 
     // Initialize specific view event handlers
     setupWorldStockFilters();
+    setupFundEvents(); // Initial load
+}
+
+// === FUND EVENTS HANDLER ===
+function setupFundEvents() {
+    const exchangeView = document.querySelector('.exchange-full-view');
+    if (!exchangeView) return;
+
+    exchangeView.addEventListener('click', (e) => {
+        const card = e.target.closest('.fund-card');
+        if (card) {
+            const actionBtn = e.target.closest('[data-action]');
+            const fundId = card.dataset.fundId;
+            const fund = STOCK_DATA.funds.find(f => f.id === fundId);
+
+            if (fund) {
+                if (actionBtn) {
+                    const action = actionBtn.dataset.action;
+                    if (action === 'invest-fund') {
+                        e.stopPropagation();
+                        alert(`${fund.name} fonuna yatırım ekranı (Yakında)`);
+                    } else if (action === 'fund-details') {
+                        e.stopPropagation();
+                        showFundDetailsModal(fund);
+                    }
+                } else {
+                    showFundDetailsModal(fund);
+                }
+            }
+        }
+
+        const filterTab = e.target.closest('.filter-tab:not(.search-input)');
+        if (filterTab) {
+            const filter = filterTab.dataset.filter;
+            const allTabs = exchangeView.querySelectorAll('.filter-tab');
+            allTabs.forEach(t => t.classList.remove('active'));
+            filterTab.classList.add('active');
+            applyFundFilter(filter);
+        }
+    });
+}
+
+function handleFundClick(e) {
+    const card = e.target.closest('.fund-card');
+    const actionBtn = e.target.closest('[data-action]');
+
+    if (!card) return;
+
+    const fundId = card.dataset.fundId;
+    const fund = STOCK_DATA.funds.find(f => f.id === fundId);
+
+    if (!fund) return;
+
+    if (actionBtn) {
+        const action = actionBtn.dataset.action;
+        if (action === 'invest-fund') {
+            alert(`${fund.name} fonuna yatırım ekranı (Yakında)`);
+        } else if (action === 'fund-details') {
+            showFundDetailsModal(fund);
+        }
+    } else {
+        // Kartın geneline tıklandığında detayları aç
+        showFundDetailsModal(fund);
+    }
+}
+
+function applyFundFilter(filter) {
+    const cards = document.querySelectorAll('.fund-card');
+    cards.forEach(card => {
+        const fundId = card.dataset.fundId;
+        const fund = STOCK_DATA.funds.find(f => f.id === fundId);
+        if (filter === 'all' || fund.risk === filter) {
+            card.style.display = 'flex';
+        } else {
+            card.style.display = 'none';
+        }
+    });
+}
+
+function showFundDetailsModal(fund) {
+    const modalHTML = `
+        <div class="modal-overlay active" id="fund-details-modal">
+            <div class="modal-container detail-modal">
+                <div class="modal-header">
+                    <div class="header-main-info">
+                        <div class="fund-ticker-box">${fund.ticker}</div>
+                        <div class="header-texts">
+                            <h2>${fund.name}</h2>
+                            <span class="sector-badge">Yatırım Fonu</span>
+                        </div>
+                    </div>
+                    <button class="modal-close" onclick="this.closest('.modal-overlay').remove()">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="detail-content-grid">
+                        <div class="detail-visual">
+                            <div class="large-radar-container">
+                                <h4 class="visual-title">Fon Varlık Dağılımı</h4>
+                                ${renderFundRadar(fund.distribution)}
+                            </div>
+                        </div>
+                        <div class="detail-stats-panel">
+                            <div class="detail-stat-row">
+                                <span class="lbl">Birim Fiyat:</span>
+                                <span class="val text-gold">${fund.price.toLocaleString()} ₳</span>
+                            </div>
+                            <div class="detail-stat-row">
+                                <span class="lbl">Günlük Değişim:</span>
+                                <span class="val ${fund.change >= 0 ? 'text-green' : 'text-red'}">
+                                    ${fund.change >= 0 ? '+' : ''}${fund.change}%
+                                </span>
+                            </div>
+                            <div class="detail-stat-row">
+                                <span class="lbl">Yönetilen Varlık (AUM):</span>
+                                <span class="val">${(fund.aum / 1000000).toFixed(1)}M ₳</span>
+                            </div>
+                            <div class="finance-risk-card">
+                                <div class="risk-info">
+                                    <span class="risk-title">Risk Seviyesi</span>
+                                    <span class="risk-score-val risk-${fund.risk}">${fund.risk === 'high' ? 'Yüksek' : fund.risk === 'medium' ? 'Orta' : 'Düşük'}</span>
+                                </div>
+                                <p style="font-size:0.7rem; color:var(--text-muted); margin:0;">
+                                    Bu fon, piyasa koşullarına göre varlık dağılımını optimize eder.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn-modal secondary" onclick="this.closest('.modal-overlay').remove()">Kapat</button>
+                    <button class="btn-modal primary">
+                        <i class="fa-solid fa-coins"></i> Yatırım Yap
+                    </button>
+                </div>
+            </div>
+        </div>
+    `;
+    document.body.insertAdjacentHTML('beforeend', modalHTML);
+}
+
+// === RENDER FUND RADAR CHART (SVG) ===
+function renderFundRadar(distribution) {
+    if (!distribution) return '';
+
+    const size = 150;
+    const center = size / 2;
+    const radius = size * 0.35;
+    const keys = Object.keys(distribution);
+    const count = keys.length;
+
+    const points = keys.map((key, i) => {
+        const val = distribution[key];
+        const angle = (i * 2 * Math.PI) / count - Math.PI / 2;
+        const x = center + (radius * val / 100) * Math.cos(angle);
+        const y = center + (radius * val / 100) * Math.sin(angle);
+        return `${x},${y}`;
+    }).join(' ');
+
+    const webPaths = [0.2, 0.4, 0.6, 0.8, 1].map(r => {
+        let p = "";
+        for (let i = 0; i <= count; i++) {
+            const angle = (i * 2 * Math.PI) / count - Math.PI / 2;
+            const x = center + (radius * r) * Math.cos(angle);
+            const y = center + (radius * r) * Math.sin(angle);
+            p += (i === 0 ? "M" : "L") + x + "," + y;
+        }
+        return `<path d="${p}" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="1"/>`;
+    }).join('');
+
+    return `
+        <div class="fund-radar-container-big">
+            <svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">
+                ${webPaths}
+                <polygon points="${points}" fill="rgba(59, 130, 246, 0.2)" stroke="var(--accent-blue)" stroke-width="2"/>
+                ${keys.map((key, i) => {
+        const angle = (i * 2 * Math.PI) / count - Math.PI / 2;
+        const x = center + (radius + 20) * Math.cos(angle);
+        const y = center + (radius + 20) * Math.sin(angle);
+        return `<text x="${x}" y="${y}" font-size="8" fill="var(--text-muted)" text-anchor="middle" dominant-baseline="middle">${key.substring(0, 5)}</text>`;
+    }).join('')}
+            </svg>
+            <div class="fund-summary-list-big">
+                ${keys.map(key => `
+                    <div class="fund-summary-item">
+                        <span class="dot"></span>
+                        <span class="label">${key}</span>
+                        <span class="val">%${distribution[key]}</span>
+                    </div>
+                `).join('')}
+            </div>
+        </div>
+    `;
 }
 
 /**
@@ -897,7 +1108,7 @@ function renderFundCard(fund) {
     };
 
     return `
-        <div class="fund-card" data-fund-id="${fund.id}">
+        <div class="fund-card" data-fund-id="${fund.id}" style="cursor: pointer;">
             <div class="fund-header">
                 <div class="fund-identity">
                     <span class="fund-ticker">${fund.ticker}</span>
