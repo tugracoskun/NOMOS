@@ -632,30 +632,106 @@ function renderPrestigeCard(company) {
         `;
 }
 
-// === PRODUCTS SECTION ===
+// === GET SECTOR CONFIGURATION ===
+function getSectorConfig(category, professionId) {
+    const configs = {
+        retail: {
+            title: 'Ürünlerim',
+            icon: 'fa-shirt',
+            unit: 'Stok',
+            unitSuffix: 'adet',
+            actionPrimary: 'Sat',
+            actionPrimaryIcon: 'fa-tag',
+            actionSecondary: 'Gönder',
+            actionSecondaryIcon: 'fa-truck',
+            demandLabel: 'Talep'
+        },
+        production: {
+            title: 'Üretim Bandı',
+            icon: 'fa-industry',
+            unit: 'Kapasite',
+            unitSuffix: 'birim',
+            actionPrimary: 'Sevkiyat',
+            actionPrimaryIcon: 'fa-dolly',
+            actionSecondary: 'İşle',
+            actionSecondaryIcon: 'fa-gears',
+            demandLabel: 'Pazar İhtiyacı'
+        },
+        finance: {
+            title: 'Mevduat & Fonlar',
+            icon: 'fa-vault',
+            unit: 'Varlık',
+            unitSuffix: '₳',
+            actionPrimary: 'İşlet',
+            actionPrimaryIcon: 'fa-chart-line',
+            actionSecondary: 'Kredi Ver',
+            actionSecondaryIcon: 'fa-hand-holding-dollar',
+            demandLabel: 'Faiz Oranı'
+        },
+        social: {
+            title: 'Sosyal Projeler',
+            icon: 'fa-hand-holding-heart',
+            unit: 'Etki',
+            unitSuffix: 'puan',
+            actionPrimary: 'Tamamla',
+            actionPrimaryIcon: 'fa-check-double',
+            actionSecondary: 'Bağış Topla',
+            actionSecondaryIcon: 'fa-heart',
+            demandLabel: 'Toplumsal İhtiyaç'
+        },
+        strategic: {
+            title: 'Operasyonel Kontratlar',
+            icon: 'fa-file-signature',
+            unit: 'Durum',
+            unitSuffix: 'aktif',
+            actionPrimary: 'Yürüt',
+            actionPrimaryIcon: 'fa-bolt',
+            actionSecondary: 'İhale Al',
+            actionSecondaryIcon: 'fa-gavel',
+            demandLabel: 'Öncelik'
+        },
+        innovation: {
+            title: 'Ar-Ge & Patentler',
+            icon: 'fa-lightbulb',
+            unit: 'İlerleme',
+            unitSuffix: '%',
+            actionPrimary: 'Yayınla',
+            actionPrimaryIcon: 'fa-rocket',
+            actionSecondary: 'Test Et',
+            actionSecondaryIcon: 'fa-microscope',
+            demandLabel: 'Yenilik Skoru'
+        }
+    };
+
+    return configs[category] || configs.retail;
+}
+
+// === PRODUCTS/OPERATIONS SECTION ===
 function renderProductsSection(company, profession) {
+    const config = getSectorConfig(profession.category, profession.id);
+
     return `
         <div class="products-section">
             <div class="section-header">
-                <h3><i class="fa-solid fa-cubes"></i> Ürünlerim</h3>
+                <h3><i class="fa-solid ${config.icon}"></i> ${config.title}</h3>
                 <div class="section-actions">
-                    <input type="text" placeholder="Ürün ara..." class="search-input" id="product-search">
+                    <input type="text" placeholder="Ara..." class="search-input" id="product-search">
                     <button class="btn-sm" data-action="add-product">
                         <i class="fa-solid fa-plus"></i>
                     </button>
                 </div>
             </div>
             <div class="products-grid" id="products-grid">
-                ${company.products.map(product => renderProductCard(product, profession)).join('')}
+                ${company.products.map(product => renderProductCard(product, profession, config)).join('')}
             </div>
         </div>
         `;
 }
 
-// === PRODUCT CARD ===
-function renderProductCard(product, profession) {
+// === PRODUCT/OPERATION CARD ===
+function renderProductCard(product, profession, config) {
+    const sectorConfig = config || getSectorConfig(profession.category, profession.id);
     const demandColor = product.demand >= 70 ? '#22c55e' : product.demand >= 40 ? '#fbbf24' : '#ef4444';
-    const demandLabel = product.demand >= 70 ? 'Yüksek Talep' : product.demand >= 40 ? 'Normal Talep' : 'Düşük Talep';
 
     return `
         <div class="product-card" data-product-id="${product.id}">
@@ -666,7 +742,7 @@ function renderProductCard(product, profession) {
                 <div class="product-info">
                     <h4 class="product-name">${product.name}</h4>
                     <div class="product-meta">
-                        <span class="quality-badge" title="Kalite">
+                        <span class="quality-badge" title="Kalite/Etki">
                             <i class="fa-solid fa-medal"></i> ${product.quality}%
                         </span>
                     </div>
@@ -679,17 +755,17 @@ function renderProductCard(product, profession) {
             </div>
             <div class="product-stats">
                 <div class="stat">
-                    <span class="label">Stok</span>
-                    <span class="value">${product.stock} adet</span>
+                    <span class="label">${sectorConfig.unit}</span>
+                    <span class="value">${product.stock} ${sectorConfig.unitSuffix}</span>
                 </div>
                 <div class="stat">
-                    <span class="label">Fiyat</span>
+                    <span class="label">Maliyet/Fiyat</span>
                     <span class="value text-gold">${product.price} ₳</span>
                 </div>
             </div>
             <div class="product-demand">
                 <div class="demand-header">
-                    <span class="demand-label" style="color: ${demandColor}">${demandLabel}</span>
+                    <span class="demand-label" style="color: ${demandColor}">${sectorConfig.demandLabel}</span>
                     <span class="demand-value">${product.demand}%</span>
                 </div>
                 <div class="demand-bar-container">
@@ -698,10 +774,10 @@ function renderProductCard(product, profession) {
             </div>
             <div class="product-actions">
                 <button class="btn-product" data-action="sell-product" data-product="${product.id}">
-                    <i class="fa-solid fa-tag"></i> Sat
+                    <i class="fa-solid ${sectorConfig.actionPrimaryIcon}"></i> ${sectorConfig.actionPrimary}
                 </button>
                 <button class="btn-product secondary" data-action="ship-product" data-product="${product.id}">
-                    <i class="fa-solid fa-truck"></i> Gönder
+                    <i class="fa-solid ${sectorConfig.actionSecondaryIcon}"></i> ${sectorConfig.actionSecondary}
                 </button>
             </div>
         </div>
