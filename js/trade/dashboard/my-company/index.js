@@ -311,53 +311,111 @@ function renderCompanyWidget(company, profession, metrics) {
 
 // === FULL COMPANY VIEW ===
 function renderFullCompanyView(company, profession, metrics) {
+    const allCompanies = getAllCompanies();
+    const hasMultipleCompanies = allCompanies.length > 1;
+
     return `
         <div class="company-full-view" data-profession="${profession.id}">
             <!-- Company Header -->
             ${renderCompanyHeader(company, profession)}
 
-            <!-- Main Content Grid -->
-            <div class="company-compact-grid">
-                <!-- Left Column: Financials + Products -->
-                <div class="company-left-column">
-                    <div class="financial-summary-bar">
-                        <div class="summary-card">
-                            <div class="summary-icon text-gold"><i class="fa-solid fa-coins"></i></div>
-                            <div class="summary-content">
-                                <span class="summary-value">${company.totalValue.toLocaleString()} ₳</span>
-                                <span class="summary-label">Şirket Değeri</span>
+            <!-- Scrollable Content -->
+            <div class="company-full-view-scroll">
+                
+                <!-- Management Dashboard (Top Hub) -->
+                <div class="company-management-hub">
+                    <div class="management-grid">
+                        <!-- Stat 1: Financials -->
+                        ${renderFinancialStats(company)}
+                        
+                        <!-- Stat 2: Operational -->
+                        ${renderOperationalStats(company, metrics)}
+                        
+                        <!-- Stat 3: Staff & Network -->
+                        <div class="stats-card network-staff">
+                            <div class="card-header">
+                                <h3><i class="fa-solid fa-network-wired"></i> Yönetim & Staff</h3>
+                            </div>
+                            <div class="card-content">
+                                <div class="hub-mini-section">
+                                    <div class="section-label">Çalışanlar</div>
+                                    <div class="staff-summary-mini">
+                                        <div class="staff-count-box">
+                                            <span class="count">${company.employees}/${company.maxEmployees}</span>
+                                            <span class="lbl">Aktif Personel</span>
+                                        </div>
+                                        <button class="btn-sm-ghost" data-action="manage-employees">
+                                            <i class="fa-solid fa-users-gear"></i> Yönet
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="hub-mini-section">
+                                    <div class="section-label">Şirket Ağınız (${allCompanies.length}/${MAX_COMPANIES})</div>
+                                    <div class="company-grid-mini">
+                                        ${allCompanies.map(c => `
+                                            <div class="mini-comp-dot ${c.id === company.id ? 'active' : ''}" 
+                                                 title="${c.name}" data-company-id="${c.id}">
+                                                <i class="${getProfessionInfo(c.profession).icon}"></i>
+                                            </div>
+                                        `).join('')}
+                                        ${allCompanies.length < MAX_COMPANIES ? `
+                                            <div class="mini-comp-dot add" data-action="create-company">
+                                                <i class="fa-solid fa-plus"></i>
+                                            </div>
+                                        ` : ''}
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                        <div class="summary-card">
-                            <div class="summary-icon text-green"><i class="fa-solid fa-arrow-trend-up"></i></div>
-                            <div class="summary-content">
-                                <span class="summary-value">+${company.dailyIncome.toLocaleString()} ₳</span>
-                                <span class="summary-label">Günlük Gelir</span>
-                            </div>
-                        </div>
-                        <div class="summary-card">
-                            <div class="summary-icon text-blue"><i class="fa-solid fa-users"></i></div>
-                            <div class="summary-content">
-                                <span class="summary-value">${company.employees}/${company.maxEmployees}</span>
-                                <span class="summary-label">Çalışanlar</span>
-                            </div>
-                        </div>
-                        <div class="summary-card">
-                            <div class="summary-icon text-yellow"><i class="fa-solid fa-star"></i></div>
-                            <div class="summary-content">
-                                <span class="summary-value">${company.reputation}/100</span>
-                                <span class="summary-label">İtibar</span>
-                            </div>
-                        </div>
-                    </div>
 
-                    ${renderProductsSection(company, profession)}
+                        <!-- Stat 4: Reputation -->
+                        ${renderReputationCard(company)}
+                    </div>
                 </div>
 
-                <!-- Right Column: Orders + Activity -->
-                <div class="company-right-column">
-                    ${renderOrdersSectionCompact(company)}
-                    ${renderActivityFeedCompact(company)}
+                <!-- Main Content Grid -->
+                <div class="company-compact-grid">
+                    <!-- Left Column: Products -->
+                    <div class="company-left-column">
+                        <div class="financial-summary-bar">
+                            <div class="summary-card">
+                                <div class="summary-icon text-gold"><i class="fa-solid fa-coins"></i></div>
+                                <div class="summary-content">
+                                    <span class="summary-value">${company.totalValue.toLocaleString()} ₳</span>
+                                    <span class="summary-label">Şirket Değeri</span>
+                                </div>
+                            </div>
+                            <div class="summary-card">
+                                <div class="summary-icon text-green"><i class="fa-solid fa-arrow-trend-up"></i></div>
+                                <div class="summary-content">
+                                    <span class="summary-value">+${company.dailyIncome.toLocaleString()} ₳</span>
+                                    <span class="summary-label">Günlük Gelir</span>
+                                </div>
+                            </div>
+                            <div class="summary-card">
+                                <div class="summary-icon text-blue"><i class="fa-solid fa-warehouse"></i></div>
+                                <div class="summary-content">
+                                    <span class="summary-value">${metrics.totalStock}</span>
+                                    <span class="summary-label">Toplam Stok</span>
+                                </div>
+                            </div>
+                            <div class="summary-card">
+                                <div class="summary-icon text-yellow"><i class="fa-solid fa-star"></i></div>
+                                <div class="summary-content">
+                                    <span class="summary-value">${company.reputation}/100</span>
+                                    <span class="summary-label">İtibar</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        ${renderProductsSection(company, profession)}
+                    </div>
+
+                    <!-- Right Column: Orders + Activity -->
+                    <div class="company-right-column">
+                        ${renderOrdersSectionCompact(company)}
+                        ${renderActivityFeedCompact(company)}
+                    </div>
                 </div>
             </div>
         </div>
@@ -2140,6 +2198,23 @@ export function setupCompanyEventHandlers() {
 // Separate handler function to allow removal
 function handleCompanyClick(e) {
     const action = e.target.closest('[data-action]')?.dataset.action;
+    const companyId = e.target.closest('[data-company-id]')?.dataset.companyId;
+
+    // Handle company switching from mini dots or list
+    if (companyId && !action) {
+        import('../data/company-data.js').then(module => {
+            module.setActiveCompany(companyId);
+            // Re-render the section
+            const updatedCompany = module.loadPlayerCompany();
+            const root = document.querySelector('.dashboard-content');
+            if (root) {
+                root.innerHTML = renderMyCompanySection(updatedCompany);
+                setupCompanyEventHandlers();
+            }
+        });
+        return;
+    }
+
     if (!action) return;
 
     switch (action) {
@@ -2149,11 +2224,17 @@ function handleCompanyClick(e) {
             setupModalCloseHandlers();
             break;
         case 'company-management':
-            const mgmtCompany = loadPlayerCompany();
-            const mgmtProfession = getProfessionInfo(mgmtCompany.profession);
-            showModal(renderCompanyManagementModal(mgmtCompany, mgmtProfession));
-            setupCompanyManagementHandlers();
-            setupModalCloseHandlers();
+            // Logic to switch to "Management" tab or scroll to hub
+            const hub = document.querySelector('.company-management-hub');
+            if (hub) {
+                hub.scrollIntoView({ behavior: 'smooth' });
+            } else {
+                const mgmtCompany = loadPlayerCompany();
+                const mgmtProfession = getProfessionInfo(mgmtCompany.profession);
+                showModal(renderCompanyManagementModal(mgmtCompany, mgmtProfession));
+                setupCompanyManagementHandlers();
+                setupModalCloseHandlers();
+            }
             break;
         case 'edit-company':
             const company = loadPlayerCompany();
