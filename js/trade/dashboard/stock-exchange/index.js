@@ -180,29 +180,29 @@ function renderFullExchangeView() {
                     <!-- VIEW: Overview (General Dashboard) -->
                     <div class="exchange-view-panel active" id="view-overview">
                         <div class="exchange-dashboard-grid">
-                            <div class="dashboard-top-row">
-                                <div class="consolidated-trade-tabs widget-card">
-                                    <div class="tabs-navigation">
-                                        <button class="trade-sub-tab active" data-sub-tab="investments">
-                                            <i class="fa-solid fa-clock-rotate-left"></i> Son Yatırımlar
-                                        </button>
-                                        <button class="trade-sub-tab" data-sub-tab="agreements">
-                                            <i class="fa-solid fa-handshake"></i> Ticari Antlaşmalar
-                                        </button>
-                                        <button class="trade-sub-tab" data-sub-tab="economies">
-                                            <i class="fa-solid fa-globe"></i> Ülke Ekonomileri
-                                        </button>
+                            <div class="dashboard-top-row horizontal-widgets">
+                                <div class="widget-card summary-widget">
+                                    <div class="widget-header">
+                                        <h4><i class="fa-solid fa-clock-rotate-left"></i> Son Yatırımlar</h4>
                                     </div>
-                                    <div class="tabs-content">
-                                        <div class="tab-pane active" id="pane-investments">
-                                            ${renderRecentInvestments()}
-                                        </div>
-                                        <div class="tab-pane" id="pane-agreements">
-                                            ${renderTradeAgreements()}
-                                        </div>
-                                        <div class="tab-pane" id="pane-economies">
-                                            ${renderCountryEconomies()}
-                                        </div>
+                                    <div class="widget-body">
+                                        ${renderRecentInvestments()}
+                                    </div>
+                                </div>
+                                <div class="widget-card summary-widget">
+                                    <div class="widget-header">
+                                        <h4><i class="fa-solid fa-handshake"></i> Ticari Antlaşmalar</h4>
+                                    </div>
+                                    <div class="widget-body">
+                                        ${renderTradeAgreements()}
+                                    </div>
+                                </div>
+                                <div class="widget-card summary-widget">
+                                    <div class="widget-header">
+                                        <h4><i class="fa-solid fa-globe"></i> Ülke Ekonomileri</h4>
+                                    </div>
+                                    <div class="widget-body">
+                                        ${renderCountryEconomies()}
                                     </div>
                                 </div>
                             </div>
@@ -226,30 +226,32 @@ function renderFullExchangeView() {
                                                 <div class="card-content">
                                                     <div class="card-top">
                                                         <span class="index-ticker">${index.name}</span>
-                                                        <span class="index-badge">GLOBAL</span>
+                                                        <span class="index-change-tag ${index.change >= 0 ? 'positive' : 'negative'}">
+                                                            ${index.change >= 0 ? '▲' : '▼'} ${index.change}%
+                                                        </span>
                                                     </div>
                                                     <div class="card-middle">
-                                                        <div class="index-value-container">
-                                                            <span class="current-value">${index.value.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
-                                                            <div class="change-info">
-                                                                <i class="fa-solid fa-arrow-${index.change >= 0 ? 'up-right' : 'down-left'}"></i>
-                                                                <span>${index.change >= 0 ? '+' : ''}${index.change}%</span>
-                                                            </div>
-                                                        </div>
+                                                        <span class="current-value">${index.value.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                                                     </div>
-                                                    <div class="card-bottom">
-                                                        <div class="index-visual">
-                                                            <svg width="100%" height="40" viewBox="0 0 100 40" preserveAspectRatio="none">
-                                                                <path d="M0,35 Q15,${30 - index.change * 5} 30,${35 + index.change * 3} T60,${30 - index.change * 2} T100,25" 
-                                                                      fill="none" stroke="url(#indexGrad_${index.name.replace(/\s+/g, '')})" stroke-width="2.5" stroke-linecap="round"/>
-                                                                <defs>
-                                                                    <linearGradient id="indexGrad_${index.name.replace(/\s+/g, '')}" x1="0%" y1="0%" x2="100%" y2="0%">
-                                                                        <stop offset="0%" stop-color="${index.change >= 0 ? '#4ade80' : '#f87171'}" stop-opacity="0.3"/>
-                                                                        <stop offset="100%" stop-color="${index.change >= 0 ? '#4ade80' : '#f87171'}" stop-opacity="1"/>
-                                                                    </linearGradient>
-                                                                </defs>
-                                                            </svg>
-                                                        </div>
+                                                    <div class="card-chart-area">
+                                                        <svg width="100%" height="80" viewBox="0 0 100 50" preserveAspectRatio="none">
+                                                            <defs>
+                                                                <linearGradient id="areaGrad_${index.name.replace(/\s+/g, '')}" x1="0%" y1="0%" x2="0%" y2="100%">
+                                                                    <stop offset="0%" stop-color="${index.change >= 0 ? '#4ade80' : '#f87171'}" stop-opacity="0.3"/>
+                                                                    <stop offset="100%" stop-color="${index.change >= 0 ? '#4ade80' : '#f87171'}" stop-opacity="0"/>
+                                                                </linearGradient>
+                                                            </defs>
+                                                            <!-- Area Fill -->
+                                                            <path d="M0,50 L0,35 Q15,${30 - index.change * 5} 30,${35 + index.change * 3} T60,${30 - index.change * 2} T100,25 L100,50 Z" 
+                                                                  fill="url(#areaGrad_${index.name.replace(/\s+/g, '')})"/>
+                                                            <!-- Main Line -->
+                                                            <path d="M0,35 Q15,${30 - index.change * 5} 30,${35 + index.change * 3} T60,${30 - index.change * 2} T100,25" 
+                                                                  fill="none" stroke="${index.change >= 0 ? '#4ade80' : '#f87171'}" stroke-width="2" stroke-linecap="round"/>
+                                                            <!-- Decorative markers (candlestick like) -->
+                                                            <line x1="20" y1="30" x2="20" y2="40" stroke="currentColor" stroke-width="1" opacity="0.2"/>
+                                                            <line x1="50" y1="25" x2="50" y2="35" stroke="currentColor" stroke-width="1" opacity="0.2"/>
+                                                            <line x1="80" y1="20" x2="80" y2="30" stroke="currentColor" stroke-width="1" opacity="0.2"/>
+                                                        </svg>
                                                     </div>
                                                 </div>
                                             </div>
