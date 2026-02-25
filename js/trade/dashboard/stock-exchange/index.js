@@ -454,28 +454,34 @@ function renderFullExchangeView() {
                     <!-- VIEW: World Stocks -->
                     <div class="exchange-view-panel" id="view-world-stocks">
                         <section class="world-stocks-section">
-                            <div class="section-header">
-                                <h2><i class="fa-solid fa-globe" style="color:#60a5fa;margin-right:8px;"></i>Dünya Hisseleri</h2>
-                                <div class="section-controls">
-                                    <input type="text" class="search-input" placeholder="Şirket ara..." id="world-stock-search">
-                                    <div class="filter-tabs">
-                                        <button class="filter-tab active" data-filter="all">Tümü</button>
-                                        <button class="filter-tab" data-filter="giants">Piyasa Devleri</button>
-                                        <button class="filter-tab" data-filter="trendy">Popüler</button>
-                                        <button class="filter-tab" data-filter="trendy">Popüler</button>
-                                        <button class="filter-tab" data-filter="newcomers">Yeniler</button>
+                            <div class="view-header-modern">
+                                <div class="title-group">
+                                    <h2><i class="fa-solid fa-globe"></i> Dünya Hisseleri</h2>
+                                    <p>Küresel borsalardaki en değerli şirketler ve anlık veriler</p>
+                                </div>
+                                <div class="view-controls">
+                                    <div class="search-box-modern">
+                                        <i class="fa-solid fa-magnifying-glass"></i>
+                                        <input type="text" placeholder="Hisse veya şirket ara..." id="world-stock-search">
+                                    </div>
+                                    <div class="filter-group-modern">
+                                        <button class="filter-btn active" data-filter="all">Tümü</button>
+                                        <button class="filter-btn" data-filter="giants">Devler</button>
+                                        <button class="filter-btn" data-filter="trendy">Popüler</button>
+                                        <button class="filter-btn" data-filter="newcomers">Yeni Eklenenler</button>
                                     </div>
                                 </div>
                             </div>
-                            <div class="stocks-table world-stocks-table">
-                                <div class="table-header">
-                                    <div class="col-ticker">Sembol</div>
-                                    <div class="col-name">Şirket</div>
-                                    <div class="col-price">Fiyat</div>
-                                    <div class="col-change">Değişim</div>
-                                    <div class="col-mcap">Piyasa Değeri</div>
-                                    <div class="col-country">Ülke</div>
-                                    <div class="col-actions">İşlem</div>
+                            
+                            <div class="modern-stocks-table">
+                                <div class="table-head">
+                                    <div class="th-col col-symbol">SEMBOL</div>
+                                    <div class="th-col col-company">ŞİRKET</div>
+                                    <div class="th-col col-price">FİYAT</div>
+                                    <div class="th-col col-change">DEĞİŞİM</div>
+                                    <div class="th-col col-cap">PİYASA DEĞERİ</div>
+                                    <div class="th-col col-country">ÜLKE</div>
+                                    <div class="th-col col-action">İŞLEM</div>
                                 </div>
                                 <div class="table-body" id="world-stocks-table-body">
                                     ${renderWorldStocks()}
@@ -1654,31 +1660,43 @@ const WORLD_STOCKS = [
 function renderWorldStocks() {
     return WORLD_STOCKS.map(stock => {
         const isPositive = stock.change >= 0;
-        const changeClass = isPositive ? 'positive' : 'negative';
-        const changeIcon = isPositive ? 'fa-caret-up' : 'fa-caret-down';
+        const changeClass = isPositive ? 'up' : 'down';
         const changeSign = isPositive ? '+' : '';
 
         return `
-            <div class="table-row world-stock-row" data-category="${stock.category}">
-                <div class="col-ticker">
-                    <span class="ticker-badge">${stock.ticker}</span>
+            <div class="modern-stock-row" data-category="${stock.category}">
+                <div class="td-col col-symbol">
+                    <div class="stock-ticker-box">
+                        <span class="ticker-text">${stock.ticker}</span>
+                    </div>
                 </div>
-                <div class="col-name">
-                    <span class="stock-company-name">${stock.name}</span>
+                <div class="td-col col-company">
+                    <div class="company-info-cell">
+                        <div class="company-logo-placeholder">${stock.name.charAt(0)}</div>
+                        <span class="company-full-name">${stock.name}</span>
+                    </div>
                 </div>
-                <div class="col-price">$${stock.price.toLocaleString('en-US', { minimumFractionDigits: 2 })}</div>
-                <div class="col-change ${changeClass}">
-                    <i class="fa-solid ${changeIcon}"></i>
-                    ${changeSign}${stock.change}%
+                <div class="td-col col-price">
+                    <span class="price-val">$${stock.price.toLocaleString('en-US', { minimumFractionDigits: 2 })}</span>
                 </div>
-                <div class="col-mcap">$${stock.mcap}</div>
-                <div class="col-country">
-                    <span class="country-flag">${stock.flag}</span>
-                    <span class="country-name">${stock.country}</span>
+                <div class="td-col col-change">
+                    <div class="change-pill ${changeClass}">
+                        <i class="fa-solid fa-arrow-${isPositive ? 'up' : 'down'}"></i>
+                        <span>${changeSign}${stock.change}%</span>
+                    </div>
                 </div>
-                <div class="col-actions">
-                    <button class="btn-trade-sm btn-buy-sm" title="Satın Al">
-                        <i class="fa-solid fa-cart-plus"></i>
+                <div class="td-col col-cap">
+                    <span class="cap-val">$${stock.mcap}</span>
+                </div>
+                <div class="td-col col-country">
+                    <div class="country-cell">
+                        <span class="flag-icon">${stock.flag}</span>
+                        <span class="country-label">${stock.country}</span>
+                    </div>
+                </div>
+                <div class="td-col col-action">
+                    <button class="btn-buy-modern" onclick="alert('${stock.name} satın alma ekranı')">
+                        <i class="fa-solid fa-cart-plus"></i> SATIN AL
                     </button>
                 </div>
             </div>
