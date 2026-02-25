@@ -13060,3 +13060,32 @@
     background: #2a2e39;
     border-radius: 10px;
 }
+
+/* Sorting Styles */
+.th-col.sortable {
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    user-select: none;
+}
+
+.th-col.sortable:hover {
+    color: #d1d4dc;
+}
+
+.th-col.sortable i {
+    font-size: 0.65rem;
+    color: #4b5563;
+    transition: all 0.2s;
+}
+
+.th-col.sortable:hover i {
+    color: #868993;
+}
+
+.th-col.sortable i[class*="fa-sort-up"],
+.th-col.sortable i[class*="fa-sort-down"] {
+    color: #fff;
+}

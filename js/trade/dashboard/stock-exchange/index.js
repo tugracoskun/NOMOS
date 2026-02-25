@@ -475,11 +475,11 @@ function renderFullExchangeView() {
                             
                             <div class="modern-stocks-table">
                                 <div class="table-head">
-                                    <div class="th-col col-symbol">SEMBOL</div>
-                                    <div class="th-col col-company">ŞİRKET</div>
-                                    <div class="th-col col-price">FİYAT</div>
-                                    <div class="th-col col-change">DEĞİŞİM</div>
-                                    <div class="th-col col-cap">PİYASA DEĞERİ</div>
+                                    <div class="th-col col-symbol sortable" data-sort="ticker">SEMBOL <i class="fa-solid fa-sort"></i></div>
+                                    <div class="th-col col-company sortable" data-sort="name">ŞİRKET <i class="fa-solid fa-sort"></i></div>
+                                    <div class="th-col col-price sortable" data-sort="price">FİYAT <i class="fa-solid fa-sort"></i></div>
+                                    <div class="th-col col-change sortable" data-sort="change">DEĞİŞİM <i class="fa-solid fa-sort"></i></div>
+                                    <div class="th-col col-cap sortable" data-sort="mcap">PİYASA DEĞERİ <i class="fa-solid fa-sort"></i></div>
                                     <div class="th-col col-country">ÜLKE</div>
                                     <div class="th-col col-action">İŞLEM</div>
                                 </div>
@@ -532,6 +532,7 @@ export function setupExchangeViewNav() {
 
     // Initialize specific view event handlers
     setupWorldStockFilters();
+    setupWorldStockSorting();
     setupFundEvents(); // Initial load
     setupSubTabs(); // Handle sub-tabs in overview
 }
@@ -757,18 +758,18 @@ function renderFundRadar(distribution) {
  * Dünya hisseleri için filtreleme ve arama olaylarını ayarlar
  */
 function setupWorldStockFilters() {
-    const filterTabs = document.querySelectorAll('.world-stocks-section .filter-tab');
+    const filterBtns = document.querySelectorAll('.world-stocks-section .filter-btn');
     const searchInput = document.getElementById('world-stock-search');
-    const rows = document.querySelectorAll('.world-stock-row');
 
     const applyFilters = () => {
-        const activeFilter = document.querySelector('.world-stocks-section .filter-tab.active')?.dataset.filter || 'all';
+        const activeFilter = document.querySelector('.world-stocks-section .filter-btn.active')?.dataset.filter || 'all';
         const searchTerm = searchInput?.value.toLowerCase() || '';
+        const rows = document.querySelectorAll('.modern-stock-row');
 
         rows.forEach(row => {
             const category = row.dataset.category;
-            const ticker = row.querySelector('.ticker-badge')?.textContent.toLowerCase() || '';
-            const name = row.querySelector('.stock-company-name')?.textContent.toLowerCase() || '';
+            const ticker = row.querySelector('.ticker-text')?.textContent.toLowerCase() || '';
+            const name = row.querySelector('.company-full-name')?.textContent.toLowerCase() || '';
 
             const matchesFilter = activeFilter === 'all' || category === activeFilter;
             const matchesSearch = ticker.includes(searchTerm) || name.includes(searchTerm);
@@ -781,16 +782,93 @@ function setupWorldStockFilters() {
         });
     };
 
-    filterTabs.forEach(tab => {
-        tab.addEventListener('click', () => {
-            filterTabs.forEach(t => t.classList.remove('active'));
-            tab.classList.add('active');
+    filterBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            filterBtns.forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
             applyFilters();
         });
     });
 
     if (searchInput) {
         searchInput.addEventListener('input', applyFilters);
+    }
+}
+
+let worldSortState = { field: null, direction: 'asc' };
+
+function setupWorldStockSorting() {
+    const headers = document.querySelectorAll('.table-head .th-col.sortable');
+
+    headers.forEach(header => {
+        header.addEventListener('click', () => {
+            const field = header.dataset.sort;
+
+            // Toggle direction
+            if (worldSortState.field === field) {
+                worldSortState.direction = worldSortState.direction === 'asc' ? 'desc' : 'asc';
+            } else {
+                worldSortState.field = field;
+                worldSortState.direction = 'asc';
+            }
+
+            // Update icons
+            headers.forEach(h => {
+                const icon = h.querySelector('i');
+                if (h === header) {
+                    icon.className = `fa-solid fa-sort-${worldSortState.direction === 'asc' ? 'up' : 'down'}`;
+                } else {
+                    icon.className = 'fa-solid fa-sort';
+                }
+            });
+
+            sortWorldStocks(field, worldSortState.direction);
+        });
+    });
+}
+
+function sortWorldStocks(field, direction) {
+    const parseMcap = (val) => {
+        const num = parseFloat(val);
+        if (val.includes('T')) return num * 1000000;
+        if (val.includes('B')) return num * 1000;
+        return num;
+    };
+
+    WORLD_STOCKS.sort((a, b) => {
+        let valA = a[field];
+        let valB = b[field];
+
+        if (field === 'mcap') {
+            valA = parseMcap(valA);
+            valB = parseMcap(valB);
+        }
+
+        if (typeof valA === 'string') {
+            return direction === 'asc'
+                ? valA.localeCompare(valB)
+                : valB.localeCompare(valA);
+        } else {
+            return direction === 'asc' ? valA - valB : valB - valA;
+        }
+    });
+
+    // Re-render
+    const tableBody = document.getElementById('world-stocks-table-body');
+    if (tableBody) {
+        tableBody.innerHTML = renderWorldStocks();
+        // Filters should be reapplied if search/category is active
+        const searchInput = document.getElementById('world-stock-search');
+        if (searchInput && searchInput.value) {
+            // Trigger input event to re-apply filters
+            searchInput.dispatchEvent(new Event('input'));
+        } else {
+            // Just apply current active filter if any
+            const activeFilter = document.querySelector('.world-stocks-section .filter-btn.active');
+            if (activeFilter && activeFilter.dataset.filter !== 'all') {
+                activeFilter.click();
+            }
+        }
     }
 }
 
