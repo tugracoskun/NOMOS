@@ -11951,6 +11951,31 @@
 }
 
 /* === TRADING VIEW STYLE CHART EXTENSION === */
+.exchange-page-header {
+    background: #131722;
+    padding: 0 20px;
+    border-bottom: 2px solid #363a45;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 64px;
+}
+
+.exchange-full-view {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.exchange-main-layout {
+    display: flex;
+    flex: 1;
+    overflow: hidden;
+    gap: 12px;
+    background: #0b0e14;
+    padding: 2px;
+}
+
 .tv-chart-main-layout {
     display: flex;
     height: 100%;
@@ -11962,16 +11987,18 @@
     display: flex;
     flex-direction: column;
     min-width: 0;
-    border-right: 1px solid #2a2e39;
+    box-shadow: 6px 0 15px rgba(0, 0, 0, 0.3);
+    z-index: 5;
 }
 
 .chart-header {
     background: #131722;
-    padding: 10px 15px;
+    padding: 4px 12px;
     border-bottom: 1px solid #2a2e39;
     display: flex;
     justify-content: space-between;
     align-items: center;
+    height: 42px;
 }
 
 .chart-symbol .symbol-box {
@@ -11998,7 +12025,6 @@
     display: flex;
     align-items: center;
     gap: 10px;
-    margin-top: 2px;
 }
 
 .price-box .price {
@@ -12080,6 +12106,8 @@
     background: #131722;
     display: flex;
     flex-direction: column;
+    border-left: 1px solid #2a2e39;
+    margin-left: 2px;
 }
 
 .sidebar-section {
@@ -12099,11 +12127,12 @@
 }
 
 .sidebar-section h4 {
-    font-size: 0.7rem;
+    font-size: 0.68rem;
     text-transform: uppercase;
-    color: #868993;
+    color: #d1d4dc;
     margin: 0;
-    font-weight: 700;
+    font-weight: 800;
+    letter-spacing: 0.05em;
 }
 
 .watch-list {
@@ -12114,11 +12143,13 @@
 
 .watch-item {
     display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
-    padding: 8px 10px;
-    font-size: 0.75rem;
+    grid-template-columns: 1.2fr 0.8fr 0.8fr;
+    padding: 6px 10px;
+    font-size: 0.72rem;
     border-radius: 4px;
     cursor: pointer;
+    align-items: center;
+    transition: background 0.2s;
 }
 
 .watch-item:hover {
@@ -12128,6 +12159,7 @@
 .w-symbol {
     font-weight: 700;
     color: #d1d4dc;
+    letter-spacing: -0.02em;
 }
 
 .w-price {
@@ -12258,19 +12290,7 @@
     color: #22c55e;
 }
 
-/* === BORSA LAYOUT & GAP FIX === */
-.exchange-full-view {
-    display: flex;
-    flex-direction: column;
-    height: 100%;
-}
-
-.exchange-main-layout {
-    display: flex;
-    flex: 1;
-    overflow: hidden;
-    gap: 0;
-}
+/* Consolidated layout styles in the Trading View section above */
 
 .exchange-left-panel {
     flex: 1;
@@ -12289,15 +12309,7 @@
     flex-direction: column;
 }
 
-/* === CHART TOOLBAR & BUTTONS PREMIUM === */
-.chart-header {
-    background: #131722;
-    padding: 6px 12px;
-    border-bottom: 1px solid #2a2e39;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
+/* Removed duplicate definitions - consolidated above */
 
 .chart-type-selector {
     display: flex;
