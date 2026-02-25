@@ -296,19 +296,75 @@ function renderFullExchangeView() {
                                     <div class="zoom-hint">Fare tekerleği ile yakınlaştırın</div>
                                     ${renderAdvancedChart()}
                                 </div>
+
+                                <!-- Integrated Internal Content -->
+                                <div class="chart-internal-content">
+                                    <div class="tv-chart-timeline-large">
+                                        <div class="timeline-tabs">
+                                            <button class="tf-btn" data-tf="15m">15 Dakika</button>
+                                            <button class="tf-btn" data-tf="1h">1 Saat</button>
+                                            <button class="tf-btn active" data-tf="4h">4 Saat</button>
+                                            <button class="tf-btn" data-tf="1d">1 Gün</button>
+                                            <button class="tf-btn" data-tf="1w">1 Hafta</button>
+                                        </div>
+                                    </div>
+
+                                    <div class="chart-internal-grid">
+                                        <div class="internal-col-left">
+                                            <div class="internal-section">
+                                                <h4><i class="fa-solid fa-newspaper"></i> HABERLER</h4>
+                                                <div class="stock-news-item mini">
+                                                    <div class="news-title">NOMOS 100 Endeksi pozitif seyrediyor.</div>
+                                                    <span class="time">2sa</span>
+                                                </div>
+                                                <div class="stock-news-item mini">
+                                                    <div class="news-title">Teknoloji rallisi başladı mı?</div>
+                                                    <span class="time">5sa</span>
+                                                </div>
+                                            </div>
+                                            <div class="internal-section">
+                                                <h4><i class="fa-solid fa-pie-chart"></i> FONLAR (BYF)</h4>
+                                                <div class="funds-mini-row">
+                                                    <div class="f-mini-tag">Büyüme %12</div>
+                                                    <div class="f-mini-tag">Tekno %8</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="internal-col-right">
+                                            <div class="internal-section chat-mini">
+                                                <h4><i class="fa-solid fa-comments"></i> SOHBET</h4>
+                                                <div class="chat-messages mini" id="tv-chat-box">
+                                                    <div class="chat-msg">
+                                                        <span class="u">BorsaKaplanı:</span>
+                                                        <span class="m">12,500 direnci önemli.</span>
+                                                    </div>
+                                                    <div class="chat-msg">
+                                                        <span class="u">Analist:</span>
+                                                        <span class="m">Hacim artmalı.</span>
+                                                    </div>
+                                                </div>
+                                                <div class="chat-input-area mini">
+                                                    <input type="text" placeholder="Mesaj..." id="stock-chat-input">
+                                                    <button class="btn-chat-send"><i class="fa-solid fa-paper-plane"></i></button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
                                 <div class="chart-trading-bar">
-                                     <div class="sentiment-indicator" title="Piyasa Duyarlılığı (Deneysel)">
+                                     <div class="sentiment-indicator" title="Piyasa Duyarlılığı">
                                          <div class="sentiment-bar-fill"></div>
-                                         <span class="sentiment-label shadow-text">BOĞA PİYASASI %65</span>
+                                         <span class="sentiment-label shadow-text">BOĞA %65</span>
                                      </div>
                                      <div class="quick-trade-buttons">
-                                         <button class="q-trade-btn buy" onclick="alert('Alım emri gönderildi: 12,458 ₳')">
+                                         <button class="q-trade-btn buy" onclick="alert('Alım emri: 12,458')">
                                              <span class="action-label">AL</span>
-                                             <span class="action-price">12,458.32</span>
+                                             <span class="action-price">12,458</span>
                                          </button>
-                                         <button class="q-trade-btn sell" onclick="alert('Satım emri gönderildi: 12,457 ₳')">
+                                         <button class="q-trade-btn sell" onclick="alert('Satım emri: 12,457')">
                                              <span class="action-label">SAT</span>
-                                             <span class="action-price">12,457.90</span>
+                                             <span class="action-price">12,457</span>
                                          </button>
                                      </div>
                                  </div>
@@ -317,13 +373,6 @@ function renderFullExchangeView() {
                                          <div class="mini-stat"><span>YÜK:</span> <span class="v text-green">12,520</span></div>
                                          <div class="mini-stat"><span>DÜŞ:</span> <span class="v text-red">12,195</span></div>
                                          <div class="mini-stat"><span>HAC:</span> <span class="v">2.44M</span></div>
-                                     </div>
-                                     <div class="chart-timeframes-bottom">
-                                         <button class="tf-btn" data-tf="15m">15dk</button>
-                                         <button class="tf-btn" data-tf="1h">1sa</button>
-                                         <button class="tf-btn active" data-tf="4h">4sa</button>
-                                         <button class="tf-btn" data-tf="1d">1G</button>
-                                         <button class="tf-btn" data-tf="1w">1H</button>
                                      </div>
                                  </div>
                             </div>
@@ -780,6 +829,35 @@ function setupChartEvents() {
     const btnZoomOut = document.getElementById('btn-zoom-out');
     const btnZoomReset = document.getElementById('btn-zoom-reset');
     const chartArea = document.getElementById('chart-main-area');
+
+    // Social & Chat Interactions
+    const chatInput = document.getElementById('stock-chat-input');
+    const btnChatSend = document.querySelector('.btn-chat-send');
+    const chatBox = document.getElementById('tv-chat-box');
+
+    const sendChatMessage = () => {
+        if (!chatInput || !chatInput.value.trim()) return;
+
+        const msg = document.createElement('div');
+        msg.className = 'chat-msg me';
+        msg.innerHTML = `<span class="u">Siz</span><span class="m">${chatInput.value}</span>`;
+        chatBox.appendChild(msg);
+        chatInput.value = '';
+        chatBox.scrollTop = chatBox.scrollHeight;
+    };
+
+    btnChatSend?.addEventListener('click', sendChatMessage);
+    chatInput?.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') sendChatMessage();
+    });
+
+    // News placeholders
+    chartView.querySelectorAll('.stock-news-item').forEach(item => {
+        item.addEventListener('click', () => {
+            const title = item.querySelector('.news-title').textContent;
+            showNotification('Haber Başlığı', title, 'info');
+        });
+    });
 
     if (btnZoomIn) btnZoomIn.addEventListener('click', () => { currentZoom = Math.min(5, currentZoom * 1.2); renderMainChart(); });
     if (btnZoomOut) btnZoomOut.addEventListener('click', () => { currentZoom = Math.max(0.2, currentZoom / 1.2); renderMainChart(); });
