@@ -296,20 +296,36 @@ function renderFullExchangeView() {
                                     <div class="zoom-hint">Fare tekerleği ile yakınlaştırın</div>
                                     ${renderAdvancedChart()}
                                 </div>
-                                <div class="chart-bottom-info">
-                                    <div class="chart-stats-mini">
-                                        <div class="mini-stat"><span>YÜK:</span> <span class="v text-green">12,520</span></div>
-                                        <div class="mini-stat"><span>DÜŞ:</span> <span class="v text-red">12,195</span></div>
-                                        <div class="mini-stat"><span>HAC:</span> <span class="v">2.44M</span></div>
-                                    </div>
-                                    <div class="chart-timeframes-bottom">
-                                        <button class="tf-btn" data-tf="15m">15dk</button>
-                                        <button class="tf-btn" data-tf="1h">1sa</button>
-                                        <button class="tf-btn active" data-tf="4h">4sa</button>
-                                        <button class="tf-btn" data-tf="1d">1G</button>
-                                        <button class="tf-btn" data-tf="1w">1H</button>
-                                    </div>
-                                </div>
+                                <div class="chart-trading-bar">
+                                     <div class="sentiment-indicator" title="Piyasa Duyarlılığı (Deneysel)">
+                                         <div class="sentiment-bar-fill"></div>
+                                         <span class="sentiment-label shadow-text">BOĞA PİYASASI %65</span>
+                                     </div>
+                                     <div class="quick-trade-buttons">
+                                         <button class="q-trade-btn buy" onclick="alert('Alım emri gönderildi: 12,458 ₳')">
+                                             <span class="action-label">AL</span>
+                                             <span class="action-price">12,458.32</span>
+                                         </button>
+                                         <button class="q-trade-btn sell" onclick="alert('Satım emri gönderildi: 12,457 ₳')">
+                                             <span class="action-label">SAT</span>
+                                             <span class="action-price">12,457.90</span>
+                                         </button>
+                                     </div>
+                                 </div>
+                                 <div class="chart-bottom-info">
+                                     <div class="chart-stats-mini">
+                                         <div class="mini-stat"><span>YÜK:</span> <span class="v text-green">12,520</span></div>
+                                         <div class="mini-stat"><span>DÜŞ:</span> <span class="v text-red">12,195</span></div>
+                                         <div class="mini-stat"><span>HAC:</span> <span class="v">2.44M</span></div>
+                                     </div>
+                                     <div class="chart-timeframes-bottom">
+                                         <button class="tf-btn" data-tf="15m">15dk</button>
+                                         <button class="tf-btn" data-tf="1h">1sa</button>
+                                         <button class="tf-btn active" data-tf="4h">4sa</button>
+                                         <button class="tf-btn" data-tf="1d">1G</button>
+                                         <button class="tf-btn" data-tf="1w">1H</button>
+                                     </div>
+                                 </div>
                             </div>
                             
                             <!-- Chart Sidebar (Right) -->
