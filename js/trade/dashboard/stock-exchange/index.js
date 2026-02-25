@@ -5,7 +5,18 @@ import { marketState, getMarketMultiplier, marketScenarios } from '../../../data
 import { resourcesList } from '../../../map/resources.js';
 import { resourcesEconomics } from '../../../data/city-stats.js';
 
-// Simüle edilmiş şirket borsası verileri
+export const PORTFOLIO_STATS = {
+    total: 45250.00,
+    change: 2.4,
+    holdings: [
+        { ticker: 'TKN', qty: 500, change: 5.8 },
+        { ticker: 'ENP', qty: 200, change: 2.1 },
+        { ticker: 'GDG', qty: 350, change: -1.2 },
+        { ticker: 'BYF', qty: 10, change: 2.8 },
+        { ticker: 'LXM', qty: 50, change: 1.5 }
+    ]
+};
+
 const STOCK_DATA = {
     companies: [
         { id: 'textile_corp', name: 'Tekstil A.Ş.', ticker: 'TKS', sector: 'textile', price: 1250, change: 3.5, volume: 125000, marketCap: 15000000 },
@@ -122,7 +133,7 @@ function renderFullExchangeView() {
                     <h1><i class="fa-solid fa-chart-line"></i> NOMOS Borsa</h1>
                     <div class="market-status open">
                         <span class="status-dot"></span>
-                        Piyasa Açık
+                        <span class="status-text">PİYAŞA AÇIK</span>
                     </div>
                 </div>
                 <div class="header-center">
@@ -134,7 +145,7 @@ function renderFullExchangeView() {
                         </button>
                         <button class="exchange-nav-btn" data-view="chart">
                             <i class="fa-solid fa-chart-line"></i>
-                            <span>Borsa</span>
+                            <span>Grafik</span>
                         </button>
                         <button class="exchange-nav-btn" data-view="funds">
                             <i class="fa-solid fa-coins"></i>
@@ -147,10 +158,16 @@ function renderFullExchangeView() {
                     </div>
                 </div>
                 <div class="header-right">
-                    <div class="portfolio-summary">
-                        <span class="label">Portföy Değeri</span>
-                        <span class="value text-gold">45,250 ₳</span>
-                        <span class="change positive">+2.4%</span>
+                    <div class="header-actions">
+                        <button class="btn-icon-header" title="Alarm Kur"><i class="fa-solid fa-bell"></i></button>
+                        <button class="btn-icon-header" title="Ayarlar"><i class="fa-solid fa-gear"></i></button>
+                    </div>
+                    <div class="portfolio-summary-compact">
+                        <div class="label">PORTFÖY</div>
+                        <div class="val-group">
+                            <span class="value">${PORTFOLIO_STATS.total.toLocaleString()} ₳</span>
+                            <span class="change positive">+${PORTFOLIO_STATS.change}%</span>
+                        </div>
                     </div>
                 </div>
             </header>
@@ -245,30 +262,87 @@ function renderFullExchangeView() {
 
                     <!-- VIEW: Chart -->
                     <div class="exchange-view-panel" id="view-chart">
-                        <div class="tv-chart-container">
-                            <div class="chart-header">
-                                <div class="chart-symbol">
-                                    <span class="symbol">NOMOS 100</span>
-                                    <span class="price">12,458.32</span>
-                                    <span class="change positive">+1.34%</span>
+                        <div class="tv-chart-main-layout">
+                            <div class="tv-chart-container">
+                                <div class="chart-header">
+                                    <div class="chart-symbol">
+                                        <div class="symbol-box">
+                                            <span class="symbol">NOMOS 100</span>
+                                            <span class="market">INDEX</span>
+                                        </div>
+                                        <div class="price-box">
+                                            <span class="price">12,458.32</span>
+                                            <span class="change positive">+1.34%</span>
+                                        </div>
+                                    </div>
+                                    <div class="chart-controls-group">
+                                        <div class="chart-type-selector">
+                                            <button class="chart-tool-btn active" data-chart-type="candle" title="Mum Grafiği">
+                                                <i class="fa-solid fa-chart-candlestick"></i>
+                                            </button>
+                                            <button class="chart-tool-btn" data-chart-type="line" title="Çizgi Grafiği">
+                                                <i class="fa-solid fa-chart-line"></i>
+                                            </button>
+                                        </div>
+                                        <div class="divider"></div>
+                                        <div class="chart-timeframes">
+                                            <button class="tf-btn" data-tf="15m">15dk</button>
+                                            <button class="tf-btn" data-tf="1h">1sa</button>
+                                            <button class="tf-btn active" data-tf="4h">4sa</button>
+                                            <button class="tf-btn" data-tf="1d">1G</button>
+                                            <button class="tf-btn" data-tf="1w">1H</button>
+                                        </div>
+                                    </div>
                                 </div>
-                                <div class="chart-timeframes">
-                                    <button class="tf-btn">1S</button>
-                                    <button class="tf-btn">1G</button>
-                                    <button class="tf-btn active">1H</button>
-                                    <button class="tf-btn">1A</button>
-                                    <button class="tf-btn">Tümü</button>
+                                <div class="chart-area" id="chart-main-area">
+                                    ${renderAdvancedChart()}
+                                </div>
+                                <div class="chart-bottom-info">
+                                    <div class="chart-stats-mini">
+                                        <div class="mini-stat"><span>YÜK:</span> <span class="v text-green">12,520</span></div>
+                                        <div class="mini-stat"><span>DÜŞ:</span> <span class="v text-red">12,195</span></div>
+                                        <div class="mini-stat"><span>HAC:</span> <span class="v">2.44M</span></div>
+                                    </div>
                                 </div>
                             </div>
-                            <div class="chart-area">
-                                ${renderAdvancedChart()}
-                            </div>
-                            <div class="chart-footer">
-                                <div class="chart-stats">
-                                    <div class="stat"><span class="label">Açılış</span><span class="val">12,280</span></div>
-                                    <div class="stat"><span class="label">Yüksek</span><span class="val text-green">12,520</span></div>
-                                    <div class="stat"><span class="label">Düşük</span><span class="val text-red">12,195</span></div>
-                                    <div class="stat"><span class="label">Hacim</span><span class="val">2.4M</span></div>
+                            
+                            <!-- Chart Sidebar (Right) -->
+                            <div class="chart-sidebar">
+                                <div class="sidebar-section">
+                                    <h4><i class="fa-solid fa-list-ul"></i> İzleme Listesi</h4>
+                                    <div class="watch-list" id="tv-watch-list">
+                                        <!-- Will be filled by JS -->
+                                        <div class="watch-item">
+                                            <span class="w-symbol">TKS</span>
+                                            <span class="w-price">1,250</span>
+                                            <span class="w-change positive">+3.5%</span>
+                                        </div>
+                                        <div class="watch-item">
+                                            <span class="w-symbol">TKN</span>
+                                            <span class="w-price">2,450</span>
+                                            <span class="w-change positive">+5.8%</span>
+                                        </div>
+                                        <div class="watch-item">
+                                            <span class="w-symbol">ENP</span>
+                                            <span class="w-price">1,780</span>
+                                            <span class="w-change negative">-0.4%</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="sidebar-section">
+                                    <div class="section-title-row">
+                                        <h4><i class="fa-solid fa-bell"></i> Alarmlar</h4>
+                                        <button class="btn-sidebar-add" id="btn-create-alert"><i class="fa-solid fa-plus"></i></button>
+                                    </div>
+                                    <div class="alert-list" id="tv-alert-list">
+                                        <div class="no-alerts">Aktif alarm bulunmuyor.</div>
+                                    </div>
+                                </div>
+                                <div class="sidebar-section filler">
+                                    <h4><i class="fa-solid fa-circle-info"></i> Detaylar</h4>
+                                    <div class="selection-details">
+                                        <p class="desc">Grafik üzerinde bir nokta seçerek veri detaylarını burada görebilirsiniz.</p>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -647,7 +721,72 @@ function renderAdvancedChart() {
 }
 
 // Initialize the interactive chart after DOM is ready
+let currentChartType = 'candle';
+let currentTimeframe = '4h';
+
 export function initInteractiveChart() {
+    setupChartEvents();
+    renderMainChart();
+}
+
+function setupChartEvents() {
+    const chartView = document.getElementById('view-chart');
+    if (!chartView || chartView.dataset.eventsSetup) return;
+
+    // Timeframe Buttons
+    chartView.querySelectorAll('.tf-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            chartView.querySelectorAll('.tf-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            currentTimeframe = btn.dataset.tf;
+            renderMainChart();
+        });
+    });
+
+    // Chart Type Buttons
+    chartView.querySelectorAll('.chart-tool-btn[data-chart-type]').forEach(btn => {
+        btn.addEventListener('click', () => {
+            chartView.querySelectorAll('.chart-tool-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            currentChartType = btn.dataset.chart - type;
+            renderMainChart();
+        });
+    });
+
+    // Alert Creation
+    const btnAlert = document.getElementById('btn-create-alert');
+    if (btnAlert) {
+        btnAlert.addEventListener('click', () => {
+            const price = prompt("Alarm kurmak istediğiniz fiyat seviyesini girin:", "12450");
+            if (price) {
+                addAlertToList(parseFloat(price));
+            }
+        });
+    }
+
+    chartView.dataset.eventsSetup = "true";
+}
+
+function addAlertToList(price) {
+    const list = document.getElementById('tv-alert-list');
+    if (list.querySelector('.no-alerts')) list.innerHTML = '';
+
+    const id = 'alert_' + Date.now();
+    const alertHtml = `
+        <div class="alert-item" id="${id}">
+            <div class="alert-info">
+                <span class="alert-symbol">NOMOS 100</span>
+                <span class="alert-price">${price.toLocaleString()}</span>
+            </div>
+            <button class="btn-clear-alert" onclick="this.closest('.alert-item').remove()">
+                <i class="fa-solid fa-trash-can"></i>
+            </button>
+        </div>
+    `;
+    list.insertAdjacentHTML('afterbegin', alertHtml);
+}
+
+function renderMainChart() {
     const canvas = document.getElementById('tv-chart-canvas');
     if (!canvas) return;
 
@@ -656,22 +795,23 @@ export function initInteractiveChart() {
 
     // Set canvas size
     const rect = wrapper.getBoundingClientRect();
-    canvas.width = rect.width || 800;
-    canvas.height = rect.height || 280;
+    canvas.width = rect.width;
+    canvas.height = rect.height;
 
     const width = canvas.width;
     const height = canvas.height;
-    const chartHeight = height - 60; // Leave space for volume
+    const chartHeight = height - 60;
     const volumeHeight = 40;
 
-    // Generate candle data
-    const candles = generateCandleData(50);
+    // Generate candle data based on timeframe
+    let candleCount = currentTimeframe === '15m' ? 80 : currentTimeframe === '1d' ? 30 : 50;
+    const candles = generateCandleData(candleCount);
     const maxHigh = Math.max(...candles.map(c => c.high));
     const minLow = Math.min(...candles.map(c => c.low));
     const range = maxHigh - minLow;
     const maxVolume = Math.max(...candles.map(c => c.volume));
 
-    const candleWidth = Math.floor((width - 80) / candles.length) - 2;
+    const candleWidth = Math.max(Math.floor((width - 80) / candles.length) - 2, 2);
     const gap = 2;
 
     // Store candle positions for hit detection
@@ -749,28 +889,59 @@ export function initInteractiveChart() {
             ctx.stroke();
 
             // Body
-            if (i === highlightIndex) {
-                ctx.fillStyle = bullish ? '#4ade80' : '#f87171';
-                ctx.shadowColor = bullish ? '#22c55e' : '#ef4444';
-                ctx.shadowBlur = 8;
-            } else {
-                ctx.fillStyle = bullish ? '#22c55e' : '#ef4444';
+            // Body / Line
+            if (currentChartType === 'candle') {
+                if (i === highlightIndex) {
+                    ctx.fillStyle = bullish ? '#4ade80' : '#f87171';
+                    ctx.shadowColor = bullish ? '#22c55e' : '#ef4444';
+                    ctx.shadowBlur = 8;
+                } else {
+                    ctx.fillStyle = bullish ? '#22c55e' : '#ef4444';
+                    ctx.shadowBlur = 0;
+                }
+                ctx.fillRect(x, bodyTop, candleWidth, bodyHeight);
                 ctx.shadowBlur = 0;
+            } else {
+                // Draw Line Chart
+                if (i > 0) {
+                    const prevX = (i - 1) * (candleWidth + gap) + 20 + candleWidth / 2;
+                    const prevY = 10 + ((maxHigh - candles[i - 1].close) / range) * (chartHeight - 20);
+                    ctx.beginPath();
+                    ctx.strokeStyle = '#2962ff';
+                    ctx.lineWidth = 2;
+                    ctx.moveTo(prevX, prevY);
+                    ctx.lineTo(x + candleWidth / 2, yClose);
+                    ctx.stroke();
+
+                    // Area
+                    ctx.beginPath();
+                    ctx.fillStyle = 'rgba(41, 98, 255, 0.05)';
+                    ctx.moveTo(prevX, prevY);
+                    ctx.lineTo(x + candleWidth / 2, yClose);
+                    ctx.lineTo(x + candleWidth / 2, chartHeight);
+                    ctx.lineTo(prevX, chartHeight);
+                    ctx.fill();
+                }
             }
-            ctx.fillRect(x, bodyTop, candleWidth, bodyHeight);
-            ctx.shadowBlur = 0;
 
             // Volume bar
             const volHeight = (c.volume / maxVolume) * volumeHeight;
-            ctx.fillStyle = bullish ? 'rgba(34, 197, 94, 0.25)' : 'rgba(239, 68, 68, 0.25)';
+            ctx.fillStyle = bullish ? 'rgba(34, 197, 94, 0.2)' : 'rgba(239, 68, 68, 0.2)';
             ctx.fillRect(x, height - volHeight - 5, candleWidth, volHeight);
         });
+
+        // Price Axis line
+        ctx.strokeStyle = '#2a2e39';
+        ctx.beginPath();
+        ctx.moveTo(width - 60, 0);
+        ctx.lineTo(width - 60, chartHeight);
+        ctx.stroke();
 
         // Volume label
         ctx.fillStyle = 'rgba(148, 163, 184, 0.5)';
         ctx.font = '9px Inter, sans-serif';
         ctx.textAlign = 'left';
-        ctx.fillText('VOL', 5, height - 10);
+        ctx.fillText('HACİM', 15, height - 10);
     }
 
     // Initial draw

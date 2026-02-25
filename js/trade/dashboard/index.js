@@ -4,7 +4,7 @@
 import { getGameState } from '../../data/state.js';
 import { marketState, initMarket } from '../../data/market.js';
 import { renderMyCompanySection, setupCompanyEventHandlers } from './my-company/index.js';
-import { renderStockExchangeSection, initInteractiveChart, setupExchangeViewNav } from './stock-exchange/index.js';
+import { renderStockExchangeSection, initInteractiveChart, setupExchangeViewNav, PORTFOLIO_STATS } from './stock-exchange/index.js';
 import { renderMarketNews } from './news/index.js';
 import { renderShipmentTracker } from './logistics/index.js';
 import { renderCommodityExchangeWidget, renderCommodityExchangeSection, setupCommodityExchangeEvents } from './commodity-exchange/index.js';
@@ -215,15 +215,17 @@ function renderOverviewTab() {
                     <div class="portfolio-summary-body">
                         <div class="portfolio-total">
                             <span class="portfolio-label">Toplam Değer</span>
-                            <span class="portfolio-value">45,250 ₳</span>
-                            <span class="portfolio-change positive">+2.4% <i class="fa-solid fa-arrow-up"></i></span>
+                            <span class="portfolio-value">${PORTFOLIO_STATS.total.toLocaleString()} ₳</span>
+                            <span class="portfolio-change positive">+${PORTFOLIO_STATS.change}% <i class="fa-solid fa-arrow-up"></i></span>
                         </div>
                         <div class="portfolio-holdings">
-                            <div class="holding-item"><span class="hold-ticker">TKN</span><span class="hold-qty">500 adet</span><span class="hold-val positive">+5.8%</span></div>
-                            <div class="holding-item"><span class="hold-ticker">ENP</span><span class="hold-qty">200 adet</span><span class="hold-val positive">+2.1%</span></div>
-                            <div class="holding-item"><span class="hold-ticker">GDG</span><span class="hold-qty">350 adet</span><span class="hold-val negative">-1.2%</span></div>
-                            <div class="holding-item"><span class="hold-ticker">BYF</span><span class="hold-qty">10 birim</span><span class="hold-val positive">+2.8%</span></div>
-                            <div class="holding-item"><span class="hold-ticker">LXM</span><span class="hold-qty">50 adet</span><span class="hold-val positive">+1.5%</span></div>
+                            ${PORTFOLIO_STATS.holdings.map(h => `
+                                <div class="holding-item">
+                                    <span class="hold-ticker">${h.ticker}</span>
+                                    <span class="hold-qty">${h.qty} adet</span>
+                                    <span class="hold-val ${h.change >= 0 ? 'positive' : 'negative'}">${h.change >= 0 ? '+' : ''}${h.change}%</span>
+                                </div>
+                            `).join('')}
                         </div>
                     </div>
                 </div>
