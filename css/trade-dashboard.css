@@ -12289,14 +12289,77 @@
     flex-direction: column;
 }
 
-/* Chart Bottom Timeframes */
+/* === CHART TOOLBAR & BUTTONS PREMIUM === */
+.chart-header {
+    background: #131722;
+    padding: 6px 12px;
+    border-bottom: 1px solid #2a2e39;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.chart-type-selector {
+    display: flex;
+    gap: 2px;
+    padding: 2px;
+    background: rgba(255, 255, 255, 0.02);
+    border-radius: 4px;
+}
+
+.chart-tool-btn {
+    background: transparent;
+    border: none;
+    color: #868993 !important;
+    font-size: 0.82rem;
+    padding: 6px 10px;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+}
+
+.chart-tool-btn:hover {
+    background: #2a2e39;
+    color: #d1d4dc !important;
+}
+
+.chart-tool-btn.active {
+    background: rgba(41, 98, 255, 0.15);
+    color: #2962ff !important;
+    font-weight: 600;
+}
+
+.zoom-controls {
+    display: flex;
+    gap: 4px;
+}
+
+.zoom-controls .chart-tool-btn {
+    padding: 5px;
+    width: 28px;
+    height: 28px;
+}
+
+.divider {
+    width: 1px;
+    height: 18px;
+    background: #2a2e39;
+    margin: 0 10px;
+}
+
+/* TimeScale Styles */
 .chart-bottom-info {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 6px 15px;
+    padding: 0 15px;
     background: #131722;
     border-top: 1px solid #2a2e39;
+    height: 38px;
 }
 
 .chart-timeframes-bottom {
@@ -12318,49 +12381,38 @@
 
 .chart-timeframes-bottom .tf-btn:hover {
     color: #d1d4dc;
+    background: rgba(255, 255, 255, 0.03);
 }
 
 .chart-timeframes-bottom .tf-btn.active {
-    background: rgba(41, 98, 255, 0.1);
     color: #2962ff;
+    background: rgba(41, 98, 255, 0.1);
 }
 
-/* Zoom Controls & Hint */
-.zoom-controls {
-    display: flex;
-    gap: 5px;
-    margin-left: 10px;
-}
-
+/* Chart Area & Hint */
 .chart-area {
     position: relative;
+    flex: 1;
 }
 
 .zoom-hint {
     position: absolute;
     bottom: 20px;
     left: 20px;
-    background: rgba(0, 0, 0, 0.6);
+    background: rgba(19, 23, 34, 0.9);
     color: #868993;
-    padding: 4px 10px;
+    padding: 6px 12px;
     border-radius: 6px;
     font-size: 0.65rem;
     pointer-events: none;
     z-index: 10;
     backdrop-filter: blur(4px);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    border: 1px solid #2a2e39;
     opacity: 0;
     transition: opacity 0.3s;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
 }
 
 .chart-area:hover .zoom-hint {
     opacity: 1;
-}
-
-
-.divider {
-    width: 1px;
-    height: 20px;
-    background: #2a2e39;
-    margin: 0 10px;
 }

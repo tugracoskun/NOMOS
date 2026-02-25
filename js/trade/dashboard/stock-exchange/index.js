@@ -825,9 +825,9 @@ function renderMainChart() {
 
     const width = canvas.width;
     const height = canvas.height;
-    const xAxisHeight = 30; // Extra space for time labels
-    const chartHeight = height - volumeHeight - xAxisHeight - 20;
+    const xAxisHeight = 30;
     const volumeHeight = 40;
+    const chartHeight = height - volumeHeight - xAxisHeight - 20;
 
     // Generate candle data based on timeframe and zoom level
     const baseCount = currentTimeframe === '15m' ? 80 : currentTimeframe === '1d' ? 30 : 50;
@@ -958,21 +958,57 @@ function renderMainChart() {
             // Volume bar
             const volHeight = (c.volume / maxVolume) * volumeHeight;
             ctx.fillStyle = bullish ? 'rgba(34, 197, 94, 0.2)' : 'rgba(239, 68, 68, 0.2)';
-            ctx.fillRect(x, height - volHeight - 5, candleWidth, volHeight);
+            ctx.fillRect(x, height - xAxisHeight - volHeight - 2, candleWidth, volHeight);
         });
 
         // Price Axis line
         ctx.strokeStyle = '#2a2e39';
         ctx.beginPath();
         ctx.moveTo(width - 60, 0);
-        ctx.lineTo(width - 60, chartHeight);
+        ctx.lineTo(width - 60, height - xAxisHeight);
         ctx.stroke();
+
+        // X-Axis (Time) Line
+        ctx.strokeStyle = '#2a2e39';
+        ctx.beginPath();
+        ctx.moveTo(0, height - xAxisHeight);
+        ctx.lineTo(width, height - xAxisHeight);
+        ctx.stroke();
+
+        // Time Axis Labels
+        ctx.fillStyle = 'rgba(148, 163, 184, 0.8)';
+        ctx.font = '10px Inter, sans-serif';
+        ctx.textAlign = 'center';
+
+        const labelInterval = Math.max(1, Math.floor(candles.length / 8));
+        candles.forEach((c, i) => {
+            if (i % labelInterval === 0) {
+                const x = i * (candleWidth + gap) + 20 + candleWidth / 2;
+                const date = new Date(c.timestamp);
+                let label = '';
+
+                if (currentTimeframe === '15m' || currentTimeframe === '1h' || currentTimeframe === '4h') {
+                    label = date.getHours().toString().padStart(2, '0') + ':' + date.getMinutes().toString().padStart(2, '0');
+                } else {
+                    label = date.getDate() + ' ' + date.toLocaleString('tr-TR', { month: 'short' });
+                }
+
+                ctx.fillText(label, x, height - 10);
+
+                // Vertical grid lines
+                ctx.strokeStyle = 'rgba(255, 255, 255, 0.03)';
+                ctx.beginPath();
+                ctx.moveTo(x, 0);
+                ctx.lineTo(x, height - xAxisHeight);
+                ctx.stroke();
+            }
+        });
 
         // Volume label
         ctx.fillStyle = 'rgba(148, 163, 184, 0.5)';
         ctx.font = '9px Inter, sans-serif';
         ctx.textAlign = 'left';
-        ctx.fillText('HACİM', 15, height - 10);
+        ctx.fillText('HACİM', 15, height - xAxisHeight - 5);
     }
 
     // Initial draw
@@ -1045,7 +1081,7 @@ function renderMainChart() {
     });
 }
 
-function generateCandleData(count) {
+function generateCandleData(count, timeframe) {
     let price = 12000 + Math.random() * 500;
     const data = [];
 
