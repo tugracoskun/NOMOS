@@ -285,16 +285,15 @@ function renderFullExchangeView() {
                                             </button>
                                         </div>
                                         <div class="divider"></div>
-                                        <div class="chart-timeframes">
-                                            <button class="tf-btn" data-tf="15m">15dk</button>
-                                            <button class="tf-btn" data-tf="1h">1sa</button>
-                                            <button class="tf-btn active" data-tf="4h">4sa</button>
-                                            <button class="tf-btn" data-tf="1d">1G</button>
-                                            <button class="tf-btn" data-tf="1w">1H</button>
+                                        <div class="zoom-controls">
+                                            <button class="chart-tool-btn" id="btn-zoom-in" title="Yakınlaştır"><i class="fa-solid fa-magnifying-glass-plus"></i></button>
+                                            <button class="chart-tool-btn" id="btn-zoom-out" title="Uzaklaştır"><i class="fa-solid fa-magnifying-glass-minus"></i></button>
+                                            <button class="chart-tool-btn" id="btn-zoom-reset" title="Sıfırla"><i class="fa-solid fa-arrows-rotate"></i></button>
                                         </div>
                                     </div>
                                 </div>
                                 <div class="chart-area" id="chart-main-area">
+                                    <div class="zoom-hint">Fare tekerleği ile yakınlaştırın</div>
                                     ${renderAdvancedChart()}
                                 </div>
                                 <div class="chart-bottom-info">
@@ -302,6 +301,13 @@ function renderFullExchangeView() {
                                         <div class="mini-stat"><span>YÜK:</span> <span class="v text-green">12,520</span></div>
                                         <div class="mini-stat"><span>DÜŞ:</span> <span class="v text-red">12,195</span></div>
                                         <div class="mini-stat"><span>HAC:</span> <span class="v">2.44M</span></div>
+                                    </div>
+                                    <div class="chart-timeframes-bottom">
+                                        <button class="tf-btn" data-tf="15m">15dk</button>
+                                        <button class="tf-btn" data-tf="1h">1sa</button>
+                                        <button class="tf-btn active" data-tf="4h">4sa</button>
+                                        <button class="tf-btn" data-tf="1d">1G</button>
+                                        <button class="tf-btn" data-tf="1w">1H</button>
                                     </div>
                                 </div>
                             </div>
@@ -311,7 +317,6 @@ function renderFullExchangeView() {
                                 <div class="sidebar-section">
                                     <h4><i class="fa-solid fa-list-ul"></i> İzleme Listesi</h4>
                                     <div class="watch-list" id="tv-watch-list">
-                                        <!-- Will be filled by JS -->
                                         <div class="watch-item">
                                             <span class="w-symbol">TKS</span>
                                             <span class="w-price">1,250</span>
@@ -723,6 +728,7 @@ function renderAdvancedChart() {
 // Initialize the interactive chart after DOM is ready
 let currentChartType = 'candle';
 let currentTimeframe = '4h';
+let currentZoom = 1.0;
 
 export function initInteractiveChart() {
     setupChartEvents();
@@ -733,7 +739,7 @@ function setupChartEvents() {
     const chartView = document.getElementById('view-chart');
     if (!chartView || chartView.dataset.eventsSetup) return;
 
-    // Timeframe Buttons
+    // Timeframe Buttons (Now at the bottom)
     chartView.querySelectorAll('.tf-btn').forEach(btn => {
         btn.addEventListener('click', () => {
             chartView.querySelectorAll('.tf-btn').forEach(b => b.classList.remove('active'));
@@ -748,19 +754,38 @@ function setupChartEvents() {
         btn.addEventListener('click', () => {
             chartView.querySelectorAll('.chart-tool-btn').forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
-            currentChartType = btn.dataset.chart - type;
+            currentChartType = btn.dataset.chartType; // Fix: Use camelCase for data-chart-type
             renderMainChart();
         });
     });
+
+    // Zoom Controls
+    const btnZoomIn = document.getElementById('btn-zoom-in');
+    const btnZoomOut = document.getElementById('btn-zoom-out');
+    const btnZoomReset = document.getElementById('btn-zoom-reset');
+    const chartArea = document.getElementById('chart-main-area');
+
+    if (btnZoomIn) btnZoomIn.addEventListener('click', () => { currentZoom = Math.min(5, currentZoom * 1.2); renderMainChart(); });
+    if (btnZoomOut) btnZoomOut.addEventListener('click', () => { currentZoom = Math.max(0.2, currentZoom / 1.2); renderMainChart(); });
+    if (btnZoomReset) btnZoomReset.addEventListener('click', () => { currentZoom = 1.0; renderMainChart(); });
+
+    // Wheel Zoom
+    if (chartArea) {
+        chartArea.addEventListener('wheel', (e) => {
+            e.preventDefault();
+            const zoomSpeed = 0.1;
+            if (e.deltaY < 0) currentZoom = Math.min(5, currentZoom + zoomSpeed);
+            else currentZoom = Math.max(0.2, currentZoom - zoomSpeed);
+            renderMainChart();
+        }, { passive: false });
+    }
 
     // Alert Creation
     const btnAlert = document.getElementById('btn-create-alert');
     if (btnAlert) {
         btnAlert.addEventListener('click', () => {
             const price = prompt("Alarm kurmak istediğiniz fiyat seviyesini girin:", "12450");
-            if (price) {
-                addAlertToList(parseFloat(price));
-            }
+            if (price) addAlertToList(parseFloat(price));
         });
     }
 
@@ -800,12 +825,14 @@ function renderMainChart() {
 
     const width = canvas.width;
     const height = canvas.height;
-    const chartHeight = height - 60;
+    const xAxisHeight = 30; // Extra space for time labels
+    const chartHeight = height - volumeHeight - xAxisHeight - 20;
     const volumeHeight = 40;
 
-    // Generate candle data based on timeframe
-    let candleCount = currentTimeframe === '15m' ? 80 : currentTimeframe === '1d' ? 30 : 50;
-    const candles = generateCandleData(candleCount);
+    // Generate candle data based on timeframe and zoom level
+    const baseCount = currentTimeframe === '15m' ? 80 : currentTimeframe === '1d' ? 30 : 50;
+    const candleCount = Math.max(10, Math.floor(baseCount / currentZoom));
+    const candles = generateCandleData(candleCount, currentTimeframe);
     const maxHigh = Math.max(...candles.map(c => c.high));
     const minLow = Math.min(...candles.map(c => c.low));
     const range = maxHigh - minLow;
@@ -876,8 +903,12 @@ function renderMainChart() {
 
             // Highlight effect
             if (i === highlightIndex) {
-                ctx.fillStyle = 'rgba(34, 211, 238, 0.1)';
-                ctx.fillRect(x - 2, 0, candleWidth + 4, chartHeight);
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.03)';
+                ctx.fillRect(x - gap, 0, candleWidth + gap * 2, height - xAxisHeight);
+
+                // Active X label highlight
+                ctx.fillStyle = '#2962ff';
+                ctx.fillRect(x - gap, height - xAxisHeight, candleWidth + gap * 2, 2);
             }
 
             // Wick
@@ -1018,6 +1049,13 @@ function generateCandleData(count) {
     let price = 12000 + Math.random() * 500;
     const data = [];
 
+    const now = Date.now();
+    let timeStep = 1000 * 60 * 60 * 4; // Default 4h
+    if (timeframe === '15m') timeStep = 1000 * 60 * 15;
+    else if (timeframe === '1h') timeStep = 1000 * 60 * 60;
+    else if (timeframe === '1d') timeStep = 1000 * 60 * 60 * 24;
+    else if (timeframe === '1w') timeStep = 1000 * 60 * 60 * 24 * 7;
+
     for (let i = 0; i < count; i++) {
         const open = price;
         const volatility = 50 + Math.random() * 80;
@@ -1027,11 +1065,16 @@ function generateCandleData(count) {
         const high = Math.max(open, close) + Math.random() * 40;
         const low = Math.min(open, close) - Math.random() * 40;
         price = close;
+
+        // Reverse order for time
+        const timestamp = now - (count - i) * timeStep;
+
         data.push({
             open,
             close,
             high,
             low,
+            timestamp,
             volume: 30 + Math.random() * 70
         });
     }

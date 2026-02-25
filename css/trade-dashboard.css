@@ -12257,3 +12257,110 @@
     font-weight: 800;
     color: #22c55e;
 }
+
+/* === BORSA LAYOUT & GAP FIX === */
+.exchange-full-view {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.exchange-main-layout {
+    display: flex;
+    flex: 1;
+    overflow: hidden;
+    gap: 0;
+}
+
+.exchange-left-panel {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+.exchange-view-panel {
+    display: none;
+    height: 100%;
+}
+
+.exchange-view-panel.active {
+    display: flex;
+    flex-direction: column;
+}
+
+/* Chart Bottom Timeframes */
+.chart-bottom-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 6px 15px;
+    background: #131722;
+    border-top: 1px solid #2a2e39;
+}
+
+.chart-timeframes-bottom {
+    display: flex;
+    gap: 4px;
+}
+
+.chart-timeframes-bottom .tf-btn {
+    background: transparent;
+    border: none;
+    color: #868993;
+    font-size: 0.72rem;
+    font-weight: 700;
+    padding: 4px 10px;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: all 0.2s;
+}
+
+.chart-timeframes-bottom .tf-btn:hover {
+    color: #d1d4dc;
+}
+
+.chart-timeframes-bottom .tf-btn.active {
+    background: rgba(41, 98, 255, 0.1);
+    color: #2962ff;
+}
+
+/* Zoom Controls & Hint */
+.zoom-controls {
+    display: flex;
+    gap: 5px;
+    margin-left: 10px;
+}
+
+.chart-area {
+    position: relative;
+}
+
+.zoom-hint {
+    position: absolute;
+    bottom: 20px;
+    left: 20px;
+    background: rgba(0, 0, 0, 0.6);
+    color: #868993;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 0.65rem;
+    pointer-events: none;
+    z-index: 10;
+    backdrop-filter: blur(4px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+.chart-area:hover .zoom-hint {
+    opacity: 1;
+}
+
+
+.divider {
+    width: 1px;
+    height: 20px;
+    background: #2a2e39;
+    margin: 0 10px;
+}
