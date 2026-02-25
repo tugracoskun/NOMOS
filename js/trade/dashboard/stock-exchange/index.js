@@ -278,11 +278,30 @@ function renderFullExchangeView() {
                                     <div class="chart-controls-group">
                                         <div class="chart-type-selector">
                                             <button class="chart-tool-btn active" data-chart-type="candle" title="Mum Grafiği">
-                                                <i class="fa-solid fa-chart-candlestick"></i>
+                                                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" class="custom-chart-icon">
+                                                    <rect x="2" y="11" width="3" height="6" rx="0.5" opacity="0.4"/>
+                                                    <rect x="3.2" y="9" width="0.6" height="10" rx="0.3" opacity="0.2"/>
+                                                    <rect x="7" y="6" width="3" height="7" rx="0.5" opacity="0.4"/>
+                                                    <rect x="8.2" y="4" width="0.6" height="11" rx="0.3" opacity="0.2"/>
+                                                    <rect x="12" y="10" width="3" height="6" rx="0.5" opacity="0.4"/>
+                                                    <rect x="13.2" y="8" width="0.6" height="10" rx="0.3" opacity="0.2"/>
+                                                    <rect x="17" y="4" width="3" height="8" rx="0.5" opacity="0.4"/>
+                                                    <rect x="18.2" y="2" width="0.6" height="12" rx="0.3" opacity="0.2"/>
+                                                    <path d="M1 18L6 13L11 16L22 5" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                                    <path d="M17 5H22V10" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                                </svg>
                                             </button>
                                             <button class="chart-tool-btn" data-chart-type="line" title="Çizgi Grafiği">
                                                 <i class="fa-solid fa-chart-line"></i>
                                             </button>
+                                        </div>
+                                        <div class="divider"></div>
+                                        <div class="timeline-tabs compact">
+                                            <button class="tf-btn" data-tf="15m">15dk</button>
+                                            <button class="tf-btn" data-tf="1h">1sa</button>
+                                            <button class="tf-btn active" data-tf="4h">4sa</button>
+                                            <button class="tf-btn" data-tf="1d">1g</button>
+                                            <button class="tf-btn" data-tf="1w">1h</button>
                                         </div>
                                         <div class="divider"></div>
                                         <div class="zoom-controls">
@@ -299,15 +318,6 @@ function renderFullExchangeView() {
 
                                 <!-- Integrated Internal Content -->
                                 <div class="chart-internal-content">
-                                    <div class="tv-chart-timeline-large">
-                                        <div class="timeline-tabs">
-                                            <button class="tf-btn" data-tf="15m">15 Dakika</button>
-                                            <button class="tf-btn" data-tf="1h">1 Saat</button>
-                                            <button class="tf-btn active" data-tf="4h">4 Saat</button>
-                                            <button class="tf-btn" data-tf="1d">1 Gün</button>
-                                            <button class="tf-btn" data-tf="1w">1 Hafta</button>
-                                        </div>
-                                    </div>
 
                                     <div class="chart-internal-grid">
                                         <div class="internal-col-left">
