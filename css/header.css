@@ -197,9 +197,10 @@
     border-radius: 6px;
     padding: 0 10px;
     height: 32px;
-    /* Resource group ile eşit boy */
     width: 200px;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    flex-shrink: 0;
+    /* Sarsılmayı önlemek için */
 }
 
 .search-wrapper-mini:hover {
@@ -260,6 +261,8 @@
     height: 32px;
     border-radius: 6px;
     border: 1px solid var(--border);
+    flex-shrink: 0;
+    /* Sarsılmayı önlemek için */
 }
 
 .text-yellow {
@@ -296,10 +299,20 @@
     text-shadow: 0 1px 2px black;
 }
 
+.resource-value {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--text-light);
+    font-variant-numeric: tabular-nums;
+    /* Sayılar değişirken titremeyi önler */
+}
+
 .label {
-    font-size: 0.75rem;
+    font-size: 0.7rem;
     color: var(--text-dim);
-    font-weight: 500;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
 
 .settings-btn {
