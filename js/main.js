@@ -26,6 +26,22 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
+    // --- GLOBAL SEARCH SHORTCUT (/) ---
+    document.addEventListener('keydown', (e) => {
+        // Eğer bir input/textarea içinde değilsek ve '/' basalırsa
+        if (e.key === '/' && document.activeElement.tagName !== 'INPUT' && document.activeElement.tagName !== 'TEXTAREA') {
+            e.preventDefault();
+            const searchInput = document.getElementById('global-search-input');
+            if (searchInput) {
+                searchInput.focus();
+            }
+        }
+        // ESC ile aramadan çık
+        if (e.key === 'Escape' && document.activeElement.id === 'global-search-input') {
+            document.activeElement.blur();
+        }
+    });
+
     // Sayfa ilk açıldığında veya F5 atıldığında URL'e göre doğru yeri aç
     handleInitialLoad();
 });

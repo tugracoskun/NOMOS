@@ -18,11 +18,14 @@
     padding: 20px;
 
     /* KRİTİK AYAR 2: ALT SINIR */
-    /* Header (60px top + 50px nav + 2px loading) = 112px + padding */
-    height: calc(100vh - 132px);
+    height: calc(100vh - 130px);
+    /* Dikey alanı daha agresif doldur */
+    /* Header + Footer/Padding telafisi */
+    min-height: 500px;
 
     overflow: hidden;
     align-items: stretch;
+    /* İçerideki sütunları boydan boya uzat */
     animation: fadeIn 0.4s ease;
 }
 
@@ -42,22 +45,25 @@
 .home-col-left {
     display: flex;
     flex-direction: column;
-    gap: 8px;
-    overflow: hidden;
+    gap: 12px;
+    overflow-y: auto;
     padding-right: 5px;
+    height: 100%;
 }
 
 /* Meclis widget kalan alanı doldursun */
 .parliament-widget {
     flex: 1;
+    min-height: 0;
 }
 
 .home-col-right {
     display: flex;
     flex-direction: column;
-    gap: 8px;
-    overflow: hidden;
+    gap: 12px;
+    overflow-y: auto;
     padding-right: 5px;
+    height: 100%;
 }
 
 
@@ -487,19 +493,24 @@
 .home-col-center {
     display: flex;
     flex-direction: column;
-    height: 100%;
+    height: 100% !important;
+    min-height: 0;
     min-width: 0;
+    align-self: stretch;
 }
 
 .chat-container {
     background-color: var(--bg-card);
     border: 1px solid var(--border);
     border-radius: 12px;
+    flex: 1;
+    /* TÜM ALANI DOLDUR */
     height: 100%;
     display: flex;
     flex-direction: column;
     overflow: hidden;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+    position: relative;
 }
 
 .chat-header-tabs {
@@ -537,13 +548,15 @@
 
 .chat-messages-area {
     flex: 1;
+    /* MESAJ ALANINI UZAT */
     overflow-y: auto;
     padding: 20px;
     display: flex;
     flex-direction: column;
-    gap: 15px;
-    background-image: radial-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px);
-    background-size: 20px 20px;
+    gap: 12px;
+    background: rgba(15, 23, 42, 0.2);
+    /* Bütünleşik koyu arka plan */
+    border-bottom: 1px solid rgba(255, 255, 255, 0.03);
 }
 
 .chat-messages-area::-webkit-scrollbar {
