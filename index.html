@@ -36,15 +36,22 @@
     <!-- ÜST PANEL -->
     <header class="game-header">
         <div class="header-top">
-            <!-- Profil -->
-            <div class="user-section">
-                <div class="avatar-frame">
+            <!-- Profil & Enerji Status Card -->
+            <div class="user-profile-status">
+                <div class="avatar-container">
+                    <div class="avatar-glow"></div>
                     <img src="https://i.pravatar.cc/150?img=11" alt="Avatar" id="user-avatar">
-                    <span class="level-badge">LVL 12</span>
+                    <div class="level-indicator">12</div>
                 </div>
-                <div class="user-details">
-                    <span class="username">Başkan [TR]</span>
-                    <span class="user-title">Parti Lideri</span>
+                <div class="user-info-area">
+                    <div class="user-meta">
+                        <span class="username">Başkan [TR]</span>
+                    </div>
+                    <div class="energy-container-mini">
+                        <div class="energy-bar-bg">
+                            <div class="energy-bar-fill" style="width: 85%;" id="energy-bar"></div>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -59,18 +66,10 @@
 
             <!-- Enerji ve Ayarlar -->
             <div class="status-section">
-                <div class="resource-group">
+                <div class="resource-group gold-display">
                     <i class="fa-solid fa-coins text-gold"></i>
                     <span class="resource-value" id="global-gold">50,000</span>
                     <span class="label">Altın</span>
-                </div>
-                <div class="resource-group">
-                    <i class="fa-solid fa-bolt text-yellow"></i>
-                    <div class="bar-container">
-                        <div class="bar-fill" style="width: 85%;" id="energy-bar"></div>
-                        <span class="bar-text" id="energy-text">85 / 100</span>
-                    </div>
-                    <span class="label">Enerji</span>
                 </div>
                 <button class="settings-btn" id="btn-settings"><i class="fa-solid fa-gear"></i> Ayarlar</button>
             </div>
