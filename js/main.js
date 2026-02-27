@@ -31,13 +31,13 @@ document.addEventListener('DOMContentLoaded', () => {
         // Eğer bir input/textarea içinde değilsek ve '/' basalırsa
         if (e.key === '/' && document.activeElement.tagName !== 'INPUT' && document.activeElement.tagName !== 'TEXTAREA') {
             e.preventDefault();
-            const searchInput = document.getElementById('global-search-input');
+            const searchInput = document.getElementById('global-search-input-compact');
             if (searchInput) {
                 searchInput.focus();
             }
         }
         // ESC ile aramadan çık
-        if (e.key === 'Escape' && document.activeElement.id === 'global-search-input') {
+        if (e.key === 'Escape' && document.activeElement.id === 'global-search-input-compact') {
             document.activeElement.blur();
         }
     });
