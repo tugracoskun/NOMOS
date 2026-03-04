@@ -221,7 +221,7 @@ function renderFullExchangeView() {
                                     </div>
                                     <div class="indices-grid-modern">
                                         ${STOCK_DATA.indices.map(index => `
-                                            <div class="premium-index-card ${index.change >= 0 ? 'bullish' : 'bearish'}">
+                                            <div class="premium-index-card ${index.change >= 0 ? 'bullish' : 'bearish'}" data-index-name="${index.name}" style="cursor:pointer;" title="Detay için tıklayın">
                                                 <div class="glass-reflection"></div>
                                                 <div class="card-content">
                                                     <div class="card-top">
@@ -535,6 +535,283 @@ export function setupExchangeViewNav() {
     setupWorldStockSorting();
     setupFundEvents(); // Initial load
     setupSubTabs(); // Handle sub-tabs in overview
+    setupIndexCardClicks(); // Endeks kartlarına tıklama
+}
+
+// === INDEX CARD CLICK → POPUP PREVIEW ===
+function setupIndexCardClicks() {
+    document.addEventListener('click', (e) => {
+        const card = e.target.closest('.premium-index-card[data-index-name]');
+        if (!card) return;
+
+        const indexName = card.dataset.indexName;
+        const index = STOCK_DATA.indices.find(i => i.name === indexName);
+        if (index) {
+            showIndexPreviewPopup(index);
+        }
+    });
+}
+
+function showIndexPreviewPopup(index) {
+    // Remove existing popup
+    const existing = document.getElementById('index-preview-popup');
+    if (existing) existing.remove();
+
+    const isUp = index.change >= 0;
+    const color = isUp ? '#4ade80' : '#f87171';
+    const accentColor = isUp ? '#22c55e' : '#ef4444';
+
+    // Mock detailed data
+    const open = (index.value * (1 - index.change / 200)).toFixed(2);
+    const high = (index.value * (1 + Math.abs(index.change) / 80)).toFixed(2);
+    const low = (index.value * (1 - Math.abs(index.change) / 60)).toFixed(2);
+    const prevClose = (index.value * (1 - index.change / 100)).toFixed(2);
+    const volume = (Math.random() * 5 + 1).toFixed(2);
+    const week52High = (index.value * 1.15).toFixed(2);
+    const week52Low = (index.value * 0.78).toFixed(2);
+    const changeAbs = (index.value - parseFloat(prevClose)).toFixed(2);
+
+    // Generate mock candle data for SVG
+    const candles = generateMockCandlestickData(index.value, index.change, 30);
+    const chartSVG = renderDetailedIndexChart(candles, color, index.name);
+
+    const popupHTML = `
+        <div class="index-popup-overlay" id="index-preview-popup">
+            <div class="index-popup-container">
+
+                <!-- Header -->
+                <div class="index-popup-header">
+                    <div class="popup-title-area">
+                        <div class="popup-index-badge ${isUp ? 'bullish' : 'bearish'}">
+                            <i class="fa-solid fa-chart-line"></i>
+                        </div>
+                        <div class="popup-title-text">
+                            <h2>${index.name}</h2>
+                            <span class="popup-subtitle">NOMOS Borsa Endeksi • Anlık Veri</span>
+                        </div>
+                    </div>
+                    <div class="popup-price-area">
+                        <span class="popup-main-price">${index.value.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
+                        <span class="popup-change-tag ${isUp ? 'positive' : 'negative'}">
+                            <i class="fa-solid fa-${isUp ? 'arrow-up' : 'arrow-down'}"></i>
+                            ${isUp ? '+' : ''}${changeAbs} (${isUp ? '+' : ''}${index.change}%)
+                        </span>
+                    </div>
+                    <button class="index-popup-close" id="index-popup-close-btn">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </div>
+
+                <!-- Chart Area -->
+                <div class="index-popup-chart-area">
+                    <div class="chart-timeframe-bar">
+                        <button class="tf-pill active">1G</button>
+                        <button class="tf-pill">1H</button>
+                        <button class="tf-pill">1A</button>
+                        <button class="tf-pill">3A</button>
+                        <button class="tf-pill">1Y</button>
+                        <button class="tf-pill">Tümü</button>
+                    </div>
+                    <div class="popup-chart-wrapper">
+                        ${chartSVG}
+                    </div>
+                </div>
+
+                <!-- Stats Grid -->
+                <div class="index-popup-stats">
+                    <div class="stat-item">
+                        <span class="stat-label">Açılış</span>
+                        <span class="stat-value">${parseFloat(open).toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Önceki Kapanış</span>
+                        <span class="stat-value">${parseFloat(prevClose).toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Gün Yüksek</span>
+                        <span class="stat-value text-green">${parseFloat(high).toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Gün Düşük</span>
+                        <span class="stat-value text-red">${parseFloat(low).toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">İşlem Hacmi</span>
+                        <span class="stat-value">${volume}M</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">52H Yüksek</span>
+                        <span class="stat-value text-green">${parseFloat(week52High).toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">52H Düşük</span>
+                        <span class="stat-value text-red">${parseFloat(week52Low).toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Piyasa Durumu</span>
+                        <span class="stat-value" style="color:${accentColor}">${isUp ? '🟢 Boğa' : '🔴 Ayı'}</span>
+                    </div>
+                </div>
+
+                <!-- Bottom Row: Summary + News -->
+                <div class="index-popup-bottom">
+                    <div class="popup-summary-box">
+                        <h4><i class="fa-solid fa-chart-pie"></i> Piyasa Özeti</h4>
+                        <p>
+                            ${index.name} endeksi bugün ${isUp ? 'yukarı yönlü' : 'aşağı yönlü'} bir seyir izledi. 
+                            Seans içinde ${isUp ? 'alıcılar baskısı' : 'satıcılar baskısı'} görüldü. 
+                            Endeks ${parseFloat(high).toLocaleString()} seviyesinden dirençle karşılaşırken, 
+                            ${parseFloat(low).toLocaleString()} seviyesinde destek buldu.
+                        </p>
+                    </div>
+                    <div class="popup-news-box">
+                        <h4><i class="fa-solid fa-newspaper"></i> Son Haberler</h4>
+                        <div class="popup-news-list">
+                            <div class="popup-news-item">
+                                <span class="news-dot ${isUp ? 'green' : 'red'}"></span>
+                                <span>${index.name} ${isUp ? 'pozitif açıldı' : 'negatif seyirde'}.</span>
+                                <small>2sa</small>
+                            </div>
+                            <div class="popup-news-item">
+                                <span class="news-dot"></span>
+                                <span>Merkez Bankası faiz kararını açıkladı.</span>
+                                <small>5sa</small>
+                            </div>
+                            <div class="popup-news-item">
+                                <span class="news-dot green"></span>
+                                <span>Dış ticaret verileri beklentilerin üzerinde.</span>
+                                <small>1g</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+
+    document.body.insertAdjacentHTML('beforeend', popupHTML);
+
+    // Animate in
+    requestAnimationFrame(() => {
+        const overlay = document.getElementById('index-preview-popup');
+        if (overlay) overlay.classList.add('active');
+    });
+
+    // Close handlers
+    const closeBtn = document.getElementById('index-popup-close-btn');
+    const overlay = document.getElementById('index-preview-popup');
+
+    const closePopup = () => {
+        if (overlay) {
+            overlay.classList.remove('active');
+            overlay.classList.add('closing');
+            setTimeout(() => overlay.remove(), 300);
+        }
+    };
+
+    closeBtn?.addEventListener('click', closePopup);
+    overlay?.addEventListener('click', (e) => {
+        if (e.target === overlay) closePopup();
+    });
+    document.addEventListener('keydown', function escHandler(e) {
+        if (e.key === 'Escape') {
+            closePopup();
+            document.removeEventListener('keydown', escHandler);
+        }
+    });
+
+    // Timeframe pills inside popup
+    const pills = overlay?.querySelectorAll('.tf-pill');
+    pills?.forEach(pill => {
+        pill.addEventListener('click', () => {
+            pills.forEach(p => p.classList.remove('active'));
+            pill.classList.add('active');
+        });
+    });
+}
+
+function generateMockCandlestickData(currentValue, changePercent, count) {
+    const data = [];
+    let price = currentValue * (1 - changePercent / 50);
+
+    for (let i = 0; i < count; i++) {
+        const trend = changePercent >= 0 ? 0.003 : -0.003;
+        const noise = (Math.random() - 0.45) * price * 0.015;
+        const open = price;
+        price = price * (1 + trend) + noise;
+        const close = price;
+        const high = Math.max(open, close) * (1 + Math.random() * 0.008);
+        const low = Math.min(open, close) * (1 - Math.random() * 0.008);
+        data.push({ open, close, high, low });
+    }
+    return data;
+}
+
+function renderDetailedIndexChart(candles, color, name) {
+    const W = 600, H = 200;
+    const padding = { top: 10, right: 10, bottom: 5, left: 10 };
+    const chartW = W - padding.left - padding.right;
+    const chartH = H - padding.top - padding.bottom;
+
+    const allPrices = candles.flatMap(c => [c.high, c.low]);
+    const minP = Math.min(...allPrices);
+    const maxP = Math.max(...allPrices);
+    const range = maxP - minP || 1;
+
+    const toY = (val) => padding.top + chartH - ((val - minP) / range) * chartH;
+    const barW = chartW / candles.length;
+
+    let candleSVG = '';
+    let areaPath = `M${padding.left},${toY(candles[0].close)}`;
+    let linePath = `M${padding.left},${toY(candles[0].close)}`;
+
+    candles.forEach((c, i) => {
+        const x = padding.left + i * barW + barW / 2;
+        const isGreen = c.close >= c.open;
+        const bodyTop = toY(Math.max(c.open, c.close));
+        const bodyBot = toY(Math.min(c.open, c.close));
+        const bodyH = Math.max(bodyBot - bodyTop, 1);
+        const wickColor = isGreen ? 'rgba(74, 222, 128, 0.5)' : 'rgba(248, 113, 113, 0.5)';
+        const bodyColor = isGreen ? 'rgba(74, 222, 128, 0.7)' : 'rgba(248, 113, 113, 0.7)';
+
+        // Wick
+        candleSVG += `<line x1="${x}" y1="${toY(c.high)}" x2="${x}" y2="${toY(c.low)}" stroke="${wickColor}" stroke-width="1"/>`;
+        // Body
+        candleSVG += `<rect x="${x - barW * 0.3}" y="${bodyTop}" width="${barW * 0.6}" height="${bodyH}" fill="${bodyColor}" rx="1"/>`;
+
+        // Line/area path
+        const closeY = toY(c.close);
+        linePath += ` L${x},${closeY}`;
+        areaPath += ` L${x},${closeY}`;
+    });
+
+    // Close area path
+    const lastX = padding.left + (candles.length - 1) * barW + barW / 2;
+    areaPath += ` L${lastX},${H} L${padding.left},${H} Z`;
+
+    const gradientId = `indexDetailGrad_${name.replace(/\s+/g, '')}`;
+
+    return `
+        <svg viewBox="0 0 ${W} ${H}" class="index-detail-chart-svg" preserveAspectRatio="none">
+            <defs>
+                <linearGradient id="${gradientId}" x1="0%" y1="0%" x2="0%" y2="100%">
+                    <stop offset="0%" stop-color="${color}" stop-opacity="0.15"/>
+                    <stop offset="100%" stop-color="${color}" stop-opacity="0"/>
+                </linearGradient>
+            </defs>
+            <!-- Grid lines -->
+            <line x1="${padding.left}" y1="${padding.top}" x2="${W - padding.right}" y2="${padding.top}" stroke="rgba(255,255,255,0.03)" stroke-width="1"/>
+            <line x1="${padding.left}" y1="${padding.top + chartH * 0.25}" x2="${W - padding.right}" y2="${padding.top + chartH * 0.25}" stroke="rgba(255,255,255,0.03)" stroke-width="1"/>
+            <line x1="${padding.left}" y1="${padding.top + chartH * 0.5}" x2="${W - padding.right}" y2="${padding.top + chartH * 0.5}" stroke="rgba(255,255,255,0.03)" stroke-width="1"/>
+            <line x1="${padding.left}" y1="${padding.top + chartH * 0.75}" x2="${W - padding.right}" y2="${padding.top + chartH * 0.75}" stroke="rgba(255,255,255,0.03)" stroke-width="1"/>
+            <!-- Area fill -->
+            <path d="${areaPath}" fill="url(#${gradientId})"/>
+            <!-- Candlesticks -->
+            ${candleSVG}
+            <!-- Line overlay -->
+            <path d="${linePath}" fill="none" stroke="${color}" stroke-width="1.5" stroke-linecap="round" opacity="0.6"/>
+        </svg>
+    `;
 }
 
 // === CONSOLIDATED SUB-TABS HANDLER ===
