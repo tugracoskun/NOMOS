@@ -220,9 +220,8 @@ function renderFullExchangeView() {
                                         </div>
                                     </div>
                                     <div class="indices-grid-modern">
-                                        ${STOCK_DATA.indices.map(index => `
+                                        ${STOCK_DATA.indices.map((index, idx) => `
                                             <div class="premium-index-card ${index.change >= 0 ? 'bullish' : 'bearish'}" data-index-name="${index.name}" style="cursor:pointer;" title="Detay için tıklayın">
-                                                <div class="glass-reflection"></div>
                                                 <div class="card-content">
                                                     <div class="card-top">
                                                         <span class="index-ticker">${index.name}</span>
@@ -234,24 +233,7 @@ function renderFullExchangeView() {
                                                         <span class="current-value">${index.value.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                                                     </div>
                                                     <div class="card-chart-area">
-                                                        <svg width="100%" height="80" viewBox="0 0 100 50" preserveAspectRatio="none">
-                                                            <defs>
-                                                                <linearGradient id="areaGrad_${index.name.replace(/\s+/g, '')}" x1="0%" y1="0%" x2="0%" y2="100%">
-                                                                    <stop offset="0%" stop-color="${index.change >= 0 ? '#4ade80' : '#f87171'}" stop-opacity="0.3"/>
-                                                                    <stop offset="100%" stop-color="${index.change >= 0 ? '#4ade80' : '#f87171'}" stop-opacity="0"/>
-                                                                </linearGradient>
-                                                            </defs>
-                                                            <!-- Area Fill -->
-                                                            <path d="M0,50 L0,35 Q15,${30 - index.change * 5} 30,${35 + index.change * 3} T60,${30 - index.change * 2} T100,25 L100,50 Z" 
-                                                                  fill="url(#areaGrad_${index.name.replace(/\s+/g, '')})"/>
-                                                            <!-- Main Line -->
-                                                            <path d="M0,35 Q15,${30 - index.change * 5} 30,${35 + index.change * 3} T60,${30 - index.change * 2} T100,25" 
-                                                                  fill="none" stroke="${index.change >= 0 ? '#4ade80' : '#f87171'}" stroke-width="2" stroke-linecap="round"/>
-                                                            <!-- Decorative markers (candlestick like) -->
-                                                            <line x1="20" y1="30" x2="20" y2="40" stroke="currentColor" stroke-width="1" opacity="0.2"/>
-                                                            <line x1="50" y1="25" x2="50" y2="35" stroke="currentColor" stroke-width="1" opacity="0.2"/>
-                                                            <line x1="80" y1="20" x2="80" y2="30" stroke="currentColor" stroke-width="1" opacity="0.2"/>
-                                                        </svg>
+                                                        <canvas class="index-mini-chart" data-index-idx="${idx}" data-base-value="${index.value}" data-change="${index.change}"></canvas>
                                                     </div>
                                                 </div>
                                             </div>
@@ -536,6 +518,123 @@ export function setupExchangeViewNav() {
     setupFundEvents(); // Initial load
     setupSubTabs(); // Handle sub-tabs in overview
     setupIndexCardClicks(); // Endeks kartlarına tıklama
+
+    // Render mini candlestick charts on index cards
+    setTimeout(() => renderIndexMiniCharts(), 100);
+}
+
+// === MINI CANDLESTICK CHARTS FOR INDEX CARDS ===
+function renderIndexMiniCharts() {
+    const canvases = document.querySelectorAll('.index-mini-chart');
+    canvases.forEach(canvas => {
+        const baseValue = parseFloat(canvas.dataset.baseValue);
+        const change = parseFloat(canvas.dataset.change);
+        drawMiniCandleChart(canvas, baseValue, change);
+    });
+}
+
+function drawMiniCandleChart(canvas, baseValue, changePercent) {
+    const wrapper = canvas.closest('.card-chart-area');
+    if (!wrapper) return;
+
+    const rect = wrapper.getBoundingClientRect();
+    canvas.width = rect.width;
+    canvas.height = rect.height;
+
+    const ctx = canvas.getContext('2d');
+    const W = canvas.width;
+    const H = canvas.height;
+
+    // Generate candle data
+    const count = 25;
+    let price = baseValue * (1 - changePercent / 80);
+    const candles = [];
+
+    for (let i = 0; i < count; i++) {
+        const open = price;
+        const volatility = baseValue * 0.003 + Math.random() * baseValue * 0.005;
+        const trend = Math.sin(i / 7) * 0.3 + (changePercent >= 0 ? 0.08 : -0.08) + (Math.random() - 0.46);
+        price = price + trend * volatility;
+        const close = price;
+        const high = Math.max(open, close) + Math.random() * baseValue * 0.002;
+        const low = Math.min(open, close) - Math.random() * baseValue * 0.002;
+        candles.push({ open, close, high, low });
+    }
+
+    const allPrices = candles.flatMap(c => [c.high, c.low]);
+    const maxP = Math.max(...allPrices);
+    const minP = Math.min(...allPrices);
+    const range = maxP - minP || 1;
+
+    const padTop = 4;
+    const padBot = 4;
+    const chartH = H - padTop - padBot;
+    const barW = Math.max((W / count) - 1.5, 2);
+    const gap = 1;
+
+    const toY = (val) => padTop + chartH - ((val - minP) / range) * chartH;
+
+    // Background gradient
+    const bgGrad = ctx.createLinearGradient(0, 0, 0, H);
+    bgGrad.addColorStop(0, 'rgba(19, 23, 34, 0.6)');
+    bgGrad.addColorStop(1, 'rgba(15, 20, 30, 0.95)');
+    ctx.fillStyle = bgGrad;
+    ctx.fillRect(0, 0, W, H);
+
+    // Area fill under line
+    const areaColor = changePercent >= 0 ? '#4ade80' : '#f87171';
+    const areaGrad = ctx.createLinearGradient(0, 0, 0, H);
+    areaGrad.addColorStop(0, changePercent >= 0 ? 'rgba(74, 222, 128, 0.12)' : 'rgba(248, 113, 113, 0.12)');
+    areaGrad.addColorStop(1, 'rgba(0, 0, 0, 0)');
+
+    ctx.beginPath();
+    candles.forEach((c, i) => {
+        const x = i * (barW + gap) + barW / 2;
+        const y = toY(c.close);
+        if (i === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+    });
+    const lastX = (candles.length - 1) * (barW + gap) + barW / 2;
+    ctx.lineTo(lastX, H);
+    ctx.lineTo(barW / 2, H);
+    ctx.closePath();
+    ctx.fillStyle = areaGrad;
+    ctx.fill();
+
+    // Draw candlesticks
+    candles.forEach((c, i) => {
+        const x = i * (barW + gap);
+        const bullish = c.close >= c.open;
+        const bodyTop = toY(Math.max(c.open, c.close));
+        const bodyBot = toY(Math.min(c.open, c.close));
+        const bodyH = Math.max(bodyBot - bodyTop, 1);
+
+        // Wick
+        ctx.strokeStyle = bullish ? 'rgba(74, 222, 128, 0.4)' : 'rgba(248, 113, 113, 0.4)';
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(x + barW / 2, toY(c.high));
+        ctx.lineTo(x + barW / 2, toY(c.low));
+        ctx.stroke();
+
+        // Body
+        ctx.fillStyle = bullish ? 'rgba(74, 222, 128, 0.65)' : 'rgba(248, 113, 113, 0.65)';
+        ctx.fillRect(x, bodyTop, barW, bodyH);
+    });
+
+    // Line overlay
+    ctx.beginPath();
+    candles.forEach((c, i) => {
+        const x = i * (barW + gap) + barW / 2;
+        const y = toY(c.close);
+        if (i === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+    });
+    ctx.strokeStyle = areaColor;
+    ctx.lineWidth = 1.2;
+    ctx.globalAlpha = 0.5;
+    ctx.stroke();
+    ctx.globalAlpha = 1;
 }
 
 // === INDEX CARD CLICK → POPUP PREVIEW ===

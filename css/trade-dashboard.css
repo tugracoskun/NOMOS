@@ -11749,49 +11749,95 @@
 
 /* === PREMIUM INDICES DESIGN === */
 .indices-container-premium {
-    padding: 24px 0;
+    padding: 0;
+    background: linear-gradient(145deg, rgba(19, 23, 34, 0.8), rgba(30, 34, 45, 0.6));
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow:
+        0 8px 32px rgba(0, 0, 0, 0.3),
+        inset 0 1px 0 rgba(255, 255, 255, 0.04);
 }
 
 .indices-header {
     display: flex;
     justify-content: space-between;
-    align-items: flex-end;
-    margin-bottom: 20px;
-    padding: 0 4px;
+    align-items: center;
+    padding: 18px 24px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    background: rgba(0, 0, 0, 0.15);
 }
 
 .title-with-desc h3 {
     margin: 0;
-    font-size: 1.25rem;
+    font-size: 1rem;
     font-weight: 800;
-    letter-spacing: -0.5px;
-    color: var(--text-primary);
+    letter-spacing: -0.3px;
+    color: #e2e8f0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.title-with-desc h3::before {
+    content: '';
+    width: 3px;
+    height: 16px;
+    background: linear-gradient(180deg, #3b82f6, #06b6d4);
+    border-radius: 2px;
+    flex-shrink: 0;
 }
 
 .title-with-desc p {
     margin: 4px 0 0 0;
-    font-size: 0.8rem;
-    color: var(--text-muted);
+    font-size: 0.7rem;
+    color: #475569;
+    padding-left: 13px;
 }
 
 .market-badge {
     display: flex;
     align-items: center;
     gap: 8px;
-    padding: 6px 12px;
-    background: rgba(34, 197, 94, 0.1);
-    border: 1px solid rgba(34, 197, 94, 0.2);
+    padding: 5px 14px;
+    background: rgba(34, 197, 94, 0.08);
+    border: 1px solid rgba(34, 197, 94, 0.15);
     border-radius: 20px;
-    font-size: 0.7rem;
-    font-weight: 700;
-    color: var(--accent-green);
+    font-size: 0.62rem;
+    font-weight: 800;
+    color: #4ade80;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
+.market-badge .dot.pulse {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #4ade80;
+    box-shadow: 0 0 8px rgba(74, 222, 128, 0.6);
+    animation: indexPulse 2s ease-in-out infinite;
+}
+
+@keyframes indexPulse {
+
+    0%,
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+
+    50% {
+        opacity: 0.5;
+        transform: scale(0.8);
+    }
 }
 
 /* === OVERVIEW DASHBOARD (GENERAL) === */
 .exchange-dashboard-grid {
     display: flex;
     flex-direction: column;
-    gap: 30px;
+    gap: 24px;
     padding: 24px;
     height: 100%;
     overflow-y: auto;
@@ -11849,94 +11895,126 @@
     flex: 1;
 }
 
-/* Premium Index Cards Refined */
+/* ============================================
+   PREMIUM INDEX CARDS - TradingView Grade 
+   ============================================ */
 .indices-grid-modern {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 20px;
-    margin-top: 20px;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0;
+    padding: 0;
 }
 
 .premium-index-card {
     position: relative;
-    background: linear-gradient(135deg, #131722 0%, #1e222d 100%);
-    border: 1px solid #2a2e39;
-    border-radius: 16px;
-    padding: 20px;
+    background: linear-gradient(165deg, rgba(19, 23, 34, 0.95) 0%, rgba(26, 30, 42, 0.9) 100%);
+    border: none;
+    border-right: 1px solid rgba(255, 255, 255, 0.04);
+    border-radius: 0;
+    padding: 22px 24px 0;
     overflow: hidden;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    cursor: pointer;
 }
 
-.premium-index-card.bullish {
-    border-top: 3px solid #4ade80;
+.premium-index-card:last-child {
+    border-right: none;
 }
 
-.premium-index-card.bearish {
-    border-top: 3px solid #f87171;
-}
-
+/* Hover Effects */
 .premium-index-card:hover {
-    transform: translateY(-6px);
-    border-color: #363a45;
-    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
+    background: linear-gradient(165deg, rgba(25, 30, 45, 0.98) 0%, rgba(30, 35, 50, 0.95) 100%);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+
+.premium-index-card:hover .card-chart-area {
+    opacity: 1;
+}
+
+/* Card Top Row */
+.premium-index-card .card-content {
+    position: relative;
+    z-index: 2;
 }
 
 .premium-index-card .card-top {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 15px;
+    margin-bottom: 12px;
 }
 
 .index-ticker {
-    font-size: 0.95rem;
+    font-size: 0.82rem;
     font-weight: 800;
-    color: #d1d4dc;
+    color: #94a3b8;
+    letter-spacing: 0.5px;
 }
 
 .index-change-tag {
-    font-size: 0.72rem;
+    font-size: 0.68rem;
     font-weight: 800;
-    padding: 3px 8px;
-    border-radius: 4px;
+    padding: 3px 10px;
+    border-radius: 6px;
+    letter-spacing: 0.3px;
 }
 
 .index-change-tag.positive {
     background: rgba(74, 222, 128, 0.1);
     color: #4ade80;
+    border: 1px solid rgba(74, 222, 128, 0.15);
 }
 
 .index-change-tag.negative {
     background: rgba(248, 113, 113, 0.1);
     color: #f87171;
+    border: 1px solid rgba(248, 113, 113, 0.15);
+}
+
+/* Price Value */
+.premium-index-card .card-middle {
+    margin-bottom: 6px;
 }
 
 .current-value {
-    font-size: 1.8rem;
+    font-size: 1.6rem;
     font-weight: 800;
-    color: #fff;
-    font-family: 'JetBrains Mono', monospace;
-    letter-spacing: -0.5px;
+    color: #f1f5f9;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -1px;
+    line-height: 1;
 }
 
+/* Chart Area */
 .card-chart-area {
-    margin-top: 20px;
-    height: 80px;
-    width: 100%;
-    margin-left: -20px;
-    margin-right: -20px;
-    width: calc(100% + 40px);
-    margin-bottom: -20px;
+    margin-top: 14px;
+    height: 70px;
+    width: calc(100% + 48px);
+    margin-left: -24px;
+    margin-right: -24px;
+    position: relative;
+    opacity: 0.9;
+    transition: opacity 0.3s ease;
 }
 
-.card-chart-area svg {
+.card-chart-area canvas {
     display: block;
     width: 100%;
+    height: 100%;
 }
 
 @media (max-width: 992px) {
     .indices-grid-modern {
         grid-template-columns: 1fr;
+    }
+
+    .premium-index-card {
+        border-right: none;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+    }
+
+    .premium-index-card:last-child {
+        border-bottom: none;
     }
 }
 
