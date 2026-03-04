@@ -558,7 +558,6 @@ function showIndexPreviewPopup(index) {
     if (existing) existing.remove();
 
     const isUp = index.change >= 0;
-    const color = isUp ? '#4ade80' : '#f87171';
     const accentColor = isUp ? '#22c55e' : '#ef4444';
 
     // Mock detailed data
@@ -570,10 +569,6 @@ function showIndexPreviewPopup(index) {
     const week52High = (index.value * 1.15).toFixed(2);
     const week52Low = (index.value * 0.78).toFixed(2);
     const changeAbs = (index.value - parseFloat(prevClose)).toFixed(2);
-
-    // Generate mock candle data for SVG
-    const candles = generateMockCandlestickData(index.value, index.change, 30);
-    const chartSVG = renderDetailedIndexChart(candles, color, index.name);
 
     const popupHTML = `
         <div class="index-popup-overlay" id="index-preview-popup">
@@ -602,18 +597,48 @@ function showIndexPreviewPopup(index) {
                     </button>
                 </div>
 
-                <!-- Chart Area -->
-                <div class="index-popup-chart-area">
-                    <div class="chart-timeframe-bar">
-                        <button class="tf-pill active">1G</button>
-                        <button class="tf-pill">1H</button>
-                        <button class="tf-pill">1A</button>
-                        <button class="tf-pill">3A</button>
-                        <button class="tf-pill">1Y</button>
-                        <button class="tf-pill">Tümü</button>
+                <!-- Chart Controls Bar (like main chart view) -->
+                <div class="index-popup-controls">
+                    <div class="popup-chart-type-selector">
+                        <button class="popup-chart-tool-btn active" data-popup-chart-type="candle" title="Mum Grafiği">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                                <rect x="3" y="8" width="3" height="8" rx="0.5" opacity="0.6"/>
+                                <rect x="4" y="5" width="1" height="14" rx="0.3" opacity="0.3"/>
+                                <rect x="10" y="4" width="3" height="10" rx="0.5" opacity="0.6"/>
+                                <rect x="11" y="2" width="1" height="14" rx="0.3" opacity="0.3"/>
+                                <rect x="17" y="9" width="3" height="6" rx="0.5" opacity="0.6"/>
+                                <rect x="18" y="7" width="1" height="10" rx="0.3" opacity="0.3"/>
+                            </svg>
+                        </button>
+                        <button class="popup-chart-tool-btn" data-popup-chart-type="line" title="Çizgi Grafiği">
+                            <i class="fa-solid fa-chart-line"></i>
+                        </button>
                     </div>
-                    <div class="popup-chart-wrapper">
-                        ${chartSVG}
+                    <div class="popup-divider"></div>
+                    <div class="popup-timeline-tabs">
+                        <button class="popup-tf-btn" data-popup-tf="15m">15dk</button>
+                        <button class="popup-tf-btn" data-popup-tf="1h">1sa</button>
+                        <button class="popup-tf-btn active" data-popup-tf="4h">4sa</button>
+                        <button class="popup-tf-btn" data-popup-tf="1d">1g</button>
+                        <button class="popup-tf-btn" data-popup-tf="1w">1h</button>
+                    </div>
+                    <div class="popup-divider"></div>
+                    <div class="popup-zoom-controls">
+                        <button class="popup-chart-tool-btn" id="popup-zoom-in" title="Yakınlaştır"><i class="fa-solid fa-magnifying-glass-plus"></i></button>
+                        <button class="popup-chart-tool-btn" id="popup-zoom-out" title="Uzaklaştır"><i class="fa-solid fa-magnifying-glass-minus"></i></button>
+                        <button class="popup-chart-tool-btn" id="popup-zoom-reset" title="Sıfırla"><i class="fa-solid fa-arrows-rotate"></i></button>
+                    </div>
+                </div>
+
+                <!-- Interactive Canvas Chart -->
+                <div class="index-popup-chart-area">
+                    <div class="popup-chart-wrapper" id="popup-chart-wrapper">
+                        <canvas id="popup-chart-canvas"></canvas>
+                        <div class="popup-chart-tooltip" id="popup-chart-tooltip" style="display:none;"></div>
+                        <div class="popup-crosshair-x" id="popup-crosshair-x"></div>
+                        <div class="popup-crosshair-y" id="popup-crosshair-y"></div>
+                        <div class="popup-price-label" id="popup-price-label"></div>
+                        <div class="popup-zoom-hint">Fare tekerleği ile yakınlaştırın</div>
                     </div>
                 </div>
 
@@ -720,98 +745,327 @@ function showIndexPreviewPopup(index) {
         }
     });
 
-    // Timeframe pills inside popup
-    const pills = overlay?.querySelectorAll('.tf-pill');
-    pills?.forEach(pill => {
-        pill.addEventListener('click', () => {
-            pills.forEach(p => p.classList.remove('active'));
-            pill.classList.add('active');
+    // Initialize interactive chart after DOM insertion
+    setTimeout(() => initPopupInteractiveChart(index), 50);
+}
+
+// === POPUP INTERACTIVE CHART (Canvas - TradingView Style) ===
+function initPopupInteractiveChart(index) {
+    let popupChartType = 'candle';
+    let popupTimeframe = '4h';
+    let popupZoom = 1.0;
+
+    const container = document.getElementById('index-preview-popup');
+    if (!container) return;
+
+    function renderPopupChart() {
+        const canvas = document.getElementById('popup-chart-canvas');
+        const wrapper = document.getElementById('popup-chart-wrapper');
+        if (!canvas || !wrapper) return;
+
+        const ctx = canvas.getContext('2d');
+        const rect = wrapper.getBoundingClientRect();
+        canvas.width = rect.width;
+        canvas.height = rect.height;
+
+        const width = canvas.width;
+        const height = canvas.height;
+        const xAxisHeight = 28;
+        const volumeHeight = 35;
+        const chartHeight = height - volumeHeight - xAxisHeight - 15;
+
+        // Generate candle data
+        const baseCount = popupTimeframe === '15m' ? 80 : popupTimeframe === '1d' ? 30 : 50;
+        const candleCount = Math.max(10, Math.floor(baseCount / popupZoom));
+        const candles = generatePopupCandleData(candleCount, popupTimeframe, index.value);
+        const maxHigh = Math.max(...candles.map(c => c.high));
+        const minLow = Math.min(...candles.map(c => c.low));
+        const range = maxHigh - minLow;
+        const maxVolume = Math.max(...candles.map(c => c.volume));
+
+        const candleWidth = Math.max(Math.floor((width - 70) / candles.length) - 2, 2);
+        const gap = 2;
+
+        const candlePositions = [];
+
+        function draw(highlightIndex = -1) {
+            ctx.clearRect(0, 0, width, height);
+
+            // Background gradient
+            const bgGrad = ctx.createLinearGradient(0, 0, 0, height);
+            bgGrad.addColorStop(0, 'rgba(30, 41, 59, 0.8)');
+            bgGrad.addColorStop(1, 'rgba(15, 23, 42, 1)');
+            ctx.fillStyle = bgGrad;
+            ctx.fillRect(0, 0, width, height);
+
+            // Grid lines
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.05)';
+            ctx.lineWidth = 1;
+            for (let i = 1; i < 5; i++) {
+                const y = (chartHeight / 5) * i;
+                ctx.beginPath();
+                ctx.setLineDash([4, 4]);
+                ctx.moveTo(0, y);
+                ctx.lineTo(width - 55, y);
+                ctx.stroke();
+            }
+            ctx.setLineDash([]);
+
+            // Price axis labels
+            ctx.fillStyle = 'rgba(148, 163, 184, 0.8)';
+            ctx.font = '10px Inter, sans-serif';
+            ctx.textAlign = 'right';
+            for (let i = 0; i <= 4; i++) {
+                const price = maxHigh - (range / 4) * i;
+                const y = (chartHeight / 4) * i + 12;
+                ctx.fillText(price.toFixed(0), width - 5, y);
+            }
+
+            candlePositions.length = 0;
+
+            // Draw candles
+            candles.forEach((c, i) => {
+                const x = i * (candleWidth + gap) + 15;
+                const yHigh = 10 + ((maxHigh - c.high) / range) * (chartHeight - 20);
+                const yLow = 10 + ((maxHigh - c.low) / range) * (chartHeight - 20);
+                const yOpen = 10 + ((maxHigh - c.open) / range) * (chartHeight - 20);
+                const yClose = 10 + ((maxHigh - c.close) / range) * (chartHeight - 20);
+
+                const bullish = c.close >= c.open;
+                const bodyTop = Math.min(yOpen, yClose);
+                const bodyHeight = Math.max(Math.abs(yClose - yOpen), 2);
+
+                candlePositions.push({ x, xEnd: x + candleWidth, data: c, index: i });
+
+                // Highlight
+                if (i === highlightIndex) {
+                    ctx.fillStyle = 'rgba(255, 255, 255, 0.03)';
+                    ctx.fillRect(x - gap, 0, candleWidth + gap * 2, height - xAxisHeight);
+                    ctx.fillStyle = '#2962ff';
+                    ctx.fillRect(x - gap, height - xAxisHeight, candleWidth + gap * 2, 2);
+                }
+
+                // Wick
+                ctx.strokeStyle = bullish ? '#22c55e' : '#ef4444';
+                ctx.lineWidth = 1.5;
+                ctx.beginPath();
+                ctx.moveTo(x + candleWidth / 2, yHigh);
+                ctx.lineTo(x + candleWidth / 2, yLow);
+                ctx.stroke();
+
+                if (popupChartType === 'candle') {
+                    if (i === highlightIndex) {
+                        ctx.fillStyle = bullish ? '#4ade80' : '#f87171';
+                        ctx.shadowColor = bullish ? '#22c55e' : '#ef4444';
+                        ctx.shadowBlur = 8;
+                    } else {
+                        ctx.fillStyle = bullish ? '#22c55e' : '#ef4444';
+                        ctx.shadowBlur = 0;
+                    }
+                    ctx.fillRect(x, bodyTop, candleWidth, bodyHeight);
+                    ctx.shadowBlur = 0;
+                } else {
+                    // Line chart
+                    if (i > 0) {
+                        const prevX = (i - 1) * (candleWidth + gap) + 15 + candleWidth / 2;
+                        const prevY = 10 + ((maxHigh - candles[i - 1].close) / range) * (chartHeight - 20);
+                        ctx.beginPath();
+                        ctx.strokeStyle = '#2962ff';
+                        ctx.lineWidth = 2;
+                        ctx.moveTo(prevX, prevY);
+                        ctx.lineTo(x + candleWidth / 2, yClose);
+                        ctx.stroke();
+
+                        ctx.beginPath();
+                        ctx.fillStyle = 'rgba(41, 98, 255, 0.05)';
+                        ctx.moveTo(prevX, prevY);
+                        ctx.lineTo(x + candleWidth / 2, yClose);
+                        ctx.lineTo(x + candleWidth / 2, chartHeight);
+                        ctx.lineTo(prevX, chartHeight);
+                        ctx.fill();
+                    }
+                }
+
+                // Volume bar
+                const volHeight = (c.volume / maxVolume) * volumeHeight;
+                ctx.fillStyle = bullish ? 'rgba(34, 197, 94, 0.2)' : 'rgba(239, 68, 68, 0.2)';
+                ctx.fillRect(x, height - xAxisHeight - volHeight - 2, candleWidth, volHeight);
+            });
+
+            // Price Axis line
+            ctx.strokeStyle = '#2a2e39';
+            ctx.beginPath();
+            ctx.moveTo(width - 55, 0);
+            ctx.lineTo(width - 55, height - xAxisHeight);
+            ctx.stroke();
+
+            // X-Axis line
+            ctx.strokeStyle = '#2a2e39';
+            ctx.beginPath();
+            ctx.moveTo(0, height - xAxisHeight);
+            ctx.lineTo(width, height - xAxisHeight);
+            ctx.stroke();
+
+            // Time Axis Labels
+            ctx.fillStyle = 'rgba(148, 163, 184, 0.8)';
+            ctx.font = '9px Inter, sans-serif';
+            ctx.textAlign = 'center';
+            const labelInterval = Math.max(1, Math.floor(candles.length / 7));
+            candles.forEach((c, i) => {
+                if (i % labelInterval === 0) {
+                    const x = i * (candleWidth + gap) + 15 + candleWidth / 2;
+                    const date = new Date(c.timestamp);
+                    let label = '';
+                    if (popupTimeframe === '15m' || popupTimeframe === '1h' || popupTimeframe === '4h') {
+                        label = date.getHours().toString().padStart(2, '0') + ':' + date.getMinutes().toString().padStart(2, '0');
+                    } else {
+                        label = date.getDate() + ' ' + date.toLocaleString('tr-TR', { month: 'short' });
+                    }
+                    ctx.fillText(label, x, height - 8);
+                }
+            });
+
+            // Volume label
+            ctx.fillStyle = 'rgba(148, 163, 184, 0.5)';
+            ctx.font = '8px Inter, sans-serif';
+            ctx.textAlign = 'left';
+            ctx.fillText('HACİM', 10, height - xAxisHeight - 5);
+        }
+
+        draw();
+
+        // Mouse interactions
+        const tooltip = document.getElementById('popup-chart-tooltip');
+        const crosshairX = document.getElementById('popup-crosshair-x');
+        const crosshairY = document.getElementById('popup-crosshair-y');
+        const priceLabel = document.getElementById('popup-price-label');
+
+        canvas.addEventListener('mousemove', (e) => {
+            const rect = canvas.getBoundingClientRect();
+            const mouseX = e.clientX - rect.left;
+            const mouseY = e.clientY - rect.top;
+
+            const hovered = candlePositions.find(cp => mouseX >= cp.x && mouseX <= cp.xEnd);
+
+            if (hovered && mouseY < chartHeight) {
+                crosshairX.style.display = 'block';
+                crosshairY.style.display = 'block';
+                crosshairX.style.left = `${mouseX}px`;
+                crosshairY.style.top = `${mouseY}px`;
+
+                const price = maxHigh - (mouseY / chartHeight) * range;
+                priceLabel.style.display = 'block';
+                priceLabel.style.top = `${mouseY - 10}px`;
+                priceLabel.textContent = price.toFixed(2);
+
+                const c = hovered.data;
+                const bullish = c.close >= c.open;
+                tooltip.innerHTML = `
+                    <div class="tt-header ${bullish ? 'bullish' : 'bearish'}">
+                        <span class="tt-symbol">${index.name}</span>
+                        <span class="tt-change ${bullish ? 'positive' : 'negative'}">
+                            ${bullish ? '+' : ''}${((c.close - c.open) / c.open * 100).toFixed(2)}%
+                        </span>
+                    </div>
+                    <div class="tt-row"><span>Açılış</span><span>${c.open.toFixed(2)}</span></div>
+                    <div class="tt-row"><span>Yüksek</span><span class="text-green">${c.high.toFixed(2)}</span></div>
+                    <div class="tt-row"><span>Düşük</span><span class="text-red">${c.low.toFixed(2)}</span></div>
+                    <div class="tt-row"><span>Kapanış</span><span>${c.close.toFixed(2)}</span></div>
+                    <div class="tt-row"><span>Hacim</span><span>${c.volume.toFixed(0)}K</span></div>
+                `;
+                tooltip.style.display = 'block';
+                tooltip.style.left = `${Math.min(mouseX + 15, width - 160)}px`;
+                tooltip.style.top = `${Math.min(mouseY + 15, chartHeight - 140)}px`;
+
+                draw(hovered.index);
+            } else {
+                tooltip.style.display = 'none';
+                crosshairX.style.display = 'none';
+                crosshairY.style.display = 'none';
+                priceLabel.style.display = 'none';
+                draw(-1);
+            }
+        });
+
+        canvas.addEventListener('mouseleave', () => {
+            tooltip.style.display = 'none';
+            crosshairX.style.display = 'none';
+            crosshairY.style.display = 'none';
+            priceLabel.style.display = 'none';
+            draw(-1);
+        });
+    }
+
+    // Chart type buttons
+    container.querySelectorAll('.popup-chart-tool-btn[data-popup-chart-type]').forEach(btn => {
+        btn.addEventListener('click', () => {
+            container.querySelectorAll('.popup-chart-tool-btn[data-popup-chart-type]').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            popupChartType = btn.dataset.popupChartType;
+            renderPopupChart();
         });
     });
-}
 
-function generateMockCandlestickData(currentValue, changePercent, count) {
-    const data = [];
-    let price = currentValue * (1 - changePercent / 50);
-
-    for (let i = 0; i < count; i++) {
-        const trend = changePercent >= 0 ? 0.003 : -0.003;
-        const noise = (Math.random() - 0.45) * price * 0.015;
-        const open = price;
-        price = price * (1 + trend) + noise;
-        const close = price;
-        const high = Math.max(open, close) * (1 + Math.random() * 0.008);
-        const low = Math.min(open, close) * (1 - Math.random() * 0.008);
-        data.push({ open, close, high, low });
-    }
-    return data;
-}
-
-function renderDetailedIndexChart(candles, color, name) {
-    const W = 600, H = 200;
-    const padding = { top: 10, right: 10, bottom: 5, left: 10 };
-    const chartW = W - padding.left - padding.right;
-    const chartH = H - padding.top - padding.bottom;
-
-    const allPrices = candles.flatMap(c => [c.high, c.low]);
-    const minP = Math.min(...allPrices);
-    const maxP = Math.max(...allPrices);
-    const range = maxP - minP || 1;
-
-    const toY = (val) => padding.top + chartH - ((val - minP) / range) * chartH;
-    const barW = chartW / candles.length;
-
-    let candleSVG = '';
-    let areaPath = `M${padding.left},${toY(candles[0].close)}`;
-    let linePath = `M${padding.left},${toY(candles[0].close)}`;
-
-    candles.forEach((c, i) => {
-        const x = padding.left + i * barW + barW / 2;
-        const isGreen = c.close >= c.open;
-        const bodyTop = toY(Math.max(c.open, c.close));
-        const bodyBot = toY(Math.min(c.open, c.close));
-        const bodyH = Math.max(bodyBot - bodyTop, 1);
-        const wickColor = isGreen ? 'rgba(74, 222, 128, 0.5)' : 'rgba(248, 113, 113, 0.5)';
-        const bodyColor = isGreen ? 'rgba(74, 222, 128, 0.7)' : 'rgba(248, 113, 113, 0.7)';
-
-        // Wick
-        candleSVG += `<line x1="${x}" y1="${toY(c.high)}" x2="${x}" y2="${toY(c.low)}" stroke="${wickColor}" stroke-width="1"/>`;
-        // Body
-        candleSVG += `<rect x="${x - barW * 0.3}" y="${bodyTop}" width="${barW * 0.6}" height="${bodyH}" fill="${bodyColor}" rx="1"/>`;
-
-        // Line/area path
-        const closeY = toY(c.close);
-        linePath += ` L${x},${closeY}`;
-        areaPath += ` L${x},${closeY}`;
+    // Timeframe buttons
+    container.querySelectorAll('.popup-tf-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            container.querySelectorAll('.popup-tf-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            popupTimeframe = btn.dataset.popupTf;
+            renderPopupChart();
+        });
     });
 
-    // Close area path
-    const lastX = padding.left + (candles.length - 1) * barW + barW / 2;
-    areaPath += ` L${lastX},${H} L${padding.left},${H} Z`;
+    // Zoom controls
+    document.getElementById('popup-zoom-in')?.addEventListener('click', () => {
+        popupZoom = Math.min(5, popupZoom * 1.2);
+        renderPopupChart();
+    });
+    document.getElementById('popup-zoom-out')?.addEventListener('click', () => {
+        popupZoom = Math.max(0.2, popupZoom / 1.2);
+        renderPopupChart();
+    });
+    document.getElementById('popup-zoom-reset')?.addEventListener('click', () => {
+        popupZoom = 1.0;
+        renderPopupChart();
+    });
 
-    const gradientId = `indexDetailGrad_${name.replace(/\s+/g, '')}`;
+    // Wheel zoom
+    const chartWrapper = document.getElementById('popup-chart-wrapper');
+    chartWrapper?.addEventListener('wheel', (e) => {
+        e.preventDefault();
+        const zoomSpeed = 0.1;
+        if (e.deltaY < 0) popupZoom = Math.min(5, popupZoom + zoomSpeed);
+        else popupZoom = Math.max(0.2, popupZoom - zoomSpeed);
+        renderPopupChart();
+    }, { passive: false });
 
-    return `
-        <svg viewBox="0 0 ${W} ${H}" class="index-detail-chart-svg" preserveAspectRatio="none">
-            <defs>
-                <linearGradient id="${gradientId}" x1="0%" y1="0%" x2="0%" y2="100%">
-                    <stop offset="0%" stop-color="${color}" stop-opacity="0.15"/>
-                    <stop offset="100%" stop-color="${color}" stop-opacity="0"/>
-                </linearGradient>
-            </defs>
-            <!-- Grid lines -->
-            <line x1="${padding.left}" y1="${padding.top}" x2="${W - padding.right}" y2="${padding.top}" stroke="rgba(255,255,255,0.03)" stroke-width="1"/>
-            <line x1="${padding.left}" y1="${padding.top + chartH * 0.25}" x2="${W - padding.right}" y2="${padding.top + chartH * 0.25}" stroke="rgba(255,255,255,0.03)" stroke-width="1"/>
-            <line x1="${padding.left}" y1="${padding.top + chartH * 0.5}" x2="${W - padding.right}" y2="${padding.top + chartH * 0.5}" stroke="rgba(255,255,255,0.03)" stroke-width="1"/>
-            <line x1="${padding.left}" y1="${padding.top + chartH * 0.75}" x2="${W - padding.right}" y2="${padding.top + chartH * 0.75}" stroke="rgba(255,255,255,0.03)" stroke-width="1"/>
-            <!-- Area fill -->
-            <path d="${areaPath}" fill="url(#${gradientId})"/>
-            <!-- Candlesticks -->
-            ${candleSVG}
-            <!-- Line overlay -->
-            <path d="${linePath}" fill="none" stroke="${color}" stroke-width="1.5" stroke-linecap="round" opacity="0.6"/>
-        </svg>
-    `;
+    renderPopupChart();
+}
+
+function generatePopupCandleData(count, timeframe, baseValue) {
+    let price = baseValue * 0.97 + Math.random() * baseValue * 0.03;
+    const data = [];
+    const now = Date.now();
+    let timeStep = 1000 * 60 * 60 * 4;
+    if (timeframe === '15m') timeStep = 1000 * 60 * 15;
+    else if (timeframe === '1h') timeStep = 1000 * 60 * 60;
+    else if (timeframe === '1d') timeStep = 1000 * 60 * 60 * 24;
+    else if (timeframe === '1w') timeStep = 1000 * 60 * 60 * 24 * 7;
+
+    for (let i = 0; i < count; i++) {
+        const open = price;
+        const volatility = baseValue * 0.004 + Math.random() * baseValue * 0.006;
+        const trend = Math.sin(i / 8) * 0.3 + (Math.random() - 0.48);
+        const change = trend * volatility;
+        const close = price + change;
+        const high = Math.max(open, close) + Math.random() * baseValue * 0.003;
+        const low = Math.min(open, close) - Math.random() * baseValue * 0.003;
+        price = close;
+        const timestamp = now - (count - i) * timeStep;
+        data.push({ open, close, high, low, timestamp, volume: 30 + Math.random() * 70 });
+    }
+    return data;
 }
 
 // === CONSOLIDATED SUB-TABS HANDLER ===
