@@ -49,9 +49,9 @@ export const mapModes = {
     },
     statistics: {
         id: 'statistics',
-        name: 'İstatistik',
-        icon: 'fa-solid fa-chart-bar',
-        description: 'Kapsamlı istatistik görünümü',
+        name: 'Eyalet Değeri',
+        icon: 'fa-solid fa-star',
+        description: 'Eyaletlerin değer puanlaması',
         colorScheme: null,
         hasPanel: true // Bu mod özel bir panel açar
     },

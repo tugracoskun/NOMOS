@@ -107,7 +107,7 @@ export function generateMainContentHTML(buildings) {
         <div class="city-main-content">
             <div class="content-tabs-header">
                 <div class="main-tabs">
-                    <button class="main-tab active" data-view="owned">Binalarım</button>
+                    <button class="main-tab active" data-view="owned">Binalar</button>
                     <button class="main-tab" data-view="build">Yeni İnşa Et</button>
                 </div>
             </div>
@@ -123,7 +123,7 @@ export function generateMainContentHTML(buildings) {
                     <div class="build-tabs">
                         <button class="build-tab active" data-category="economic">Yönetim</button>
                         <button class="build-tab" data-category="production">Üretim</button>
-                        <button class="build-tab" data-category="education">Eğitim</button>
+                        <button class="build-tab" data-category="education">Araştırma</button>
                     </div>
                     <div class="available-buildings" id="available-buildings">
                         ${generateBuildingCards('economic', buildings)}

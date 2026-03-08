@@ -1,0 +1,571 @@
+/* =============================================
+   DÜNYA İSTATİSTİKLERİ PANELİ - PREMIUM DARK
+   ============================================= */
+
+/* Trigger Button - Sağ Üst Köşe */
+.map-stats-trigger {
+    position: absolute;
+    top: 14px;
+    right: 14px;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    background: rgba(15, 23, 42, 0.85);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 10px;
+    color: #94a3b8;
+    font-size: 0.75rem;
+    font-weight: 700;
+    font-family: inherit;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+}
+
+.map-stats-trigger:hover {
+    background: rgba(25, 35, 55, 0.95);
+    color: #e2e8f0;
+    border-color: rgba(59, 130, 246, 0.3);
+    box-shadow:
+        0 6px 24px rgba(0, 0, 0, 0.4),
+        0 0 20px rgba(59, 130, 246, 0.08);
+    transform: translateY(-1px);
+}
+
+.map-stats-trigger i {
+    font-size: 0.85rem;
+    color: #3b82f6;
+}
+
+/* === PANEL === */
+.world-stats-panel {
+    position: absolute;
+    top: 14px;
+    right: 14px;
+    z-index: 1001;
+    width: 480px;
+    max-height: calc(100vh - 120px);
+    background: linear-gradient(145deg, rgba(15, 23, 42, 0.97) 0%, rgba(20, 28, 48, 0.97) 100%);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 16px;
+    box-shadow:
+        0 20px 60px rgba(0, 0, 0, 0.6),
+        0 0 40px rgba(59, 130, 246, 0.05),
+        inset 0 1px 0 rgba(255, 255, 255, 0.04);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+
+    /* Hidden state */
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px) scale(0.98);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    pointer-events: none;
+}
+
+.world-stats-panel.open {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0) scale(1);
+    pointer-events: all;
+}
+
+/* Header */
+.ws-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 20px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    background: rgba(0, 0, 0, 0.15);
+}
+
+.ws-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 0.9rem;
+    font-weight: 800;
+    color: #e2e8f0;
+}
+
+.ws-title i {
+    color: #3b82f6;
+    font-size: 1rem;
+}
+
+.ws-close {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    color: #64748b;
+    width: 28px;
+    height: 28px;
+    border-radius: 7px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 0.8rem;
+    transition: all 0.2s;
+}
+
+.ws-close:hover {
+    background: rgba(248, 113, 113, 0.15);
+    color: #f87171;
+    border-color: rgba(248, 113, 113, 0.3);
+}
+
+/* Tabs */
+.ws-tabs {
+    display: flex;
+    gap: 2px;
+    padding: 8px 12px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    background: rgba(0, 0, 0, 0.1);
+}
+
+.ws-tab {
+    flex: 1;
+    padding: 7px 8px;
+    background: transparent;
+    border: 1px solid transparent;
+    border-radius: 7px;
+    color: #64748b;
+    font-size: 0.62rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    font-family: inherit;
+}
+
+.ws-tab:hover {
+    background: rgba(255, 255, 255, 0.04);
+    color: #94a3b8;
+}
+
+.ws-tab.active {
+    background: rgba(59, 130, 246, 0.12);
+    color: #60a5fa;
+    border-color: rgba(59, 130, 246, 0.2);
+}
+
+.ws-tab i {
+    font-size: 0.65rem;
+}
+
+/* Body */
+.ws-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 16px;
+    max-height: calc(100vh - 260px);
+}
+
+.ws-body::-webkit-scrollbar {
+    width: 4px;
+}
+
+.ws-body::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 2px;
+}
+
+/* === OVERVIEW TAB === */
+.ws-stat-cards {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    margin-bottom: 20px;
+}
+
+.ws-stat-card {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 10px;
+    padding: 12px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    transition: background 0.2s;
+}
+
+.ws-stat-card:hover {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.ws-card-icon {
+    width: 34px;
+    height: 34px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.8rem;
+    background: rgba(59, 130, 246, 0.1);
+    color: #60a5fa;
+    flex-shrink: 0;
+}
+
+.ws-card-icon.gold { background: rgba(251, 191, 36, 0.1); color: #fbbf24; }
+.ws-card-icon.purple { background: rgba(168, 85, 247, 0.1); color: #c084fc; }
+.ws-card-icon.green { background: rgba(74, 222, 128, 0.1); color: #4ade80; }
+.ws-card-icon.red { background: rgba(248, 113, 113, 0.1); color: #f87171; }
+.ws-card-icon.cyan { background: rgba(34, 211, 238, 0.1); color: #22d3ee; }
+
+.ws-card-data {
+    display: flex;
+    flex-direction: column;
+}
+
+.ws-card-value {
+    font-size: 0.85rem;
+    font-weight: 800;
+    color: #e2e8f0;
+    line-height: 1.1;
+}
+
+.ws-card-label {
+    font-size: 0.6rem;
+    color: #64748b;
+    font-weight: 500;
+}
+
+/* Top List */
+.ws-top-list h4,
+.ws-military h4,
+.ws-economy h4 {
+    font-size: 0.72rem;
+    font-weight: 800;
+    color: #94a3b8;
+    margin: 0 0 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.ws-top-list h4 i,
+.ws-military h4 i,
+.ws-economy h4 i {
+    color: #fbbf24;
+    font-size: 0.7rem;
+}
+
+.ws-top-item, .ws-mil-row, .ws-eco-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 10px;
+    background: rgba(255, 255, 255, 0.02);
+    border-radius: 8px;
+    margin-bottom: 4px;
+    transition: background 0.15s;
+}
+
+.ws-top-item:hover, .ws-mil-row:hover, .ws-eco-row:hover {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.ws-rank {
+    font-size: 0.7rem;
+    font-weight: 800;
+    color: #475569;
+    width: 22px;
+    text-align: center;
+}
+
+.ws-flag {
+    font-size: 1.1rem;
+}
+
+.ws-flag-sm {
+    font-size: 0.9rem;
+    margin-right: 4px;
+}
+
+.ws-country-name {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #cbd5e1;
+    min-width: 80px;
+}
+
+.ws-top-bars {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+
+.ws-mini-bar, .ws-inline-bar {
+    height: 4px;
+    background: rgba(255, 255, 255, 0.06);
+    border-radius: 2px;
+    overflow: hidden;
+}
+
+.ws-inline-bar {
+    width: 60px;
+    display: inline-block;
+    vertical-align: middle;
+    margin-right: 4px;
+}
+
+.ws-bar-fill {
+    height: 100%;
+    border-radius: 2px;
+    transition: width 0.5s ease;
+}
+
+.ws-bar-fill.tech {
+    background: linear-gradient(90deg, #8b5cf6, #c084fc);
+}
+
+.ws-bar-fill.infra {
+    background: linear-gradient(90deg, #3b82f6, #60a5fa);
+}
+
+.ws-gdp-tag {
+    font-size: 0.65rem;
+    font-weight: 700;
+    color: #fbbf24;
+    margin-left: auto;
+}
+
+/* === COUNTRIES TABLE === */
+.ws-countries-table {
+    font-size: 0.7rem;
+}
+
+.ws-table-header {
+    display: grid;
+    grid-template-columns: 30px 1fr 55px 65px 80px 70px 40px 40px;
+    gap: 4px;
+    padding: 6px 8px;
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 6px;
+    margin-bottom: 4px;
+}
+
+.ws-th {
+    font-size: 0.58rem;
+    font-weight: 800;
+    color: #475569;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.ws-table-row {
+    display: grid;
+    grid-template-columns: 30px 1fr 55px 65px 80px 70px 40px 40px;
+    gap: 4px;
+    padding: 6px 8px;
+    align-items: center;
+    border-radius: 6px;
+    transition: background 0.15s;
+}
+
+.ws-table-row:hover {
+    background: rgba(255, 255, 255, 0.04);
+}
+
+.ws-td {
+    font-size: 0.68rem;
+    color: #94a3b8;
+    display: flex;
+    align-items: center;
+    gap: 3px;
+}
+
+.ws-td small {
+    font-size: 0.55rem;
+    color: #475569;
+    font-weight: 700;
+}
+
+.ws-td-rank {
+    font-weight: 800;
+    color: #475569;
+}
+
+.ws-td-name {
+    color: #cbd5e1;
+    font-weight: 700;
+}
+
+.ws-td-gdp {
+    color: #fbbf24;
+    font-weight: 700;
+}
+
+.ws-td-num {
+    color: #64748b;
+    font-weight: 600;
+    justify-content: center;
+}
+
+/* === MILITARY TAB === */
+.ws-mil-header {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 16px;
+}
+
+.ws-mil-stat {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px;
+    background: rgba(239, 68, 68, 0.05);
+    border: 1px solid rgba(239, 68, 68, 0.1);
+    border-radius: 10px;
+}
+
+.ws-mil-stat i {
+    font-size: 1rem;
+    color: #f87171;
+}
+
+.ws-mil-val {
+    display: block;
+    font-size: 0.9rem;
+    font-weight: 800;
+    color: #e2e8f0;
+}
+
+.ws-mil-label {
+    display: block;
+    font-size: 0.58rem;
+    color: #64748b;
+}
+
+.ws-mil-bar-wrap {
+    flex: 1;
+    height: 6px;
+    background: rgba(255, 255, 255, 0.06);
+    border-radius: 3px;
+    overflow: hidden;
+}
+
+.ws-mil-bar {
+    height: 100%;
+    background: linear-gradient(90deg, #ef4444, #f87171);
+    border-radius: 3px;
+    transition: width 0.5s ease;
+}
+
+.ws-mil-count {
+    font-size: 0.68rem;
+    font-weight: 700;
+    color: #f87171;
+    min-width: 40px;
+    text-align: right;
+}
+
+/* === ECONOMY TAB === */
+.ws-eco-top-cards {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    margin-bottom: 16px;
+}
+
+.ws-eco-card {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 10px;
+    padding: 12px;
+    text-align: center;
+}
+
+.ws-eco-label {
+    display: block;
+    font-size: 0.58rem;
+    color: #475569;
+    font-weight: 700;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+}
+
+.ws-eco-val {
+    display: block;
+    font-size: 1rem;
+    font-weight: 800;
+    color: #e2e8f0;
+    margin-bottom: 4px;
+}
+
+.ws-eco-trend {
+    font-size: 0.62rem;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 2px 8px;
+    border-radius: 4px;
+}
+
+.ws-eco-trend.up {
+    color: #4ade80;
+    background: rgba(74, 222, 128, 0.1);
+}
+
+.ws-eco-trend.down {
+    color: #f87171;
+    background: rgba(248, 113, 113, 0.1);
+}
+
+.ws-eco-gdp {
+    font-size: 0.68rem;
+    font-weight: 700;
+    color: #fbbf24;
+    min-width: 65px;
+}
+
+.ws-eco-bar-wrap {
+    flex: 1;
+    height: 6px;
+    background: rgba(255, 255, 255, 0.06);
+    border-radius: 3px;
+    overflow: hidden;
+}
+
+.ws-eco-bar {
+    height: 100%;
+    background: linear-gradient(90deg, #fbbf24, #f59e0b);
+    border-radius: 3px;
+    transition: width 0.5s ease;
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+    .world-stats-panel {
+        width: calc(100vw - 28px);
+        max-height: 70vh;
+    }
+
+    .ws-stat-cards {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .ws-table-header,
+    .ws-table-row {
+        grid-template-columns: 25px 1fr 50px 55px;
+    }
+
+    .ws-table-header .ws-th:nth-child(n+5),
+    .ws-table-row .ws-td:nth-child(n+5) {
+        display: none;
+    }
+}

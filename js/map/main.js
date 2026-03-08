@@ -9,6 +9,7 @@ import { initAirports, clearAirports } from './airports.js';
 import { initShipTracking, stopShipTracking, getActiveShips } from './ships.js';
 import { initPorts, clearPorts } from './ports.js';
 import { initSeaRoutes, clearSeaRoutes } from './routes.js';
+import { initWorldStatsPanel } from './world-stats.js';
 
 let mapInstance = null;
 
@@ -24,6 +25,7 @@ export function initMap(containerId) {
     // 1. Şık Loader'ı ve City Panel'i HTML'e Bas
     container.innerHTML = `
         <link rel="stylesheet" href="css/mode-slider.css">
+        <link rel="stylesheet" href="css/world-stats.css">
         <div id="actual-map-div" style="width:100%; height:100%;"></div>
         
         <div id="map-loader" class="map-loader-overlay">
@@ -97,6 +99,30 @@ export function initMap(containerId) {
             </div>
         </div>
         
+        <!-- Sağ Üst: İstatistik Butonu -->
+        <button class="map-stats-trigger" id="map-stats-trigger" title="Dünya İstatistikleri">
+            <i class="fa-solid fa-chart-bar"></i>
+            <span>İstatistik</span>
+        </button>
+
+        <!-- Dünya İstatistikleri Paneli -->
+        <div id="world-stats-panel" class="world-stats-panel">
+            <div class="ws-header">
+                <div class="ws-title">
+                    <i class="fa-solid fa-earth-americas"></i>
+                    <span>Dünya İstatistikleri</span>
+                </div>
+                <button class="ws-close" id="ws-close"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="ws-tabs" id="ws-tabs">
+                <button class="ws-tab active" data-ws-tab="overview"><i class="fa-solid fa-chart-pie"></i> Genel</button>
+                <button class="ws-tab" data-ws-tab="countries"><i class="fa-solid fa-flag"></i> Ülkeler</button>
+                <button class="ws-tab" data-ws-tab="military"><i class="fa-solid fa-shield-halved"></i> Askeri</button>
+                <button class="ws-tab" data-ws-tab="economy"><i class="fa-solid fa-coins"></i> Ekonomi</button>
+            </div>
+            <div class="ws-body" id="ws-body"></div>
+        </div>
+
         <!-- Harita Modları Paneli -->
         ${createModePanelHTML()}
     `;
@@ -180,6 +206,9 @@ export function initMap(containerId) {
 
                 // Harita Modları paneli event'lerini başlat
                 initModePanelEvents();
+
+                // Dünya İstatistikleri paneli event'lerini başlat
+                initWorldStatsPanel();
 
                 // Uçak tracking sistemini başlat
                 initFlightTracking(mapInstance);

@@ -234,26 +234,20 @@ function setupUpgradeButton(cityId) {
 }
 
 function setupInspectButton() {
-    // Event Delegation: Container üzerine dinleyici koyuyoruz
-    // Böylece butonun içeriği veya kendisi sonradan yüklense bile tıklama yakalanır.
-    setTimeout(() => {
-        const sidebar = document.querySelector('.city-sidebar');
-        if (!sidebar) return;
+    // Document-level event delegation - DOM yükleme zamanlamasından bağımsız çalışır
+    document.addEventListener('click', (e) => {
+        const btn = e.target.closest('.js-inspect-country');
+        if (!btn) return;
 
-        sidebar.addEventListener('click', (e) => {
-            // Tıklanan element veya ebeveynlerinden biri bizim buton mu?
-            const btn = e.target.closest('.js-inspect-country');
+        e.preventDefault();
+        e.stopPropagation();
 
-            if (btn) {
-                e.stopPropagation(); // Diğer eventleri engelle
-                const country = btn.dataset.country;
-                if (country) {
-                    console.log('Navigating to country:', country);
-                    window.location.hash = `country/${encodeURIComponent(country)}`;
-                }
-            }
-        });
-    }, 100); // DOM render'ın tamamlanması için güvenli marj
+        const country = btn.dataset.country;
+        if (country) {
+            console.log('Navigating to country:', country);
+            window.location.hash = `country/${encodeURIComponent(country)}`;
+        }
+    });
 }
 
 function refreshCityView() {
