@@ -216,43 +216,28 @@ function collectIncome() {
 }
 
 function showIncomeNotification(amount, source) {
-    // Basit bir toast bildirimi (DOM'a müdahale)
+    // Gold display wrapper'ını bul
+    const goldWrapper = document.querySelector('.gold-display');
+    if (!goldWrapper) return;
+
+    // Önceki bildirimi temizle
+    const existing = goldWrapper.querySelector('.income-toast');
+    if (existing) existing.remove();
+
     const notif = document.createElement('div');
     notif.className = 'income-toast';
     notif.innerHTML = `
         <i class="fa-solid fa-coins text-yellow"></i>
-        <span>+${amount.toLocaleString()} </span>
+        <span>+${amount.toLocaleString()}</span>
         <small>(${source})</small>
     `;
 
-    // CSS stilleri (inline veya global CSS'te olmalı, burada inline ekliyorum pratiklik için)
-    notif.style.cssText = `
-        position: fixed;
-        bottom: 80px;
-        right: 20px;
-        background: rgba(16, 185, 129, 0.9);
-        color: white;
-        padding: 8px 16px;
-        border-radius: 20px;
-        font-weight: bold;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-        z-index: 10000;
-        animation: floatUp 2s forwards;
-        font-family: 'Inter', sans-serif;
-    `;
+    // Gold display'in child'ı olarak ekle (altında belirir)
+    goldWrapper.appendChild(notif);
 
-    // Animasyon keyframe'ini document'a eklemek yerine basit transition kullanıyoruz
-    // veya zaten var olan CSS animasyonlarından faydalanıyoruz.
-
-    document.body.appendChild(notif);
-
+    // 2.5 saniye sonra kaybolsun
     setTimeout(() => {
-        notif.style.opacity = '0';
-        notif.style.transform = 'translateY(-20px)';
-        notif.style.transition = 'all 0.5s';
-        setTimeout(() => notif.remove(), 500);
-    }, 2000);
+        notif.style.animation = 'incomeSlideOut 0.3s ease forwards';
+        setTimeout(() => notif.remove(), 300);
+    }, 2500);
 }

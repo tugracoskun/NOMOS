@@ -902,33 +902,67 @@
 
 .nation-inspect-btn-sm {
     width: 100%;
-    background: rgba(59, 130, 246, 0.1);
-    border: 1px solid rgba(59, 130, 246, 0.2);
-    padding: 10px;
-    border-radius: 8px;
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.15) 0%, rgba(99, 102, 241, 0.15) 100%);
+    border: 1px solid rgba(59, 130, 246, 0.25);
+    padding: 11px 16px;
+    border-radius: 10px;
     color: #93c5fd;
-    font-size: 0.8rem;
-    font-weight: 600;
+    font-size: 0.78rem;
+    font-weight: 700;
     cursor: pointer;
-    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 8px;
     position: relative;
     overflow: hidden;
+    letter-spacing: 0.3px;
+    font-family: inherit;
+}
+
+/* Shimmer sweep on hover */
+.nation-inspect-btn-sm::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.08) 50%, transparent 100%);
+    transition: left 0.5s ease;
+    pointer-events: none;
+}
+
+.nation-inspect-btn-sm:hover::after {
+    left: 100%;
 }
 
 .nation-inspect-btn-sm:hover {
-    background: rgba(37, 99, 235, 0.2);
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.3) 0%, rgba(99, 102, 241, 0.25) 100%);
     border-color: #3b82f6;
-    color: white;
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.15);
+    color: #ffffff;
+    transform: translateY(-2px);
+    box-shadow: 
+        0 6px 20px rgba(59, 130, 246, 0.2),
+        0 0 0 1px rgba(59, 130, 246, 0.1);
 }
 
+/* Tıklama: belirgin feedback */
 .nation-inspect-btn-sm:active {
-    transform: translateY(0);
+    transform: translateY(1px) scale(0.96);
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.5) 0%, rgba(99, 102, 241, 0.4) 100%);
+    box-shadow: 
+        0 1px 4px rgba(59, 130, 246, 0.3),
+        inset 0 2px 6px rgba(0, 0, 0, 0.2);
+    color: #ffffff;
+    transition: all 0.08s ease;
+}
+
+/* Focus ring for accessibility */
+.nation-inspect-btn-sm:focus-visible {
+    outline: 2px solid #3b82f6;
+    outline-offset: 2px;
 }
 
 /* CITY RANK TOOLTIP */
