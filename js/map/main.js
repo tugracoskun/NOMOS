@@ -105,22 +105,40 @@ export function initMap(containerId) {
             <span>İstatistik</span>
         </button>
 
-        <!-- Dünya İstatistikleri Paneli -->
-        <div id="world-stats-panel" class="world-stats-panel">
-            <div class="ws-header">
-                <div class="ws-title">
-                    <i class="fa-solid fa-earth-americas"></i>
-                    <span>Dünya İstatistikleri</span>
+        <!-- Dünya İstatistikleri - Popup Overlay (AoH2 Tarzı) -->
+        <div id="world-stats-overlay" class="world-stats-overlay">
+            <div class="ws-popup">
+                <div class="ws-top-bar">
+                    <div class="ws-cat-title" id="ws-cat-title">
+                        <span class="ws-cat-name" id="ws-cat-name">Nüfus</span>
+                    </div>
+                    <button class="ws-close-btn" id="ws-close-btn"><i class="fa-solid fa-xmark"></i></button>
                 </div>
-                <button class="ws-close" id="ws-close"><i class="fa-solid fa-xmark"></i></button>
+                <div class="ws-icon-tabs" id="ws-icon-tabs">
+                    <button class="ws-icon-tab active" data-cat="population" title="Nüfus"><i class="fa-solid fa-users"></i></button>
+                    <button class="ws-icon-tab" data-cat="economy" title="Ekonomi"><i class="fa-solid fa-coins"></i></button>
+                    <button class="ws-icon-tab" data-cat="technology" title="Teknoloji"><i class="fa-solid fa-flask"></i></button>
+                    <button class="ws-icon-tab" data-cat="infrastructure" title="Altyapı"><i class="fa-solid fa-road"></i></button>
+                    <button class="ws-icon-tab" data-cat="buildings" title="Binalar"><i class="fa-solid fa-city"></i></button>
+                    <button class="ws-icon-tab" data-cat="military" title="Askeri Güç"><i class="fa-solid fa-shield-halved"></i></button>
+                    <button class="ws-icon-tab" data-cat="producers" title="En Büyük Üreticiler"><i class="fa-solid fa-wheat-awn"></i></button>
+                </div>
+                <div class="ws-chart-wrapper">
+                    <div class="ws-y-label" id="ws-y-label">Nüfus</div>
+                    <div class="ws-max-line" id="ws-max-line">
+                        <span class="ws-max-val" id="ws-max-val">0</span>
+                    </div>
+                    <div class="ws-chart-area" id="ws-chart-area"></div>
+                </div>
+                <div class="ws-legend" id="ws-legend">
+                    <span class="ws-leg-item"><span class="ws-leg-dot" style="background:#d4a574"></span>Afrika</span>
+                    <span class="ws-leg-item"><span class="ws-leg-dot" style="background:#c8b642"></span>Asya</span>
+                    <span class="ws-leg-item"><span class="ws-leg-dot" style="background:#d48c2e"></span>Avrupa</span>
+                    <span class="ws-leg-item"><span class="ws-leg-dot" style="background:#3dab5c"></span>Güney Amerika</span>
+                    <span class="ws-leg-item"><span class="ws-leg-dot" style="background:#4a8ddb"></span>Kuzey Amerika</span>
+                    <span class="ws-leg-item"><span class="ws-leg-dot" style="background:#7a7a7a"></span>Okyanusya</span>
+                </div>
             </div>
-            <div class="ws-tabs" id="ws-tabs">
-                <button class="ws-tab active" data-ws-tab="overview"><i class="fa-solid fa-chart-pie"></i> Genel</button>
-                <button class="ws-tab" data-ws-tab="countries"><i class="fa-solid fa-flag"></i> Ülkeler</button>
-                <button class="ws-tab" data-ws-tab="military"><i class="fa-solid fa-shield-halved"></i> Askeri</button>
-                <button class="ws-tab" data-ws-tab="economy"><i class="fa-solid fa-coins"></i> Ekonomi</button>
-            </div>
-            <div class="ws-body" id="ws-body"></div>
         </div>
 
         <!-- Harita Modları Paneli -->
