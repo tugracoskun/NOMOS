@@ -141,14 +141,17 @@ export function openCityPanel(cityData) {
     const detailBtn = document.getElementById('city-detail-btn');
     if (detailBtn) {
         // Önceki listener'ı temizle
-        detailBtn.replaceWith(detailBtn.cloneNode(true));
-        const newBtn = document.getElementById('city-detail-btn');
+        const newBtn = detailBtn.cloneNode(true);
+        detailBtn.parentNode.replaceChild(newBtn, detailBtn);
+        
         newBtn.addEventListener('click', () => {
-            // Şehir verisini localStorage'a kaydet (sayfa geçişi için)
+            console.log('City: Detay sayfasına gidiliyor...', cityData.name);
+            // Şehir verisini eksiksiz localStorage'a kaydet
             try {
                 localStorage.setItem('nomos_current_city', JSON.stringify(cityData));
+                console.log('City: Veriler başarıyla kaydedildi.');
             } catch (e) {
-                console.warn('City save error:', e);
+                console.warn('City: Kayıt hatası:', e);
             }
             // Şehir sayfasına yönlendir (cityId ile)
             window.location.hash = `city/${cityData.id}`;

@@ -167,14 +167,22 @@ export const nations = {
 export function getNationData(countryName) {
     if (!countryName) return generateFallback("Bilinmiyor", "un_000");
 
-    // 1. Önce Temel ISO Kodunu Bul (tr, us, de)
+    // 1. Önce nations objesindeki Türkçe isimle eşleşme ara
+    const byName = Object.values(nations).find(
+        n => n.name.toLowerCase() === countryName.trim().toLowerCase()
+    );
+    if (byName) {
+        const robustId = byName.id.length < 4 ? generateRobustId(byName.id) : byName.id;
+        return { ...byName, id: robustId };
+    }
+
+    // 2. ISO kodu ile dene (İngilizce isimler için)
     const isoCode = getCountryCode(countryName);
 
-    // 2. Bu kod için özel tanımlanmış veri var mı?
+    // 3. Bu kod için özel tanımlanmış veri var mı?
     let data = nations[isoCode];
 
-    // 3. Sağlam ID Oluştur (Örn: TR_101)
-    // Eğer veri tanımlıysa ve sabit bir ID'si varsa onu kullan, yoksa ISO üzerinden üret
+    // 4. Sağlam ID Oluştur
     let robustId = data?.id;
     if (!robustId || robustId.length < 4) {
         robustId = generateRobustId(isoCode);
@@ -184,7 +192,7 @@ export function getNationData(countryName) {
         return { ...data, id: robustId };
     }
 
-    // 4. Yoksa jenerik oluştur
+    // 5. Yoksa jenerik oluştur
     return generateFallback(countryName, robustId, isoCode);
 }
 

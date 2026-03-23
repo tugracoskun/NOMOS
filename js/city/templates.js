@@ -10,32 +10,6 @@ const buildingCategories = {
 export function generateSidebarHTML(cityData, nation, stats, alliancesHtml) {
     return `
         <aside class="city-sidebar">
-            <div class="sidebar-section nation-compact-card">
-                <div class="nation-compact-header">
-                    <img src="${nation.flag}" class="nation-flag-small" alt="${nation.name}">
-                    <div class="nation-info-compact">
-                        <span class="nation-sub">Bağlı Olduğu Ülke</span>
-                        <strong class="nation-name-lg">${nation.name}</strong>
-                    </div>
-                    <span class="rank-badge">#${nation.ranking || '?'}</span>
-                </div>
-                 
-                 <div class="nation-compact-stats">
-                    <div class="dict-stat">
-                        <span class="lbl"><i class="fa-solid fa-coins text-gold"></i> GSYİH</span>
-                        <span class="val">${nation.gdp}</span>
-                    </div>
-                    <div class="dict-stat">
-                        <span class="lbl"><i class="fa-solid fa-users text-green"></i> Nüfus</span>
-                        <span class="val">${nation.population}</span>
-                    </div>
-                 </div>
-
-                 <button class="nation-inspect-btn-sm js-inspect-country" data-country="${nation.name}">
-                    İncele <i class="fa-solid fa-arrow-right"></i>
-                 </button>
-            </div>
-
             <!-- FAZ 4: KAYNAK GELİRİ KARTI -->
             ${cityData.resource ? `
             <div class="sidebar-section highlight-card">

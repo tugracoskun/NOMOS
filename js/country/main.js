@@ -1,30 +1,37 @@
 import { getNationData } from '../data/nations.js';
 
 export function renderCountryPage(container, countryName) {
-    // İsim boşsa hata vermesin
     if (!countryName) return;
 
     const nation = getNationData(countryName);
 
-    // CSS Yükle (Eğer yoksa)
-    if (!document.getElementById('country-page-style')) {
+    // İlk olarak container'ı gizle (sıçramayı önlemek için)
+    container.style.opacity = '0';
+    container.style.transition = 'opacity 0.3s ease-out';
+
+    // CSS Yükleme Fonksiyonu
+    function loadCountryStyles(callback) {
+        if (document.getElementById('country-page-style')) {
+            callback();
+            return;
+        }
         const link = document.createElement('link');
         link.id = 'country-page-style';
         link.rel = 'stylesheet';
         link.href = 'css/country.css';
+        link.onload = callback;
         document.head.appendChild(link);
     }
 
-    // Basit bir layout
-    container.innerHTML = `
+    // CSS yüklendikten sonra içeriği bas
+    loadCountryStyles(() => {
+        container.innerHTML = `
         <div class="country-page-wrapper">
-            <!-- Arkaplan Efekti -->
             <div class="country-bg-glow" style="background: radial-gradient(circle at 50% 0%, ${nation.color}40 0%, transparent 70%);"></div>
 
-            <!-- Header -->
             <div class="country-header-compact">
                 <div class="flag-wrapper-compact">
-                    <img src="${nation.flag}" alt="${nation.name}">
+                    <img src="${nation.flag}" alt="${nation.name}" style="width: 100%; height: auto; max-width: 120px;">
                 </div>
                 <div class="header-info">
                     <h1 class="country-main-title">
@@ -135,6 +142,12 @@ export function renderCountryPage(container, countryName) {
         </div>
     `;
 
-    // Harbor picker modülünü yükle
-    import('../map/harbor-picker.js').catch(e => console.log('Harbor picker yüklenemedi:', e));
+        // Render bittikten hemen sonra fade-in yap
+        requestAnimationFrame(() => {
+            container.style.opacity = '1';
+        });
+
+        // Harbor picker modülünü yükle
+        import('../map/harbor-picker.js').catch(e => console.log('Harbor picker yüklenemedi:', e));
+    });
 }

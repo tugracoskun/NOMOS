@@ -76,6 +76,37 @@
     gap: 5px;
 }
 
+/* Tıklanabilir ülke linki */
+.city-country-link {
+    text-decoration: none;
+    color: #94a3b8;
+    cursor: pointer !important;
+    padding: 4px 12px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 6px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    position: relative;
+    z-index: 100 !important;
+    margin-top: 5px;
+}
+
+.city-country-link:hover {
+    color: #ffffff;
+    background: rgba(59, 130, 246, 0.2);
+    border-color: rgba(59, 130, 246, 0.4);
+    box-shadow: 0 0 15px rgba(59, 130, 246, 0.2);
+    text-decoration: underline;
+}
+
+.city-country-link:active {
+    transform: scale(0.95);
+    background: rgba(59, 130, 246, 0.3);
+}
+
 .city-value-badge {
     display: flex;
     align-items: center;

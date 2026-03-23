@@ -43,7 +43,13 @@ export function renderCityPage(container, cityId) {
                         <div class="city-title">
                             <h1>${cityData.name}</h1>
                             <div class="city-tags">
-                                <span class="city-country-badge"><i class="fa-solid fa-location-dot"></i> ${nation.name}</span>
+                                <span class="city-country-badge city-country-link" 
+                                      data-page="country" 
+                                      data-view="${nation.name.replace(/"/g, '&quot;').replace(/'/g, '&#39;')}" 
+                                      title="${nation.name} profilini görüntüle">
+                                    <i class="fa-solid fa-location-dot"></i> ${nation.name}
+                                    <i class="fa-solid fa-arrow-up-right-from-square" style="font-size:0.6rem; opacity:0.6; margin-left:4px;"></i>
+                                </span>
                                 ${isCoastal ? '<span class="coastal-tag"><i class="fa-solid fa-anchor"></i> Kıyı Şehri</span>' : ''}
                             </div>
                         </div>
@@ -80,7 +86,19 @@ export function renderCityPage(container, cityId) {
         // Event Listener'ları Kur
         setupTabs(buildings);
         setupUpgradeButton(currentCityId);
-        setupInspectButton();
+
+        // Ülke linkine doğrudan click handler bağla
+        const countryLink = container.querySelector('.city-country-link');
+        if (countryLink) {
+            countryLink.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                const countryName = countryLink.getAttribute('data-view');
+                if (countryName) {
+                    window.location.hash = `country/${encodeURIComponent(countryName)}`;
+                }
+            });
+        }
 
         // Render tamamlandı, container'ı göster
         requestAnimationFrame(() => {
@@ -233,22 +251,7 @@ function setupUpgradeButton(cityId) {
     });
 }
 
-function setupInspectButton() {
-    // Document-level event delegation - DOM yükleme zamanlamasından bağımsız çalışır
-    document.addEventListener('click', (e) => {
-        const btn = e.target.closest('.js-inspect-country');
-        if (!btn) return;
 
-        e.preventDefault();
-        e.stopPropagation();
-
-        const country = btn.dataset.country;
-        if (country) {
-            console.log('Navigating to country:', country);
-            window.location.hash = `country/${encodeURIComponent(country)}`;
-        }
-    });
-}
 
 function refreshCityView() {
     const container = document.getElementById('app-container');
