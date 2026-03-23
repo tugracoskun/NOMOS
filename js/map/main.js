@@ -129,6 +129,13 @@ export function initMap(containerId) {
                         <span class="ws-max-val" id="ws-max-val">0</span>
                     </div>
                     <div class="ws-chart-area" id="ws-chart-area"></div>
+                    <!-- Scroll okları -->
+                    <button class="ws-scroll-arrow ws-scroll-left" id="ws-scroll-left"><i class="fa-solid fa-chevron-left"></i></button>
+                    <button class="ws-scroll-arrow ws-scroll-right" id="ws-scroll-right"><i class="fa-solid fa-chevron-right"></i></button>
+                    <!-- Dikey/Yatay görünüm geçiş butonu -->
+                    <button class="ws-view-toggle" id="ws-view-toggle" title="Dikey Liste Görünümü">
+                        <i class="fa-solid fa-list"></i>
+                    </button>
                 </div>
                 <div class="ws-legend" id="ws-legend">
                     <span class="ws-leg-item"><span class="ws-leg-dot" style="background:#d4a574"></span>Afrika</span>
