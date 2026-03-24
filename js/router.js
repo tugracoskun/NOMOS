@@ -8,6 +8,7 @@ import { renderParliamentPage } from './parliament/main.js';
 import { renderCityPage } from './city/main.js';
 import { renderCountryPage } from './country/main.js';
 import { renderTradePage } from './trade/main.js';
+import { renderMessagesPage } from './messages/main.js';
 
 const appContainer = document.getElementById('app-container');
 
@@ -116,9 +117,13 @@ export function loadPage(pageName, subView = null, id = null) {
                 finishLoading();
                 break;
 
+            case 'messages':
+                renderMessagesPage(appContainer);
+                finishLoading();
+                break;
+
             case 'profile':
             case 'hangar':
-            case 'messages':
             case 'social':
                 renderPlaceholder(pageName);
                 finishLoading();
