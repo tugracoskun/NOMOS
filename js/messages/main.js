@@ -5,10 +5,8 @@ import { mockMessages, getCategoriesWithCounts, getMessagesByCategory, prioritie
 
 let currentCategory = 'all';
 let currentMessage = null;
-let messagesState = [...mockMessages]; // Mutable kopyası
 
 export function renderMessagesPage(container) {
-    // Gizle, CSS yüklenince göster
     container.style.opacity = '0';
     container.style.transition = 'opacity 0.3s ease';
 
@@ -18,21 +16,17 @@ export function renderMessagesPage(container) {
 
         container.innerHTML = `
             <div class="msg-wrapper">
-                <!-- SOL PANEL: Kategori + Mesaj Listesi -->
                 <aside class="msg-sidebar">
-                    <!-- Başlık -->
                     <div class="msg-sidebar-header">
                         <h2><i class="fa-solid fa-inbox"></i> Gelen Kutusu</h2>
                         ${totalUnread > 0 ? `<span class="msg-unread-total">${totalUnread}</span>` : ''}
                     </div>
 
-                    <!-- Arama -->
                     <div class="msg-search">
                         <i class="fa-solid fa-magnifying-glass"></i>
                         <input type="text" id="msg-search-input" placeholder="Mesaj ara...">
                     </div>
 
-                    <!-- Kategoriler -->
                     <nav class="msg-categories" id="msg-categories">
                         ${categories.map(cat => `
                             <button class="msg-cat-btn ${cat.id === currentCategory ? 'active' : ''}" data-category="${cat.id}">
@@ -43,35 +37,30 @@ export function renderMessagesPage(container) {
                         `).join('')}
                     </nav>
 
-                    <!-- Mesaj Listesi -->
                     <div class="msg-list" id="msg-list">
                         ${renderMessageList(currentCategory)}
                     </div>
 
-                    <!-- Yeni Mesaj Butonu -->
                     <button class="msg-compose-btn" id="msg-compose-btn">
                         <i class="fa-solid fa-pen-to-square"></i> Yeni Mesaj
                     </button>
                 </aside>
 
-                <!-- SAĞ PANEL: Mesaj Detay -->
                 <main class="msg-detail" id="msg-detail">
                     ${renderEmptyState()}
                 </main>
             </div>
         `;
 
-        // Event'leri bağla
         setupMessageEvents(container);
 
-        // Fade-in
         requestAnimationFrame(() => {
             container.style.opacity = '1';
         });
     });
 }
 
-// Mesaj listesini render et
+// Mesaj listesi
 function renderMessageList(category) {
     const messages = getMessagesByCategory(category);
 
@@ -85,7 +74,6 @@ function renderMessageList(category) {
     }
 
     return messages.map(msg => {
-        const pri = priorities[msg.priority] || priorities.normal;
         const flagHtml = msg.from.flag
             ? `<img src="https://flagcdn.com/w40/${msg.from.flag}.png" alt="" class="msg-item-flag">`
             : `<div class="msg-item-flag msg-item-flag-system"><i class="fa-solid fa-robot"></i></div>`;
@@ -94,7 +82,6 @@ function renderMessageList(category) {
             <div class="msg-item ${!msg.read ? 'unread' : ''} ${currentMessage?.id === msg.id ? 'active' : ''}" data-id="${msg.id}">
                 <div class="msg-item-left">
                     ${flagHtml}
-                    <div class="msg-item-priority" style="background: ${pri.color}" title="${pri.label}"></div>
                 </div>
                 <div class="msg-item-content">
                     <div class="msg-item-top">
@@ -106,18 +93,16 @@ function renderMessageList(category) {
                 </div>
                 <div class="msg-item-right">
                     ${msg.starred ? '<i class="fa-solid fa-star msg-star active"></i>' : '<i class="fa-regular fa-star msg-star"></i>'}
-                    ${msg.attachments.length > 0 ? '<i class="fa-solid fa-paperclip msg-attach-icon"></i>' : ''}
                 </div>
             </div>
         `;
     }).join('');
 }
 
-// Mesaj detay görünümü
+// Mesaj detay
 function renderMessageDetail(msg) {
     if (!msg) return renderEmptyState();
 
-    const pri = priorities[msg.priority] || priorities.normal;
     const flagHtml = msg.from.flag
         ? `<img src="https://flagcdn.com/w80/${msg.from.flag}.png" alt="" class="msg-detail-flag">`
         : `<div class="msg-detail-flag msg-detail-flag-system"><i class="fa-solid fa-robot"></i></div>`;
@@ -135,19 +120,6 @@ function renderMessageDetail(msg) {
         return `<button class="msg-action-btn ${a.cls}" data-action="${action}"><i class="fa-solid ${a.icon}"></i> ${a.label}</button>`;
     }).join('');
 
-    const attachmentsHtml = (msg.attachments || []).length > 0
-        ? `<div class="msg-attachments">
-                <div class="msg-attachments-title"><i class="fa-solid fa-paperclip"></i> Ekler (${msg.attachments.length})</div>
-                ${msg.attachments.map(att => `
-                    <div class="msg-attachment-item">
-                        <i class="fa-solid fa-file-pdf"></i>
-                        <span>${att.name}</span>
-                        <span class="msg-att-size">${att.size}</span>
-                    </div>
-                `).join('')}
-           </div>`
-        : '';
-
     return `
         <!-- Detay Header -->
         <div class="msg-detail-header">
@@ -156,22 +128,25 @@ function renderMessageDetail(msg) {
                 ${flagHtml}
                 <div>
                     <div class="msg-detail-from">${msg.from.name} <span class="msg-detail-title">${msg.from.title}</span></div>
-                    <div class="msg-detail-date">${msg.date}</div>
+                    <div class="msg-detail-date"><i class="fa-regular fa-clock"></i> ${msg.date}</div>
                 </div>
             </div>
             <div class="msg-detail-actions-top">
-                <button class="msg-icon-btn" title="Yıldızla"><i class="${msg.starred ? 'fa-solid' : 'fa-regular'} fa-star"></i></button>
-                <button class="msg-icon-btn" title="Arşivle"><i class="fa-solid fa-box-archive"></i></button>
-                <button class="msg-icon-btn msg-icon-btn-danger" title="Sil"><i class="fa-solid fa-trash"></i></button>
+                <button class="msg-top-btn msg-top-star ${msg.starred ? 'active' : ''}" title="Favorilere Ekle">
+                    <i class="${msg.starred ? 'fa-solid' : 'fa-regular'} fa-star"></i>
+                </button>
+                <button class="msg-top-btn msg-top-archive" title="Arşivle">
+                    <i class="fa-solid fa-box-archive"></i>
+                </button>
+                <button class="msg-top-btn msg-top-delete" title="Sil">
+                    <i class="fa-solid fa-trash-can"></i>
+                </button>
             </div>
         </div>
 
         <!-- Konu -->
         <div class="msg-detail-subject-bar">
             <h2>${msg.subject}</h2>
-            <span class="msg-priority-badge" style="background: ${pri.color}20; color: ${pri.color}; border: 1px solid ${pri.color}40;">
-                <i class="fa-solid ${pri.icon}"></i> ${pri.label}
-            </span>
         </div>
 
         <!-- Mesaj Gövdesi -->
@@ -179,16 +154,17 @@ function renderMessageDetail(msg) {
             <pre>${msg.body}</pre>
         </div>
 
-        <!-- Ekler -->
-        ${attachmentsHtml}
-
         <!-- Eylemler -->
         ${actionsHtml ? `<div class="msg-detail-actions">${actionsHtml}</div>` : ''}
 
-        <!-- Hızlı Yanıt -->
+        <!-- Yanıt Alanı -->
         <div class="msg-quick-reply">
-            <input type="text" placeholder="Hızlı yanıt yaz..." class="msg-reply-input">
-            <button class="msg-reply-send"><i class="fa-solid fa-paper-plane"></i></button>
+            <div class="msg-reply-box">
+                <input type="text" placeholder="Yanıtınızı yazın..." class="msg-reply-input">
+                <button class="msg-reply-send" title="Gönder">
+                    <i class="fa-solid fa-paper-plane"></i>
+                </button>
+            </div>
         </div>
     `;
 }
@@ -197,39 +173,77 @@ function renderMessageDetail(msg) {
 function renderEmptyState() {
     return `
         <div class="msg-empty-state">
-            <i class="fa-solid fa-envelope-open-text"></i>
+            <div class="msg-empty-icon">
+                <i class="fa-solid fa-envelope-open-text"></i>
+            </div>
             <h3>Mesaj Seçin</h3>
             <p>Okumak istediğiniz mesajı soldan seçin</p>
         </div>
     `;
 }
 
-// Event'ler
+// Yeni mesaj (ek paylaşma kaldırıldı)
+function renderComposeView() {
+    return `
+        <div class="msg-compose">
+            <div class="msg-compose-header">
+                <h3><i class="fa-solid fa-pen-to-square"></i> Yeni Mesaj</h3>
+                <button class="msg-top-btn" id="msg-compose-close"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="msg-compose-form">
+                <div class="msg-compose-field">
+                    <label>Kime</label>
+                    <input type="text" placeholder="Alıcı adı veya ülke..." id="msg-compose-to">
+                </div>
+                <div class="msg-compose-field">
+                    <label>Konu</label>
+                    <input type="text" placeholder="Mesaj konusu..." id="msg-compose-subject">
+                </div>
+                <div class="msg-compose-field">
+                    <label>Kategori</label>
+                    <select id="msg-compose-category">
+                        <option value="diplomacy">Diplomasi</option>
+                        <option value="trade">Ticaret</option>
+                        <option value="military">Askeri</option>
+                        <option value="social">Sosyal</option>
+                    </select>
+                </div>
+                <div class="msg-compose-field msg-compose-body-field">
+                    <label>Mesaj</label>
+                    <textarea placeholder="Mesajınızı yazın..." id="msg-compose-body" rows="8"></textarea>
+                </div>
+                <div class="msg-compose-footer">
+                    <div></div>
+                    <button class="msg-compose-send-btn" id="msg-compose-send">
+                        <i class="fa-solid fa-paper-plane"></i> Gönder
+                    </button>
+                </div>
+            </div>
+        </div>
+    `;
+}
+
+// === EVENT HANDLERS ===
+
 function setupMessageEvents(container) {
     // Kategori tıklama
     container.querySelectorAll('.msg-cat-btn').forEach(btn => {
         btn.addEventListener('click', () => {
             currentCategory = btn.dataset.category;
             currentMessage = null;
-
-            // Active class güncelle
             container.querySelectorAll('.msg-cat-btn').forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
 
-            // Listeyi güncelle
             const listEl = document.getElementById('msg-list');
             if (listEl) listEl.innerHTML = renderMessageList(currentCategory);
 
-            // Detayı sıfırla
             const detailEl = document.getElementById('msg-detail');
             if (detailEl) detailEl.innerHTML = renderEmptyState();
 
-            // Yeni listedeki item'lara event bağla
             bindMessageItemEvents(container);
         });
     });
 
-    // Mesaj item'larına event
     bindMessageItemEvents(container);
 
     // Arama
@@ -244,17 +258,16 @@ function setupMessageEvents(container) {
             if (msgs.length === 0) {
                 listEl.innerHTML = `<div class="msg-empty-list"><i class="fa-solid fa-magnifying-glass"></i><span>Sonuç bulunamadı</span></div>`;
             } else {
+                // Sadece listeyi yeniden render et
+                const tempCategory = currentCategory;
+                currentCategory = '__search__';
                 listEl.innerHTML = msgs.map(msg => {
-                    const pri = priorities[msg.priority] || priorities.normal;
                     const flagHtml = msg.from.flag
                         ? `<img src="https://flagcdn.com/w40/${msg.from.flag}.png" alt="" class="msg-item-flag">`
                         : `<div class="msg-item-flag msg-item-flag-system"><i class="fa-solid fa-robot"></i></div>`;
                     return `
                         <div class="msg-item ${!msg.read ? 'unread' : ''} ${currentMessage?.id === msg.id ? 'active' : ''}" data-id="${msg.id}">
-                            <div class="msg-item-left">
-                                ${flagHtml}
-                                <div class="msg-item-priority" style="background: ${pri.color}"></div>
-                            </div>
+                            <div class="msg-item-left">${flagHtml}</div>
                             <div class="msg-item-content">
                                 <div class="msg-item-top">
                                     <span class="msg-item-from">${msg.from.name}</span>
@@ -265,11 +278,11 @@ function setupMessageEvents(container) {
                             </div>
                             <div class="msg-item-right">
                                 ${msg.starred ? '<i class="fa-solid fa-star msg-star active"></i>' : '<i class="fa-regular fa-star msg-star"></i>'}
-                                ${msg.attachments.length > 0 ? '<i class="fa-solid fa-paperclip msg-attach-icon"></i>' : ''}
                             </div>
                         </div>
                     `;
                 }).join('');
+                currentCategory = tempCategory;
                 bindMessageItemEvents(container);
             }
         });
@@ -295,36 +308,64 @@ function bindMessageItemEvents(container) {
             const msg = mockMessages.find(m => m.id === msgId);
             if (!msg) return;
 
-            // Okundu yap
             msg.read = true;
             currentMessage = msg;
 
-            // Active class
             container.querySelectorAll('.msg-item').forEach(i => i.classList.remove('active'));
             item.classList.add('active');
             item.classList.remove('unread');
 
-            // Detayı göster
             const detailEl = document.getElementById('msg-detail');
             if (detailEl) {
                 detailEl.innerHTML = renderMessageDetail(msg);
                 setupDetailEvents(container);
             }
 
-            // Kategori sayaçlarını güncelle
             updateCategoryCounts(container);
         });
     });
 }
 
 function setupDetailEvents(container) {
-    // Geri butonu (mobil)
+    // Geri butonu
     const backBtn = document.getElementById('msg-back-btn');
     if (backBtn) {
         backBtn.addEventListener('click', () => {
             currentMessage = null;
             const detailEl = document.getElementById('msg-detail');
             if (detailEl) detailEl.innerHTML = renderEmptyState();
+        });
+    }
+
+    // Hızlı yanıt gönder
+    const replyInput = container.querySelector('.msg-reply-input');
+    const replySend = container.querySelector('.msg-reply-send');
+
+    function sendReply() {
+        if (!replyInput || !currentMessage) return;
+        const text = replyInput.value.trim();
+        if (!text) return;
+
+        // Yanıtı mesaj body'sine ekle
+        currentMessage.body += `\n\n── Yanıtınız ──\n${text}`;
+        replyInput.value = '';
+
+        // Detayı güncelle
+        const detailEl = document.getElementById('msg-detail');
+        if (detailEl) {
+            detailEl.innerHTML = renderMessageDetail(currentMessage);
+            setupDetailEvents(container);
+            // Scroll en alta
+            detailEl.scrollTop = detailEl.scrollHeight;
+        }
+    }
+
+    if (replySend) {
+        replySend.addEventListener('click', sendReply);
+    }
+    if (replyInput) {
+        replyInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') sendReply();
         });
     }
 }
@@ -336,66 +377,20 @@ function updateCategoryCounts(container) {
         if (btn) {
             const countEl = btn.querySelector('.msg-cat-count');
             if (cat.count > 0) {
-                if (countEl) {
-                    countEl.textContent = cat.count;
-                } else {
-                    btn.insertAdjacentHTML('beforeend', `<span class="msg-cat-count">${cat.count}</span>`);
-                }
+                if (countEl) countEl.textContent = cat.count;
+                else btn.insertAdjacentHTML('beforeend', `<span class="msg-cat-count">${cat.count}</span>`);
             } else if (countEl) {
                 countEl.remove();
             }
         }
     });
 
-    // Total unread
     const totalUnread = categories.find(c => c.id === 'all')?.count || 0;
     const totalBadge = container.querySelector('.msg-unread-total');
     if (totalBadge) {
-        if (totalUnread > 0) {
-            totalBadge.textContent = totalUnread;
-        } else {
-            totalBadge.remove();
-        }
+        if (totalUnread > 0) totalBadge.textContent = totalUnread;
+        else totalBadge.remove();
     }
-}
-
-// Yeni mesaj oluşturma formu
-function renderComposeView() {
-    return `
-        <div class="msg-compose">
-            <div class="msg-compose-header">
-                <h3><i class="fa-solid fa-pen-to-square"></i> Yeni Mesaj</h3>
-                <button class="msg-icon-btn" id="msg-compose-close"><i class="fa-solid fa-xmark"></i></button>
-            </div>
-            <div class="msg-compose-form">
-                <div class="msg-compose-field">
-                    <label>Kime</label>
-                    <input type="text" placeholder="Alıcı adı veya ülke..." id="msg-compose-to">
-                </div>
-                <div class="msg-compose-field">
-                    <label>Konu</label>
-                    <input type="text" placeholder="Mesaj konusu..." id="msg-compose-subject">
-                </div>
-                <div class="msg-compose-field">
-                    <label>Kategori</label>
-                    <select id="msg-compose-category">
-                        <option value="diplomacy">Diplomasi</option>
-                        <option value="trade">Ticaret</option>
-                        <option value="military">Askeri</option>
-                        <option value="social">Sosyal</option>
-                    </select>
-                </div>
-                <div class="msg-compose-field msg-compose-body-field">
-                    <label>Mesaj</label>
-                    <textarea placeholder="Mesajınızı yazın..." id="msg-compose-body" rows="8"></textarea>
-                </div>
-                <div class="msg-compose-footer">
-                    <button class="msg-compose-attach"><i class="fa-solid fa-paperclip"></i> Dosya Ekle</button>
-                    <button class="msg-compose-send" id="msg-compose-send"><i class="fa-solid fa-paper-plane"></i> Gönder</button>
-                </div>
-            </div>
-        </div>
-    `;
 }
 
 function setupComposeEvents(container) {
@@ -410,13 +405,55 @@ function setupComposeEvents(container) {
     const sendBtn = document.getElementById('msg-compose-send');
     if (sendBtn) {
         sendBtn.addEventListener('click', () => {
+            const to = document.getElementById('msg-compose-to')?.value.trim();
+            const subject = document.getElementById('msg-compose-subject')?.value.trim();
+            const category = document.getElementById('msg-compose-category')?.value;
+            const body = document.getElementById('msg-compose-body')?.value.trim();
+
+            if (!to || !subject || !body) {
+                // Boş alanları kırmızı yap
+                if (!to) document.getElementById('msg-compose-to').style.borderColor = '#ef4444';
+                if (!subject) document.getElementById('msg-compose-subject').style.borderColor = '#ef4444';
+                if (!body) document.getElementById('msg-compose-body').style.borderColor = '#ef4444';
+                return;
+            }
+
+            // Yeni mesaj oluştur
+            const newMsg = {
+                id: 'm' + Date.now(),
+                category: category || 'social',
+                from: { name: 'Sen', flag: 'tr', title: 'Lider' },
+                subject: subject,
+                preview: body.substring(0, 80) + (body.length > 80 ? '...' : ''),
+                body: `Kime: ${to}\n\n${body}`,
+                date: 'Şimdi',
+                timestamp: Date.now(),
+                read: true,
+                starred: false,
+                priority: 'normal',
+                attachments: [],
+                actions: []
+            };
+
+            // Listeye ekle
+            mockMessages.unshift(newMsg);
+
+            // Listeyi güncelle
+            const listEl = document.getElementById('msg-list');
+            if (listEl) listEl.innerHTML = renderMessageList(currentCategory);
+            bindMessageItemEvents(container);
+            updateCategoryCounts(container);
+
+            // Başarı göster
             const detailEl = document.getElementById('msg-detail');
             if (detailEl) {
                 detailEl.innerHTML = `
                     <div class="msg-empty-state">
-                        <i class="fa-solid fa-circle-check" style="color: #22c55e;"></i>
+                        <div class="msg-empty-icon" style="color: #22c55e;">
+                            <i class="fa-solid fa-circle-check"></i>
+                        </div>
                         <h3>Mesaj Gönderildi!</h3>
-                        <p>Yanıt geldiğinde bildirim alacaksınız.</p>
+                        <p>"${subject}" konulu mesajınız ${to} adresine iletildi.</p>
                     </div>
                 `;
             }

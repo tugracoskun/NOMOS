@@ -134,8 +134,10 @@ export function renderHome(container) {
                     </div>
                     <div class="chat-messages-area" id="chat-feed"></div>
                     <div class="chat-input-wrapper">
-                        <input type="text" id="chat-input" placeholder="Mesaj yaz...">
-                        <button id="chat-send-btn"><i class="fa-solid fa-paper-plane"></i></button>
+                        <div class="chat-input-box">
+                            <input type="text" id="chat-input" placeholder="Mesaj yaz...">
+                            <button id="chat-send-btn"><i class="fa-solid fa-paper-plane"></i></button>
+                        </div>
                     </div>
                 </div>
             </div>
