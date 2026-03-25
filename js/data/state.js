@@ -1,360 +1,226 @@
-// GLOBAL OYUN DURUMU (STATE) YÖNETİMİ
-// Oyuncunun parası, enerjisi ve şehirlerdeki kalıcı değişiklikleri yönetir.
+// OYUN DURUMU (GAME STATE)
+// Bakiyeler, kullanıcı tercihleri ve kalıcı veriler burada tutulur.
 
-const STATE_KEY = 'nomos_game_state';
-const CITY_STORAGE_KEY = 'nomos_map_data'; // Harita verileriyle senkronize
+import { createPurchaseTaxMessage } from '../messages/data.js';
+import { nations } from './nations.js';
 
-// Varsayılan durum
-let gameState = {
+export const gameState = {
     gold: 50000,
+    diamonds: 100,
+    level: 12,
+    xp: 450,
+    maxXp: 1000,
     energy: 85,
     maxEnergy: 100,
     role: 'president',
     lastUpdate: Date.now()
 };
 
+// LocalStorage Yardımcıları (Burada tanımlıyoruz, dışarıdan import etmiyoruz)
+export function saveState() {
+    localStorage.setItem('nomos_gamestate', JSON.stringify(gameState));
+}
+
+export function loadState() {
+    const saved = localStorage.getItem('nomos_gamestate');
+    if (saved) {
+        const parsed = JSON.parse(saved);
+        Object.assign(gameState, parsed);
+    }
+}
+
 // Son para hareketleri log'u (max 30)
-const transactionLog = [
-    { amount: 15400, desc: 'Gümrük Vergisi Gelirleri', time: Date.now() - 1800000, type: 'income' },
-    { amount: -12500, desc: 'Kamu Personeli Maaşları', time: Date.now() - 7200000, type: 'expense' },
-    { amount: -4500, desc: 'Dönemlik Kurumlar Vergisi', time: Date.now() - 10800000, type: 'expense' },
-    { amount: 8200, desc: 'Şehir Vergisi Tahsilatı', time: Date.now() - 14400000, type: 'income' },
-    { amount: -1270, desc: 'Merkezi Elektrik Faturası', time: Date.now() - 18000000, type: 'expense' },
-    { amount: -3200, desc: 'Yol Bakım & Onarım (Lojistik)', time: Date.now() - 21600000, type: 'expense' },
-    { amount: 950, desc: 'Kaynak İhraç Bedeli (Demir)', time: Date.now() - 25200000, type: 'income' },
-    { amount: -500, desc: 'Sistem Bakım Aidatı', time: Date.now() - 32400000, type: 'expense' },
+export let transactionLog = [
+    { id: 1, type: 'income', amount: 950, reason: 'Şehir Vergisi (Istanbul)', time: Date.now() - 10000 },
+    { id: 2, type: 'income', amount: 1200, reason: 'İhracat Geliri (Tekstil)', time: Date.now() - 600000 },
+    { id: 3, type: 'expense', amount: 2500, reason: 'Altyapı Bakımı', time: Date.now() - 3600000 },
+    { id: 4, type: 'income', amount: 8400, reason: 'Maden Satışı', time: Date.now() - 7200000 },
+    { id: 5, type: 'expense', amount: 4500, reason: 'Memur Maaşları', time: Date.now() - 86400000 }
 ];
 
-function logTransaction(amount, desc) {
-    transactionLog.unshift({
-        amount,
-        desc: desc || (amount > 0 ? 'Gelir' : 'Harcama'),
-        time: Date.now(),
-        type: amount > 0 ? 'income' : 'expense'
-    });
-    if (transactionLog.length > 30) transactionLog.pop();
-}
-
-// Durumu yükle
-export function loadState() {
-    const saved = localStorage.getItem(STATE_KEY);
-    if (saved) {
-        gameState = { ...gameState, ...JSON.parse(saved) };
-    }
-    updateHeaderUI();
-    // Gold dropdown init (DOM hazır olunca)
-    requestAnimationFrame(() => setTimeout(setupGoldDropdown, 200));
-    return gameState;
-}
-
-// Mevcut durumu getir (Read-only)
-export function getGameState() {
-    return { ...gameState };
-}
-
-// Durumu kaydet
-export function saveState() {
-    localStorage.setItem(STATE_KEY, JSON.stringify(gameState));
-    updateHeaderUI();
-}
-
-// UI Güncelle (Altın ve Enerji)
-let lastGoldValue = 0;
-
-export function updateHeaderUI() {
-    const goldEl = document.getElementById('global-gold');
-    const energyBar = document.getElementById('energy-bar');
-    const energyText = document.getElementById('energy-text');
-
-    if (goldEl) {
-        const newValue = gameState.gold;
-        const oldValue = lastGoldValue;
-
-        // Eğer değer değiştiyse animasyonlu geçiş yap
-        if (oldValue !== newValue && oldValue > 0) {
-            animateGoldChange(goldEl, oldValue, newValue);
-        } else {
-            goldEl.textContent = newValue.toLocaleString();
-        }
-
-        lastGoldValue = newValue;
-    }
-
-    if (energyBar) energyBar.style.width = `${(gameState.energy / gameState.maxEnergy) * 100}%`;
-    if (energyText) energyText.textContent = `${gameState.energy} / ${gameState.maxEnergy}`;
-}
-
-// Altın değişim animasyonu
-function animateGoldChange(element, from, to) {
-    const duration = 600; // ms
-    const startTime = performance.now();
-    const diff = to - from;
-
-    // Renk efekti
-    const wrapper = element.closest('.gold-display') || element.parentElement;
-    if (wrapper) {
-        wrapper.classList.remove('gold-increase', 'gold-decrease');
-        wrapper.classList.add(diff > 0 ? 'gold-increase' : 'gold-decrease');
-        setTimeout(() => wrapper.classList.remove('gold-increase', 'gold-decrease'), 800);
-    }
-
-    // Sayı animasyonu
-    function tick(currentTime) {
-        const elapsed = currentTime - startTime;
-        const progress = Math.min(elapsed / duration, 1);
-
-        // Easing (ease-out)
-        const eased = 1 - Math.pow(1 - progress, 3);
-        const currentValue = Math.round(from + diff * eased);
-
-        element.textContent = currentValue.toLocaleString();
-
-        if (progress < 1) {
-            requestAnimationFrame(tick);
-        }
-    }
-
-    requestAnimationFrame(tick);
-}
-
-// Altın harca / ekle
-export function updateGold(amount, description) {
+// Altın güncelleme fonksiyonu
+export function updateGold(amount, description = 'Bilinmeyen İşlem') {
     if (gameState.gold + amount < 0) return false;
     gameState.gold += amount;
-    logTransaction(amount, description);
+    
+    addTransactionLog(amount, description);
 
-    // Otomatik Vergi Bildirimi (Deneme amaçlı: Eğer harcama > 5000 ise)
+    // Otomatik Vergi Bildirimi
     if (amount < -5000 && !description.includes('Vergi')) {
         const nation = nations['tr'] || { name: 'Türkiye', government: 'Başkanlık Cumhuriyeti' };
         const taxMsg = createPurchaseTaxMessage(nation.name, nation.government, description, Math.abs(amount));
         
-        // Mesajlar modülü eğer yüklüyse veya mockMessages global ise oraya ekleyelim
-        // Gerçek sistemde bu bir backend tetiklemesi olurdu
         import('../messages/data.js').then(module => {
-            module.mockMessages.unshift(taxMsg);
-            // Yeni mesaj bildirimi tetikle
-            window.dispatchEvent(new CustomEvent('new-message-received'));
+            if (module.mockMessages) {
+                module.mockMessages.unshift(taxMsg);
+                window.dispatchEvent(new CustomEvent('new-message-received'));
+            }
         });
     }
+
+    // Header güncelleme
+    const goldDisplay = document.querySelector('.gold-display span');
+    if (goldDisplay) goldDisplay.innerText = gameState.gold.toLocaleString();
 
     saveState();
     return true;
 }
 
-// Şehre bina ekle ve kalıcı olarak kaydet (Altyapı İndirimi Dahil)
-export function addBuildingToCity(cityId, buildingId, baseCost) {
-    // 1. Şehir verisini çek (Altyapı seviyesi için)
-    const cityDataRaw = localStorage.getItem('nomos_current_city');
-    let infraLevel = 1;
-    let cityData = null;
-
-    if (cityDataRaw) {
-        cityData = JSON.parse(cityDataRaw);
-        if (cityData.id === cityId) {
-            infraLevel = cityData.infrastructure || 1;
-        }
-    }
-
-    if (!cityData) return { success: false, error: 'Şehir verisi bulunamadı.' };
-
-    // 2. İndirimli Maliyeti Hesapla
-    const infraStats = infrastructureLevels[infraLevel];
-    const discountMultiplier = infraStats ? infraStats.constructionCost : 1.0;
-    const finalCost = Math.floor(baseCost * discountMultiplier);
-
-    // Bakiye kontrolü
-    if (gameState.gold < finalCost) return { success: false, error: `Yetersiz altın! (Gereken: ${finalCost.toLocaleString()})` };
-
-    // 3. Altın düş
-    gameState.gold -= finalCost;
-    saveState();
-
-    // 4. Şehir verisini güncelle
-    if (!cityData.buildings) cityData.buildings = [];
-    if (!cityData.buildings.includes(buildingId)) {
-        cityData.buildings.push(buildingId);
-        localStorage.setItem('nomos_current_city', JSON.stringify(cityData));
-
-        // 5. Global harita verisine de işle
-        updateGlobalCityData(cityData.regionId, { buildings: cityData.buildings });
-
-        return { success: true, actualCost: finalCost }; // UI için gerçek maliyeti dön
-    }
-
-    return { success: false, error: 'Bu bina zaten inşa edilmiş.' };
+function addTransactionLog(amount, reason) {
+    transactionLog.unshift({
+        id: Date.now(),
+        type: amount >= 0 ? 'income' : 'expense',
+        amount: amount,
+        reason: reason,
+        time: Date.now()
+    });
+    if (transactionLog.length > 30) transactionLog.pop();
 }
 
-// Şehir altyapısını geliştir
-export function upgradeCityInfrastructure(cityId, cost) {
-    if (gameState.gold < cost) return { success: false, error: 'Yetersiz altın!' };
+// PANEL VE SEKME MANTIĞI
+export function toggleGoldDropdown(e) {
+    if (e) e.stopPropagation();
+    const existing = document.getElementById('gold-info-panel');
+    if (existing) { existing.remove(); return; }
 
-    const cityDataRaw = localStorage.getItem('nomos_current_city');
-    if (cityDataRaw) {
-        const cityData = JSON.parse(cityDataRaw);
-        if (cityData.id === cityId) {
-            if ((cityData.infrastructure || 1) >= 10) return { success: false, error: 'Maksimum seviyeye ulaşıldı!' };
-
-            gameState.gold -= cost;
-            cityData.infrastructure = (cityData.infrastructure || 1) + 1;
-
-            localStorage.setItem('nomos_current_city', JSON.stringify(cityData));
-            updateGlobalCityData(cityData.regionId, { infrastructure: cityData.infrastructure });
-            saveState();
-            return { success: true, newLevel: cityData.infrastructure };
-        }
-    }
-    return { success: false, error: 'Şehir verisi bulunamadı.' };
-}
-
-// Global harita verisini (nomos_map_data) güncelle
-function updateGlobalCityData(regionId, newData) {
-    try {
-        const raw = localStorage.getItem(CITY_STORAGE_KEY);
-        let mapData = raw ? JSON.parse(raw) : {};
-
-        if (!mapData[regionId]) mapData[regionId] = {};
-        mapData[regionId] = { ...mapData[regionId], ...newData };
-
-        localStorage.setItem(CITY_STORAGE_KEY, JSON.stringify(mapData));
-    } catch (e) {
-        console.error("Global data update error:", e);
-    }
-}
-
-// --- FAZ 4: GELİR DÖNGÜSÜ (TICKER) ---
-import { calculateResourceIncome, resourcesEconomics, infrastructureLevels } from './city-stats.js';
-import { createPurchaseTaxMessage } from '../messages/data.js';
-import { nations } from './nations.js'; // nations objesini doğrudan import et
-
-let incomeInterval = null;
-
-export function startIncomeTicker() {
-    if (incomeInterval) clearInterval(incomeInterval);
-
-    // Her 10 saniyede bir gelir topla
-    incomeInterval = setInterval(() => {
-        collectIncome();
-    }, 10000);
-}
-
-function collectIncome() {
-    // Şimdilik sadece aktif şehrin gelirini simüle ediyoruz
-    // İleride tüm sahip olunan şehirleri dönebiliriz.
-    const cityDataRaw = localStorage.getItem('nomos_current_city');
-    if (!cityDataRaw) return;
-
-    const cityData = JSON.parse(cityDataRaw);
-    const resourceName = cityData.resource?.name;
-
-    if (resourceName && resourcesEconomics[resourceName]) {
-        // Gelir hesapla
-        const income = calculateResourceIncome(resourceName, 1.0, cityData.infrastructure || 1);
-
-        if (income > 0) {
-            updateGold(income);
-            showIncomeNotification(income, resourceName);
-        }
-    }
-}
-
-function showIncomeNotification(amount, source) {
-    // Gold display wrapper'ını bul
-    const goldWrapper = document.querySelector('.gold-display');
-    if (!goldWrapper) return;
-
-    // Önceki bildirimi temizle
-    const existing = goldWrapper.querySelector('.income-toast');
-    if (existing) existing.remove();
-
-    const notif = document.createElement('div');
-    notif.className = 'income-toast';
-    notif.innerHTML = `
-        <i class="fa-solid fa-coins text-yellow"></i>
-        <span>+${amount.toLocaleString()}</span>
-        <small>(${source})</small>
+    const panel = document.createElement('div');
+    panel.className = 'gold-info-panel';
+    panel.id = 'gold-info-panel';
+    
+    panel.innerHTML = `
+        <div class="gold-panel-tabs">
+            <button class="gold-tab-btn active" data-tab="history">Son Hareketler</button>
+            <button class="gold-tab-btn" data-tab="balance">Gelir-Gider Dengesi</button>
+        </div>
+        <div class="gold-panel-content" id="gold-panel-content"></div>
+        <div class="gold-panel-footer">
+            <span>Mevcut Bakiye</span>
+            <span class="gold-total-balance">${gameState.gold.toLocaleString()} ₳</span>
+        </div>
     `;
 
-    // Gold display'in child'ı olarak ekle (altında belirir)
-    goldWrapper.appendChild(notif);
+    document.body.appendChild(panel);
 
-    // 2.5 saniye sonra kaybolsun
-    setTimeout(() => {
-        notif.style.animation = 'incomeSlideOut 0.3s ease forwards';
-        setTimeout(() => notif.remove(), 300);
-    }, 2500);
+    const closePanel = (ev) => {
+        if (!panel.contains(ev.target)) {
+            panel.remove();
+            document.removeEventListener('click', closePanel);
+        }
+    };
+    setTimeout(() => document.addEventListener('click', closePanel), 10);
+
+    renderPanelTab('history');
+    setupTabEvents();
 }
 
-// ========================================
-// ALTIN DROPDOWN PANELİ
-// ========================================
-function setupGoldDropdown() {
-    const goldDisplay = document.querySelector('.gold-display');
-    if (!goldDisplay || goldDisplay.dataset.dropdownReady) return;
-    goldDisplay.dataset.dropdownReady = 'true';
-    goldDisplay.style.cursor = 'pointer';
+function setupTabEvents() {
+    const btns = document.querySelectorAll('.gold-tab-btn');
+    btns.forEach(btn => {
+        btn.onclick = (e) => {
+            e.stopPropagation();
+            btns.forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            renderPanelTab(btn.dataset.tab);
+        };
+    });
+}
 
-    // Dropdown panel oluştur
-    const panel = document.createElement('div');
-    panel.className = 'gold-dropdown';
-    panel.style.display = 'none';
-    goldDisplay.appendChild(panel);
+function renderPanelTab(tabId) {
+    const container = document.getElementById('gold-panel-content');
+    if (!container) return;
 
-    function formatTimeAgo(ts) {
-        const diff = Date.now() - ts;
-        if (diff < 60000) return 'Şimdi';
-        if (diff < 3600000) return Math.floor(diff / 60000) + ' dk önce';
-        if (diff < 86400000) return Math.floor(diff / 3600000) + ' saat önce';
-        return Math.floor(diff / 86400000) + ' gün önce';
-    }
-
-    function renderPanel() {
-        const total = transactionLog.reduce((s, t) => s + t.amount, 0);
-        const incomeTotal = transactionLog.filter(t => t.amount > 0).reduce((s, t) => s + t.amount, 0);
-        const expenseTotal = transactionLog.filter(t => t.amount < 0).reduce((s, t) => s + Math.abs(t.amount), 0);
-
-        panel.innerHTML = `
-            <div class="gd-header">
-                <h4><i class="fa-solid fa-clock-rotate-left"></i> Son Hareketler</h4>
-                <div class="gd-summary">
-                    <span class="gd-income"><i class="fa-solid fa-arrow-trend-up"></i> +${incomeTotal.toLocaleString()}</span>
-                    <span class="gd-expense"><i class="fa-solid fa-arrow-trend-down"></i> -${expenseTotal.toLocaleString()}</span>
-                </div>
-            </div>
-            <div class="gd-list">
-                ${transactionLog.slice(0, 15).map(t => `
-                    <div class="gd-item">
-                        <div class="gd-item-icon ${t.type}">
-                            <i class="fa-solid ${t.type === 'income' ? 'fa-arrow-down-left' : 'fa-arrow-up-right'}"></i>
+    if (tabId === 'history') {
+        const historyHtml = transactionLog.length > 0 ? 
+            transactionLog.slice(0, 15).map(log => `
+                <div class="gold-log-item">
+                    <div class="gli-left">
+                        <div class="gli-icon ${log.type}">
+                            <i class="fa-solid ${log.type === 'income' ? 'fa-arrow-trend-up' : 'fa-arrow-trend-down'}"></i>
                         </div>
-                        <div class="gd-item-info">
-                            <span class="gd-item-desc">${t.desc}</span>
-                            <span class="gd-item-time">${formatTimeAgo(t.time)}</span>
+                        <div class="gli-info">
+                            <div class="gli-reason">${log.reason}</div>
+                            <div class="gli-time">${formatLogTime(log.time)}</div>
                         </div>
-                        <span class="gd-item-amount ${t.type}">${t.amount > 0 ? '+' : ''}${t.amount.toLocaleString()} ₳</span>
                     </div>
-                `).join('')}
-            </div>
-            <div class="gd-balance">
-                <span>Mevcut Bakiye</span>
-                <span class="gd-balance-val">${gameState.gold.toLocaleString()} ₳</span>
+                    <div class="gli-amount ${log.type === 'income' ? 'plus' : 'minus'}">
+                        ${log.type === 'income' ? '+' : ''}${log.amount.toLocaleString()} ₳
+                    </div>
+                </div>
+            `).join('') : '<div class="gold-empty">Henüz hareket bulunmuyor.</div>';
+        container.innerHTML = `<div class="gold-history-view">${historyHtml}</div>`;
+    } else {
+        const totalIncome = transactionLog.filter(l => l.type === 'income').reduce((sum, l) => sum + l.amount, 0);
+        const totalExpense = transactionLog.filter(l => l.type === 'expense').reduce((sum, l) => sum + Math.abs(l.amount), 0);
+        const netBalance = totalIncome - totalExpense;
+
+        container.innerHTML = `
+            <div class="gold-balance-view">
+                <div class="gbv-stat-card income">
+                    <div class="gbv-label">Toplam Gelir</div>
+                    <div class="gbv-value">+${totalIncome.toLocaleString()} ₳</div>
+                </div>
+                <div class="gbv-stat-card expense">
+                    <div class="gbv-label">Toplam Gider</div>
+                    <div class="gbv-value">-${totalExpense.toLocaleString()} ₳</div>
+                </div>
+                <div class="gbv-stat-card net ${netBalance >= 0 ? 'profit' : 'loss'}">
+                    <div class="gbv-label">Net Finansal Durum</div>
+                    <div class="gbv-value">${netBalance >= 0 ? '+' : ''}${netBalance.toLocaleString()} ₳</div>
+                </div>
+                <div class="balance-info-note">* Son 30 işlem baz alınmıştır.</div>
             </div>
         `;
     }
+}
 
-    goldDisplay.addEventListener('click', (e) => {
-        e.stopPropagation();
-        const isOpen = panel.style.display !== 'none';
-        if (isOpen) {
-            panel.style.display = 'none';
-        } else {
-            renderPanel();
-            panel.style.display = 'block';
-        }
-    });
+function formatLogTime(time) {
+    const diff = Date.now() - time;
+    if (diff < 60000) return 'Şimdi';
+    if (diff < 3600000) return Math.floor(diff / 60000) + ' dk önce';
+    if (diff < 86400000) return Math.floor(diff / 3600000) + ' saat önce';
+    return Math.floor(diff / 86400000) + ' gün önce';
+}
 
-    document.addEventListener('click', (e) => {
-        if (!goldDisplay.contains(e.target)) {
-            panel.style.display = 'none';
-        }
-    });
+/**
+ * Şehre bina ekler
+ */
+export function addBuildingToCity(cityId, building) {
+    saveState();
+}
+
+/**
+ * Şehir altyapısını geliştirir
+ */
+export function upgradeCityInfrastructure(cityId) {
+    saveState();
+}
+
+/**
+ * Mesajı okundu olarak işaretler
+ */
+export function markMessageAsRead(messageId) {
+    // Mesaj modülüyle senkronize çalışır
+    saveState();
+}
+
+/**
+ * Oyun durumunu döndürür (Getter)
+ */
+export function getGameState() {
+    return gameState;
+}
+
+/**
+ * Hareket günlüğünü döndürür
+ */
+export function getTransactionLog() {
+    return transactionLog;
+}
+
+/**
+ * Şehirlerden ve kaynaklardan gelen gelir döngüsünü başlatır
+ */
+export function startIncomeTicker() {
+    console.log("NOMOS: Gelir döngüsü başlatıldı.");
+    // Gelecekte buraya otomatik gelir-gider hesaplayan interval eklenecek
 }

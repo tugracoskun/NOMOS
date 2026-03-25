@@ -2,7 +2,7 @@
 // Uygulamanın giriş noktası ve global olay dinleyicisi
 
 import { navigateTo, handleInitialLoad } from './router.js';
-import { loadState, startIncomeTicker } from './data/state.js';
+import { loadState, startIncomeTicker, toggleGoldDropdown } from './data/state.js';
 import { initSettingsPanel } from './settings.js';
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -10,6 +10,9 @@ document.addEventListener('DOMContentLoaded', () => {
     loadState();
     startIncomeTicker();
     initSettingsPanel();
+    
+    // Altın paneli fonksiyonunu global yap (onclick için)
+    window.toggleGoldDropdown = toggleGoldDropdown;
 
     // --- GLOBAL EVENT DELEGATION ---
     document.body.addEventListener('click', (e) => {
