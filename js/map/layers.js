@@ -119,6 +119,17 @@ function generateLegendHTML(modeId) {
             items: [
                 { color: '#3b82f6', label: 'Ülkeye göre renklenir' }
             ]
+        },
+        government: {
+            title: 'Yönetim Biçimleri',
+            items: [
+                { color: '#3b82f6', label: 'Başkanlık Cumhuriyeti' },
+                { color: '#60a5fa', label: 'Cumhuriyet' },
+                { color: '#8b5cf6', label: 'Parlamenter Monarşi' },
+                { color: '#ef4444', label: 'Komünizm' },
+                { color: '#f59e0b', label: 'Monarşi' },
+                { color: '#1e293b', label: 'Diktatörlük' }
+            ]
         }
     };
 

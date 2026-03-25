@@ -122,6 +122,21 @@ export function updateGold(amount, description) {
     if (gameState.gold + amount < 0) return false;
     gameState.gold += amount;
     logTransaction(amount, description);
+
+    // Otomatik Vergi Bildirimi (Deneme amaçlı: Eğer harcama > 5000 ise)
+    if (amount < -5000 && !description.includes('Vergi')) {
+        const nation = nations['tr'] || { name: 'Türkiye', government: 'Başkanlık Cumhuriyeti' };
+        const taxMsg = createPurchaseTaxMessage(nation.name, nation.government, description, Math.abs(amount));
+        
+        // Mesajlar modülü eğer yüklüyse veya mockMessages global ise oraya ekleyelim
+        // Gerçek sistemde bu bir backend tetiklemesi olurdu
+        import('../messages/data.js').then(module => {
+            module.mockMessages.unshift(taxMsg);
+            // Yeni mesaj bildirimi tetikle
+            window.dispatchEvent(new CustomEvent('new-message-received'));
+        });
+    }
+
     saveState();
     return true;
 }
@@ -208,6 +223,8 @@ function updateGlobalCityData(regionId, newData) {
 
 // --- FAZ 4: GELİR DÖNGÜSÜ (TICKER) ---
 import { calculateResourceIncome, resourcesEconomics, infrastructureLevels } from './city-stats.js';
+import { createPurchaseTaxMessage } from '../messages/data.js';
+import { nations } from './nations.js'; // nations objesini doğrudan import et
 
 let incomeInterval = null;
 

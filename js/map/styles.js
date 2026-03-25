@@ -1,6 +1,7 @@
 // HARİTA STİLLERİ - Dinamik Mod Desteği
 import { getSavedData } from './editor.js';
 import { getCurrentMode, mapModes } from './modes.js';
+import { nations } from '../data/nations.js'; // nations objesini import et
 
 // Aktif mod
 let activeMode = 'default';
@@ -57,6 +58,9 @@ function getColorByMode(saved, country, name) {
         case 'statistics':
             // İstatistik modunda eyalet değerine göre renklendir
             return getValueColor(saved);
+        
+        case 'government':
+            return getGovernmentColor(country);
 
         default:
             // Varsayılan: Kaydedilmiş renk veya ülke bazlı
@@ -133,6 +137,21 @@ function getValueColor(saved) {
     if (score < 15) return '#fbbf24';        // Orta
     if (score < 30) return '#22c55e';        // İyi
     return '#8b5cf6';                         // Mükemmel
+}
+
+// YÖNETİM MODU: Rejim Tipine Göre Renk
+function getGovernmentColor(countryName) {
+    // Ülke ismine göre nations verisinden government değerini bul
+    const nationArr = Object.values(nations);
+    const nationData = nationArr.find(n => n.name === countryName);
+    
+    if (!nationData || !nationData.government) return '#64748b'; // Varsayılan gri
+
+    const modeConfig = mapModes['government'];
+    const colors = modeConfig.colorScheme;
+    
+    // modes.js'deki renklerden birini döndür (yoksa varsayılan)
+    return colors[nationData.government] || colors['Other'];
 }
 
 // DIŞ SINIRLAR

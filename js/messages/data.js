@@ -13,6 +13,8 @@ export const messageCategories = [
     { id: 'trash', label: 'Çöp Kutusu', icon: 'fa-trash-can', count: 0 },
 ];
 
+import { calculateTax, governmentTaxes } from '../data/taxation.js';
+
 export const mockMessages = [
     {
         id: 'm001',
@@ -117,6 +119,41 @@ export const mockMessages = [
         deleted: false
     }
 ];
+
+/**
+ * Belirli bir harcama için otomatik Vergi Faturası (Invoice) oluşturur
+ */
+export function createPurchaseTaxMessage(countryName, governmentType, itemName, itemPrice, taxType = 'vat') {
+    const taxAmount = calculateTax(governmentType, itemPrice, taxType);
+    const taxName = taxType === 'vat' ? 'KDV' : (taxType === 'luxury' ? 'ÖTV (Lüks Tüketim)' : 'Vergi');
+    const invoiceId = 'INV-' + Math.random().toString(36).substr(2, 9).toUpperCase();
+
+    return {
+        id: Date.now() + Math.floor(Math.random() * 1000),
+        sender: 'Maliye Bakanlığı (TR)',
+        senderRole: 'Devlet Kurumu',
+        senderAvatar: 'https://i.pravatar.cc/150?u=finance',
+        subject: `Resmi Vergi Tahakkuku: ${itemName}`,
+        time: 'Şimdi',
+        preview: `${itemName} alımınız için ${taxName} faturası kesilmiştir.`,
+        content: `
+            Sayın İşletme Sahibi,<br><br>
+            <b>${countryName}</b> sınırları içerisinde gerçekleştirdiğiniz <b>${itemName}</b> alım işlemi (Tutar: ${itemPrice.toLocaleString()} ₳) için devletimiz tarafından vergi tahakkuk ettirilmiştir.<br><br>
+            <b>Fatura Detayları:</b><br>
+            - İşlem Tipi: Satın Alım (Lojistik Araç/Hizmet)<br>
+            - Vergi Türü: ${taxName}<br>
+            - Oran: %${(calculateTax(governmentType, 100, taxType))}<br>
+            - Ödenecek Miktar: <b>${taxAmount.toLocaleString()} ₳</b><br><br>
+            Fatura No: ${invoiceId}<br>
+            <i>Not: Ödenmeyen vergi borçları için kanuni faiz ve haciz işlemleri uygulanmaktadır.</i>
+        `,
+        actions: [
+            { id: 'pay-tax', label: 'Vergiyi Öde', icon: 'fa-file-invoice-dollar', color: '#fbbf24', value: taxAmount }
+        ],
+        isUnread: true,
+        category: 'finance'
+    };
+}
 
 export function getMessagesByCategory(category) {
     if (category === 'all') return mockMessages.filter(m => !m.archived && !m.deleted);

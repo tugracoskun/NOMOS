@@ -94,6 +94,23 @@ export const mapModes = {
         description: 'Deniz ticaret rotalarını gösterir',
         colorScheme: null,
         hasToggle: true // Bu mod toggle açar/kapat
+    },
+    government: {
+        id: 'government',
+        name: 'Yönetim',
+        icon: 'fa-solid fa-crown',
+        description: 'Ülkelerin yönetim biçimlerine göre',
+        colorScheme: {
+            'Presidential Republic': '#3b82f6',     // Parlak Mavi
+            'Parlementer Monarşi': '#8b5cf6',       // Mor
+            'Başkanlık Cumhuriyeti': '#3b82f6',     // Parlak Mavi (Türkçe/İngilizce uyumu)
+            'Komünizm': '#ef4444',                  // Devrimci Kırmızı
+            'Monarşi': '#f59e0b',                   // Altın Sarısı
+            'Diktatörlük': '#1e293b',                // Koyu Lacivert/Siyah
+            'Cumhuriyet': '#60a5fa',                 // Gök Mavisi
+            'Other': '#64748b'                      // Gri
+        },
+        getValue: (countryData) => countryData.government || 'Other'
     }
 };
 
