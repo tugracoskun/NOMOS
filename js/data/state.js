@@ -9,9 +9,30 @@ let gameState = {
     gold: 50000,
     energy: 85,
     maxEnergy: 100,
-    role: 'president', // 'president' veya 'citizen'
+    role: 'president',
     lastUpdate: Date.now()
 };
+
+// Son para hareketleri log'u (max 30)
+const transactionLog = [
+    { amount: 12450, desc: 'Günlük Gelir', time: Date.now() - 3600000, type: 'income' },
+    { amount: -8500, desc: 'Bina İnşası (Fabrika)', time: Date.now() - 7200000, type: 'expense' },
+    { amount: 3100, desc: 'Ticaret Kârı', time: Date.now() - 10800000, type: 'income' },
+    { amount: -2000, desc: 'Liman İnşası', time: Date.now() - 14400000, type: 'expense' },
+    { amount: 950, desc: 'Kaynak Satışı (Demir)', time: Date.now() - 18000000, type: 'income' },
+    { amount: -5000, desc: 'Altyapı Yükseltme', time: Date.now() - 21600000, type: 'expense' },
+    { amount: 200, desc: 'Vergi Geliri', time: Date.now() - 25200000, type: 'income' },
+];
+
+function logTransaction(amount, desc) {
+    transactionLog.unshift({
+        amount,
+        desc: desc || (amount > 0 ? 'Gelir' : 'Harcama'),
+        time: Date.now(),
+        type: amount > 0 ? 'income' : 'expense'
+    });
+    if (transactionLog.length > 30) transactionLog.pop();
+}
 
 // Durumu yükle
 export function loadState() {
@@ -20,6 +41,8 @@ export function loadState() {
         gameState = { ...gameState, ...JSON.parse(saved) };
     }
     updateHeaderUI();
+    // Gold dropdown init (DOM hazır olunca)
+    requestAnimationFrame(() => setTimeout(setupGoldDropdown, 200));
     return gameState;
 }
 
@@ -94,9 +117,10 @@ function animateGoldChange(element, from, to) {
 }
 
 // Altın harca / ekle
-export function updateGold(amount) {
+export function updateGold(amount, description) {
     if (gameState.gold + amount < 0) return false;
     gameState.gold += amount;
+    logTransaction(amount, description);
     saveState();
     return true;
 }
@@ -240,4 +264,79 @@ function showIncomeNotification(amount, source) {
         notif.style.animation = 'incomeSlideOut 0.3s ease forwards';
         setTimeout(() => notif.remove(), 300);
     }, 2500);
+}
+
+// ========================================
+// ALTIN DROPDOWN PANELİ
+// ========================================
+function setupGoldDropdown() {
+    const goldDisplay = document.querySelector('.gold-display');
+    if (!goldDisplay || goldDisplay.dataset.dropdownReady) return;
+    goldDisplay.dataset.dropdownReady = 'true';
+    goldDisplay.style.cursor = 'pointer';
+
+    // Dropdown panel oluştur
+    const panel = document.createElement('div');
+    panel.className = 'gold-dropdown';
+    panel.style.display = 'none';
+    goldDisplay.appendChild(panel);
+
+    function formatTimeAgo(ts) {
+        const diff = Date.now() - ts;
+        if (diff < 60000) return 'Şimdi';
+        if (diff < 3600000) return Math.floor(diff / 60000) + ' dk önce';
+        if (diff < 86400000) return Math.floor(diff / 3600000) + ' saat önce';
+        return Math.floor(diff / 86400000) + ' gün önce';
+    }
+
+    function renderPanel() {
+        const total = transactionLog.reduce((s, t) => s + t.amount, 0);
+        const incomeTotal = transactionLog.filter(t => t.amount > 0).reduce((s, t) => s + t.amount, 0);
+        const expenseTotal = transactionLog.filter(t => t.amount < 0).reduce((s, t) => s + Math.abs(t.amount), 0);
+
+        panel.innerHTML = `
+            <div class="gd-header">
+                <h4><i class="fa-solid fa-clock-rotate-left"></i> Son Hareketler</h4>
+                <div class="gd-summary">
+                    <span class="gd-income"><i class="fa-solid fa-arrow-trend-up"></i> +${incomeTotal.toLocaleString()}</span>
+                    <span class="gd-expense"><i class="fa-solid fa-arrow-trend-down"></i> -${expenseTotal.toLocaleString()}</span>
+                </div>
+            </div>
+            <div class="gd-list">
+                ${transactionLog.slice(0, 15).map(t => `
+                    <div class="gd-item">
+                        <div class="gd-item-icon ${t.type}">
+                            <i class="fa-solid ${t.type === 'income' ? 'fa-arrow-down-left' : 'fa-arrow-up-right'}"></i>
+                        </div>
+                        <div class="gd-item-info">
+                            <span class="gd-item-desc">${t.desc}</span>
+                            <span class="gd-item-time">${formatTimeAgo(t.time)}</span>
+                        </div>
+                        <span class="gd-item-amount ${t.type}">${t.amount > 0 ? '+' : ''}${t.amount.toLocaleString()} ₳</span>
+                    </div>
+                `).join('')}
+            </div>
+            <div class="gd-balance">
+                <span>Mevcut Bakiye</span>
+                <span class="gd-balance-val">${gameState.gold.toLocaleString()} ₳</span>
+            </div>
+        `;
+    }
+
+    goldDisplay.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const isOpen = panel.style.display !== 'none';
+        if (isOpen) {
+            panel.style.display = 'none';
+        } else {
+            renderPanel();
+            panel.style.display = 'block';
+        }
+    });
+
+    document.addEventListener('click', (e) => {
+        if (!goldDisplay.contains(e.target)) {
+            panel.style.display = 'none';
+        }
+    });
 }
