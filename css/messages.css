@@ -328,60 +328,14 @@
 }
 
 /* =========================================
-   SAĞ PANEL (Detay)
+   SAĞ PANEL (Detay ve Esneklik)
    ========================================= */
 .msg-detail {
     display: flex;
     flex-direction: column;
-    background: rgba(15, 23, 42, 0.35);
-    border: 1px solid rgba(255, 255, 255, 0.06);
-    border-left: 1px solid rgba(255, 255, 255, 0.03);
-    border-radius: 0 12px 12px 0;
-    overflow-y: auto;
-}
-
-.msg-detail::-webkit-scrollbar { width: 3px; }
-.msg-detail::-webkit-scrollbar-thumb {
-    background: rgba(255, 255, 255, 0.04);
-    border-radius: 4px;
-}
-
-/* Boş Durum */
-.msg-empty-state {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
     height: 100%;
-    gap: 8px;
-    color: #2a3444;
-}
-
-.msg-empty-icon {
-    width: 64px;
-    height: 64px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 50%;
-    background: rgba(255, 255, 255, 0.02);
-    border: 1px solid rgba(255, 255, 255, 0.04);
-    margin-bottom: 6px;
-}
-
-.msg-empty-icon i { font-size: 1.5rem; opacity: 0.2; }
-
-.msg-empty-state h3 {
-    font-size: 0.95rem;
-    color: #4a5568;
-    font-weight: 500;
-    margin: 0;
-}
-
-.msg-empty-state p {
-    font-size: 0.78rem;
-    color: #2a3444;
-    margin: 0;
+    background: rgba(15, 23, 42, 0.3);
+    overflow: hidden; /* Dış taşıma engeli */
 }
 
 /* Detay Header */
@@ -390,7 +344,76 @@
     align-items: center;
     gap: 12px;
     padding: 16px 20px;
+    background: rgba(15, 23, 42, 0.4);
     border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    flex-shrink: 0;
+}
+
+/* Konu Barı */
+.msg-detail-subject-bar {
+    padding: 15px 20px;
+    background: rgba(255, 255, 255, 0.015);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+    flex-shrink: 0;
+}
+
+.msg-detail-subject-bar h2 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #f1f5f9;
+    margin: 0;
+}
+
+/* MESAJ GÖVDESİ (ESNEYEN ALAN) */
+.msg-detail-body {
+    flex: 1; /* TÜM BOŞLUĞU DOLDURUR */
+    padding: 25px;
+    overflow-y: auto;
+    background-image: radial-gradient(circle at 50% 50%, rgba(59, 130, 246, 0.02) 0%, transparent 80%);
+}
+
+.msg-detail-body::-webkit-scrollbar { width: 4px; }
+.msg-detail-body::-webkit-scrollbar-thumb { background: rgba(55, 65, 81, 0.6); border-radius: 10px; }
+
+.msg-detail-body pre {
+    font-family: inherit;
+    font-size: 0.88rem;
+    color: #94a3b8;
+    line-height: 1.8;
+    white-space: pre-wrap;
+    word-break: break-word;
+    margin: 0;
+}
+
+/* AKSİYONLAR VE YANIT KUTUSU (ALTA SABİTLENİR) */
+.msg-detail-footer {
+    margin-top: auto;
+    background: rgba(15, 23, 42, 0.6);
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+    padding: 15px 20px 20px;
+    flex-shrink: 0;
+}
+
+.msg-detail-actions {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 15px;
+    flex-wrap: wrap;
+}
+
+.msg-quick-reply {
+    margin-top: 5px;
+}
+
+/* Boş Durum Düzenlemesi */
+.msg-empty-state {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+    background: rgba(15, 23, 42, 0.1);
 }
 
 .msg-back-btn {

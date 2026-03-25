@@ -140,13 +140,16 @@ function renderMessageDetail(msg) {
         </div>
         <div class="msg-detail-subject-bar"><h2>${msg.subject}</h2></div>
         <div class="msg-detail-body"><pre>${msg.body}</pre></div>
-        ${actionsHtml ? `<div class="msg-detail-actions">${actionsHtml}</div>` : ''}
-        <div class="msg-quick-reply">
-            <div class="msg-reply-box">
-                <input type="text" placeholder="Yanıtınızı yazın..." class="msg-reply-input">
-                <button class="msg-reply-send" title="Gönder"><i class="fa-solid fa-paper-plane"></i></button>
+        
+        <footer class="msg-detail-footer">
+            ${actionsHtml ? `<div class="msg-detail-actions">${actionsHtml}</div>` : ''}
+            <div class="msg-quick-reply">
+                <div class="msg-reply-box">
+                    <input type="text" placeholder="Yanıtınızı yazın..." class="msg-reply-input">
+                    <button class="msg-reply-send" title="Gönder"><i class="fa-solid fa-paper-plane"></i></button>
+                </div>
             </div>
-        </div>
+        </footer>
     `;
 }
 
