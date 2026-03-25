@@ -81,6 +81,40 @@ export const mockMessages = [
         actions: [],
         archived: false,
         deleted: false
+    },
+    {
+        id: 'm008',
+        category: 'system',
+        from: { name: 'Maliye Bakanlığı', flag: 'tr', title: 'Gelir İdaresi' },
+        subject: '💡 Dönemlik Gelir Vergisi Tahakkuku',
+        preview: 'Sayın mükellef, son 3 turdaki ticari kazancınız üzerinden hesaplanan vergi borcunuz...',
+        body: `SAYIN MÜKELLEF,\n\nSon hesap dönemine ait ticari faaliyetleriniz üzerinden hesaplanan vergi dökümü aşağıdadır:\n\n• Kurumlar Vergisi: 4.200 ₳\n• Şehir Hizmet Bedeli: 800 ₳\n• Katma Değer Teşviki: -500 ₳\n\nTOPLAM ÖDENECEK: 4.500 ₳\n\nGecikme faizi binmemesi için en kısa sürede ödeme yapmanızı rica ederiz.`,
+        date: '5 dk önce',
+        timestamp: Date.now() - 300000,
+        read: false,
+        starred: false,
+        priority: 'urgent',
+        amount: 4500,
+        actions: ['pay-tax', 'archive'],
+        archived: false,
+        deleted: false
+    },
+    {
+        id: 'm009',
+        category: 'system',
+        from: { name: 'Elektrik Dağıtım', flag: null, title: 'Fatura' },
+        subject: '⚡ Elektrik Faturası Bildirimi',
+        preview: 'Şehir merkezi ve sanayi bölgelerinde kullanılan enerji maliyeti hesaplanmıştır...',
+        body: `ELEKTRİK FATURASI DETAYI\n\nAbone No: 4882-X10\nDönem: Mevcut Ay\n\nTüketim Tutarı: 1.150 ₳\nSistem Kullanım Bedeli: 120 ₳\n\nTOPLAM: 1.270 ₳\n\nYetersiz bakiye durumunda enerji üretim binalarında kısıtlamaya gidilebilir.`,
+        date: '1 saat önce',
+        timestamp: Date.now() - 3600000,
+        read: false,
+        starred: false,
+        priority: 'normal',
+        amount: 1270,
+        actions: ['pay-bill', 'archive'],
+        archived: false,
+        deleted: false
     }
 ];
 

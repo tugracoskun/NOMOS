@@ -111,6 +111,8 @@ function renderMessageDetail(msg) {
             'acknowledge': { label: 'Onayla', icon: 'fa-thumbs-up', cls: 'msg-action-accept' },
             'reply': { label: 'Yanıtla', icon: 'fa-reply', cls: 'msg-action-negotiate' },
             'view-market': { label: 'Piyasaya Git', icon: 'fa-chart-line', cls: 'msg-action-negotiate' },
+            'pay-tax': { label: 'Vergiyi Öde', icon: 'fa-money-bill-transfer', cls: 'msg-action-pay-tax' },
+            'pay-bill': { label: 'Faturayı Öde', icon: 'fa-file-invoice-dollar', cls: 'msg-action-pay-bill' },
         };
         const a = actionMap[action] || { label: action, icon: 'fa-circle', cls: '' };
         return `<button class="msg-action-btn ${a.cls}" data-action="${action}"><i class="fa-solid ${a.icon}"></i> ${a.label}</button>`;
@@ -235,6 +237,29 @@ function setupMessageEvents(container) {
 
 function setupDetailEvents(container) {
     if (!currentMessage) return;
+
+    // Ödeme Butonları (Vergi & Fatura)
+    container.querySelectorAll('.msg-action-pay-tax, .msg-action-pay-bill').forEach(btn => {
+        btn.addEventListener('click', async () => {
+            const amount = currentMessage.amount || 0;
+            const desc = btn.classList.contains('msg-action-pay-tax') ? 'Vergi Ödemesi' : 'Fatura Ödemesi';
+            
+            // updateGold import edilmesi gerekiyor, data.js'den değil state.js'den gelmeli
+            const { updateGold } = await import('../data/state.js');
+            
+            const success = updateGold(-amount, desc);
+            
+            if (success) {
+                // Mesaj içeriğini ve butonları güncelle
+                currentMessage.body += `\n\n✅ BU İŞLEM BAŞARIYLA ÖDENMİŞTİR.\nÖdeme Tarihi: ${new Date().toLocaleString('tr-TR')}\nMakbuz No: NOM-${Math.floor(Math.random()*900000 + 100000)}`;
+                currentMessage.actions = currentMessage.actions.filter(a => a !== 'pay-tax' && a !== 'pay-bill');
+                showUndoToast(container, `${desc} Başarılı! (-${amount.toLocaleString()} ₳)`, () => {});
+                refreshUI(container);
+            } else {
+                showUndoToast(container, `Yetersiz Bakiye!`, () => {});
+            }
+        });
+    });
 
     // Yıldız
     container.querySelector('.msg-top-star')?.addEventListener('click', () => {

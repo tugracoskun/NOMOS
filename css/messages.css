@@ -596,6 +596,32 @@
     border-color: rgba(59, 130, 246, 0.3);
 }
 
+/* Vergi Ödeme (Maliye Altını) */
+.msg-action-pay-tax {
+    color: #f59e0b;
+    background: rgba(245, 158, 11, 0.08);
+    border-color: rgba(245, 158, 11, 0.15);
+}
+
+.msg-action-pay-tax:hover {
+    background: rgba(245, 158, 11, 0.15);
+    border-color: rgba(245, 158, 11, 0.3);
+    color: #fbbf24;
+}
+
+/* Fatura Ödeme (Elektrik Mavisi) */
+.msg-action-pay-bill {
+    color: #38bdf8;
+    background: rgba(56, 189, 248, 0.08);
+    border-color: rgba(56, 189, 248, 0.15);
+}
+
+.msg-action-pay-bill:hover {
+    background: rgba(56, 189, 248, 0.15);
+    border-color: rgba(56, 189, 248, 0.3);
+    color: #7dd3fc;
+}
+
 /* =========================================
    YANIT ALANI (Premium)
    ========================================= */

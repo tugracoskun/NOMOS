@@ -15,13 +15,14 @@ let gameState = {
 
 // Son para hareketleri log'u (max 30)
 const transactionLog = [
-    { amount: 12450, desc: 'Günlük Gelir', time: Date.now() - 3600000, type: 'income' },
-    { amount: -8500, desc: 'Bina İnşası (Fabrika)', time: Date.now() - 7200000, type: 'expense' },
-    { amount: 3100, desc: 'Ticaret Kârı', time: Date.now() - 10800000, type: 'income' },
-    { amount: -2000, desc: 'Liman İnşası', time: Date.now() - 14400000, type: 'expense' },
-    { amount: 950, desc: 'Kaynak Satışı (Demir)', time: Date.now() - 18000000, type: 'income' },
-    { amount: -5000, desc: 'Altyapı Yükseltme', time: Date.now() - 21600000, type: 'expense' },
-    { amount: 200, desc: 'Vergi Geliri', time: Date.now() - 25200000, type: 'income' },
+    { amount: 15400, desc: 'Gümrük Vergisi Gelirleri', time: Date.now() - 1800000, type: 'income' },
+    { amount: -12500, desc: 'Kamu Personeli Maaşları', time: Date.now() - 7200000, type: 'expense' },
+    { amount: -4500, desc: 'Dönemlik Kurumlar Vergisi', time: Date.now() - 10800000, type: 'expense' },
+    { amount: 8200, desc: 'Şehir Vergisi Tahsilatı', time: Date.now() - 14400000, type: 'income' },
+    { amount: -1270, desc: 'Merkezi Elektrik Faturası', time: Date.now() - 18000000, type: 'expense' },
+    { amount: -3200, desc: 'Yol Bakım & Onarım (Lojistik)', time: Date.now() - 21600000, type: 'expense' },
+    { amount: 950, desc: 'Kaynak İhraç Bedeli (Demir)', time: Date.now() - 25200000, type: 'income' },
+    { amount: -500, desc: 'Sistem Bakım Aidatı', time: Date.now() - 32400000, type: 'expense' },
 ];
 
 function logTransaction(amount, desc) {
