@@ -3750,7 +3750,7 @@
     margin: 0 0 24px 0;
     font-size: 0.9rem;
     color: var(--text-muted);
-    max-width: 300px;
+    max-width: 400px;
 }
 
 .btn-primary.btn-create-company {
@@ -4316,8 +4316,9 @@
     padding: 12px 16px;
     background: var(--card-bg);
     border-radius: var(--radius-lg);
-    margin-bottom: 20px;
+    margin-bottom: 0;
     overflow-x: auto;
+    border: 1px solid var(--card-border);
 }
 
 .category-tab {
@@ -4354,11 +4355,21 @@
     gap: 20px;
 }
 
+
+.commodity-left-column {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    min-width: 0; /* Prevents flex overflow */
+}
+
 .commodity-list-section {
     background: var(--card-bg);
     border: 1px solid var(--card-border);
+    border-bottom: none;
     border-radius: var(--radius-lg);
     padding: 20px;
+    flex: 1;
 }
 
 .list-header {
@@ -4370,16 +4381,26 @@
 
 .list-header .search-box {
     flex: 1;
-    max-width: 300px;
+    max-width: 400px;
 }
 
 .sort-options select {
-    padding: 8px 12px;
-    background: rgba(0, 0, 0, 0.3);
+    appearance: none;
+    -webkit-appearance: none;
+    padding: 10px 36px 10px 16px;
+    background: rgba(0, 0, 0, 0.3) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23888' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E") no-repeat right 12px center;
     border: 1px solid var(--card-border);
     border-radius: var(--radius-sm);
     color: var(--text-primary);
-    font-size: 0.75rem;
+    font-size: 0.8rem;
+    cursor: pointer;
+    outline: none;
+    transition: all 0.2s ease;
+    min-width: 150px;
+}
+.sort-options select:hover, .sort-options select:focus {
+    border-color: var(--accent-gold);
+    background-color: rgba(255, 255, 255, 0.05);
 }
 
 .commodity-table .table-header,
@@ -4389,6 +4410,24 @@
     gap: 12px;
     padding: 12px 16px;
     align-items: center;
+}
+
+
+.commodity-table .table-body {
+    max-height: 500px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding-right: 4px;
+}
+.commodity-table .table-body::-webkit-scrollbar {
+    width: 6px;
+}
+.commodity-table .table-body::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+}
+.commodity-table .table-body::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.1);
 }
 
 .commodity-table .table-header {

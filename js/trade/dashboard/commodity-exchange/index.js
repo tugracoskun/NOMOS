@@ -175,7 +175,11 @@ export function renderCommodityExchangeSection() {
                 </div>
             </header>
 
-            <!-- Kategori Tabs -->
+            <!-- Main Content Grid -->
+            <div class="commodity-main-grid">
+                <!-- Sol: Emtia Listesi -->
+                <div class="commodity-left-column">
+<!-- Kategori Tabs -->
             <div class="commodity-category-tabs">
                 <button class="category-tab active" data-category="all">
                     <i class="fa-solid fa-list"></i> Tümü
@@ -187,10 +191,7 @@ export function renderCommodityExchangeSection() {
                 `).join('')}
             </div>
 
-            <!-- Main Content Grid -->
-            <div class="commodity-main-grid">
-                <!-- Sol: Emtia Listesi -->
-                <div class="commodity-list-section">
+                                <div class="commodity-list-section">
                     <div class="list-header">
                         <div class="search-box">
                             <i class="fa-solid fa-search"></i>
@@ -217,6 +218,8 @@ export function renderCommodityExchangeSection() {
                             ${commodities.map(c => renderCommodityRow(c)).join('')}
                         </div>
                     </div>
+                </div>
+
                 </div>
 
                 <!-- Sağ: Market Özeti -->
