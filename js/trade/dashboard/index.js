@@ -4,7 +4,7 @@
 import { getGameState } from '../../data/state.js';
 import { marketState, initMarket } from '../../data/market.js';
 import { renderMyCompanySection, setupCompanyEventHandlers } from './my-company/index.js';
-import { renderStockExchangeSection, initInteractiveChart, setupExchangeViewNav, PORTFOLIO_STATS } from './stock-exchange/index.js';
+import { renderStockExchangeSection, initInteractiveChart, setupExchangeViewNav } from './stock-exchange/index.js';
 import { renderMarketNews } from './news/index.js';
 import { renderShipmentTracker } from './logistics/index.js';
 import { renderCommodityExchangeWidget, renderCommodityExchangeSection, setupCommodityExchangeEvents } from './commodity-exchange/index.js';
@@ -202,30 +202,6 @@ function renderOverviewTab() {
                                 <span class="trade-type-desc">3 aktif kargo</span>
                             </div>
                             <i class="fa-solid fa-chevron-right trade-type-arrow"></i>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Portföy Özet Widget -->
-                <div class="widget-card portfolio-summary-widget" style="flex:1; min-height:0; display:flex; flex-direction:column; cursor:pointer;" data-action="open-portfolio">
-                    <div class="portfolio-summary-header">
-                        <h3><i class="fa-solid fa-wallet"></i> Portföyüm</h3>
-                        <span class="portfolio-expand-hint"><i class="fa-solid fa-expand"></i></span>
-                    </div>
-                    <div class="portfolio-summary-body">
-                        <div class="portfolio-total">
-                            <span class="portfolio-label">Toplam Değer</span>
-                            <span class="portfolio-value">${PORTFOLIO_STATS.total.toLocaleString()} ₳</span>
-                            <span class="portfolio-change positive">+${PORTFOLIO_STATS.change}% <i class="fa-solid fa-arrow-up"></i></span>
-                        </div>
-                        <div class="portfolio-holdings">
-                            ${PORTFOLIO_STATS.holdings.map(h => `
-                                <div class="holding-item">
-                                    <span class="hold-ticker">${h.ticker}</span>
-                                    <span class="hold-qty">${h.qty} adet</span>
-                                    <span class="hold-val ${h.change >= 0 ? 'positive' : 'negative'}">${h.change >= 0 ? '+' : ''}${h.change}%</span>
-                                </div>
-                            `).join('')}
                         </div>
                     </div>
                 </div>
@@ -450,13 +426,6 @@ function setupTabSpecificEvents(container, tabId) {
                     navigateToTab('exchange', 'world-stocks');
                 });
             });
-
-            // Portföy popup
-            contentArea.querySelectorAll('[data-action="open-portfolio"]').forEach(el => {
-                el.addEventListener('click', () => {
-                    openPortfolioPopup();
-                });
-            });
             break;
         case 'company':
             // Setup company management event handlers
@@ -494,54 +463,6 @@ function navigateToTab(tabId, subView) {
             }, 100);
         }
     }
-}
-
-// Portföy Popup
-function openPortfolioPopup() {
-    // Mevcut popup varsa kaldır
-    let existing = document.getElementById('portfolio-popup-overlay');
-    if (existing) existing.remove();
-
-    const overlay = document.createElement('div');
-    overlay.id = 'portfolio-popup-overlay';
-    overlay.className = 'portfolio-popup-overlay';
-    overlay.innerHTML = `
-        <div class="portfolio-popup">
-            <div class="portfolio-popup-header">
-                <h2><i class="fa-solid fa-wallet"></i> Portföyüm</h2>
-                <button class="portfolio-popup-close" id="close-portfolio-popup">
-                    <i class="fa-solid fa-xmark"></i>
-                </button>
-            </div>
-            <div class="portfolio-popup-body">
-                <div class="portfolio-popup-summary">
-                    <div class="pp-stat"><span class="pp-label">Toplam Değer</span><span class="pp-value">45,250 ₳</span></div>
-                    <div class="pp-stat"><span class="pp-label">Günlük Kar/Zarar</span><span class="pp-value positive">+1,085 ₳ (+2.4%)</span></div>
-                    <div class="pp-stat"><span class="pp-label">Yatırım Sayısı</span><span class="pp-value">8</span></div>
-                </div>
-                <div class="portfolio-popup-table">
-                    <div class="pp-table-header">
-                        <span>Varlık</span><span>Adet</span><span>Fiyat</span><span>Değer</span><span>Değişim</span>
-                    </div>
-                    <div class="pp-table-body">
-                        <div class="pp-row"><span class="pp-ticker">TKN</span><span>500</span><span>2,450 ₳</span><span>1,225,000 ₳</span><span class="positive">+5.8%</span></div>
-                        <div class="pp-row"><span class="pp-ticker">ENP</span><span>200</span><span>1,780 ₳</span><span>356,000 ₳</span><span class="positive">+2.1%</span></div>
-                        <div class="pp-row"><span class="pp-ticker">GDG</span><span>350</span><span>890 ₳</span><span>311,500 ₳</span><span class="negative">-1.2%</span></div>
-                        <div class="pp-row"><span class="pp-ticker">LXM</span><span>50</span><span>4,500 ₳</span><span>225,000 ₳</span><span class="positive">+1.5%</span></div>
-                        <div class="pp-row"><span class="pp-ticker">BYF</span><span>10</span><span>150 ₳</span><span>1,500 ₳</span><span class="positive">+2.8%</span></div>
-                        <div class="pp-row"><span class="pp-ticker">TKF</span><span>5</span><span>280 ₳</span><span>1,400 ₳</span><span class="positive">+6.2%</span></div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    `;
-    document.body.appendChild(overlay);
-
-    // Kapatma
-    document.getElementById('close-portfolio-popup').addEventListener('click', () => overlay.remove());
-    overlay.addEventListener('click', (e) => {
-        if (e.target === overlay) overlay.remove();
-    });
 }
 
 // === REAL-TIME TICKER ===

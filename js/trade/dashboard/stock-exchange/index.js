@@ -5,19 +5,17 @@ import { marketState, getMarketMultiplier, marketScenarios } from '../../../data
 import { resourcesList } from '../../../map/resources.js';
 import { resourcesEconomics } from '../../../data/city-stats.js';
 
-export const PORTFOLIO_STATS = {
-    total: 45250.00,
-    change: 2.4,
-    holdings: [
-        { ticker: 'TKN', qty: 500, change: 5.8 },
-        { ticker: 'ENP', qty: 200, change: 2.1 },
-        { ticker: 'GDG', qty: 350, change: -1.2 },
-        { ticker: 'BYF', qty: 10, change: 2.8 },
-        { ticker: 'LXM', qty: 50, change: 1.5 }
-    ]
-};
-
-const STOCK_DATA = {
+export const STOCK_DATA = {
+    countries: [
+        { id: 'tr', name: 'Türkiye', ticker: 'TR', growth: 4.5, investment: 125, score: 85, change: 1.2 },
+        { id: 'us', name: 'ABD', ticker: 'USA', growth: 2.1, investment: 4500, score: 92, change: 0.5 },
+        { id: 'de', name: 'Almanya', ticker: 'GER', growth: 0.5, investment: 2100, score: 88, change: -0.3 },
+        { id: 'cn', name: 'Çin', ticker: 'CHN', growth: 5.2, investment: 3200, score: 89, change: 2.1 },
+        { id: 'gb', name: 'İngiltere', ticker: 'UK', growth: 1.1, investment: 1500, score: 84, change: 0.8 },
+        { id: 'jp', name: 'Japonya', ticker: 'JPN', growth: 0.8, investment: 1800, score: 87, change: -0.1 },
+        { id: 'in', name: 'Hindistan', ticker: 'IND', growth: 6.5, investment: 1100, score: 81, change: 3.2 },
+        { id: 'br', name: 'Brezilya', ticker: 'BRA', growth: 2.5, investment: 850, score: 76, change: 1.5 }
+    ],
     companies: [
         { id: 'textile_corp', name: 'Tekstil A.Ş.', ticker: 'TKS', sector: 'textile', price: 1250, change: 3.5, volume: 125000, marketCap: 15000000 },
         { id: 'food_global', name: 'Gıda Global', ticker: 'GDG', sector: 'food', price: 890, change: -1.2, volume: 89000, marketCap: 8900000 },
@@ -28,28 +26,17 @@ const STOCK_DATA = {
         { id: 'logistics_express', name: 'Express Lojistik', ticker: 'EXL', sector: 'logistics', price: 980, change: 4.2, volume: 98000, marketCap: 9800000 },
         { id: 'agro_harvest', name: 'Agro Hasat', ticker: 'AGH', sector: 'agriculture', price: 650, change: -2.5, volume: 65000, marketCap: 6500000 }
     ],
-    funds: [
-        {
-            id: 'growth_fund', name: 'Büyüme Fonu', ticker: 'BYF', type: 'growth', price: 150, change: 2.8, aum: 5000000, risk: 'medium',
-            distribution: { 'Hisse Senedi': 65, 'Tahvil': 15, 'Emtia': 10, 'Kripto': 5, 'Nakit': 5 }
-        },
-        {
-            id: 'stable_fund', name: 'Sabit Getiri', ticker: 'SGF', type: 'stable', price: 105, change: 0.5, aum: 8000000, risk: 'low',
-            distribution: { 'Hisse Senedi': 10, 'Tahvil': 70, 'Emtia': 5, 'Kripto': 0, 'Nakit': 15 }
-        },
-        {
-            id: 'tech_fund', name: 'Teknoloji Fonu', ticker: 'TKF', type: 'sector', price: 280, change: 6.2, aum: 3000000, risk: 'high',
-            distribution: { 'Hisse Senedi': 85, 'Tahvil': 5, 'Emtia': 0, 'Kripto': 5, 'Nakit': 5 }
-        },
-        {
-            id: 'diversified_fund', name: 'Çeşitlendirilmiş', ticker: 'DVF', type: 'diversified', price: 125, change: 1.8, aum: 12000000, risk: 'low',
-            distribution: { 'Hisse Senedi': 35, 'Tahvil': 35, 'Emtia': 20, 'Kripto': 2, 'Nakit': 8 }
-        }
+    commodities: [
+        { id: 'gold', name: 'Altın', ticker: 'XAU', type: 'precious', price: 2350.50, change: 1.2, risk: 'low', distribution: {'Fiziki': 80, 'Kağıt': 20} },
+        { id: 'silver', name: 'Gümüş', ticker: 'XAG', type: 'precious', price: 28.40, change: 0.8, risk: 'medium', distribution: {'Fiziki': 60, 'Kağıt': 40} },
+        { id: 'oil', name: 'Ham Petrol', ticker: 'OIL', type: 'energy', price: 82.30, change: -1.5, risk: 'high', distribution: {'Varil': 90, 'Diğer': 10} },
+        { id: 'gas', name: 'Doğalgaz', ticker: 'NG', type: 'energy', price: 2.80, change: 3.4, risk: 'high', distribution: {'Boru Hat.': 70, 'LNG': 30} },
+        { id: 'copper', name: 'Bakır', ticker: 'COP', type: 'industrial', price: 4.10, change: 0.5, risk: 'medium', distribution: {'Külçe': 50, 'Diğer': 50} }
     ],
     indices: [
-        { name: 'NOMOS 100', value: 12458.32, change: 1.24 },
-        { name: 'Sanayi Endeksi', value: 8934.56, change: -0.87 },
-        { name: 'Teknoloji Endeksi', value: 15678.90, change: 2.45 }
+        { name: 'Küresel Büyüme Endeksi', value: 1045.32, change: 0.84 },
+        { name: 'Gelişen Piyasalar Endeksi', value: 834.56, change: 1.27 },
+        { name: 'Enerji Piyasası Endeksi', value: 1578.90, change: -0.45 }
     ]
 };
 
@@ -111,8 +98,8 @@ function renderExchangeWidget() {
                     Borsa
                 </button>
                 <button class="btn-exchange" data-action="view-funds">
-                    <i class="fa-solid fa-coins"></i>
-                    Fonlar
+                    <i class="fa-solid fa-gem"></i>
+                    Emtialar
                 </button>
                 <button class="btn-exchange" data-action="view-world-stocks">
                     <i class="fa-solid fa-globe"></i>
@@ -148,8 +135,8 @@ function renderFullExchangeView() {
                             <span>Grafik</span>
                         </button>
                         <button class="exchange-nav-btn" data-view="funds">
-                            <i class="fa-solid fa-coins"></i>
-                            <span>Fonlar</span>
+                            <i class="fa-solid fa-gem"></i>
+                            <span>Emtia Grafikleri</span>
                         </button>
                         <button class="exchange-nav-btn" data-view="world-stocks">
                             <i class="fa-solid fa-globe"></i>
@@ -162,14 +149,7 @@ function renderFullExchangeView() {
                         <button class="btn-icon-header" title="Alarm Kur"><i class="fa-solid fa-bell"></i></button>
                         <button class="btn-icon-header" title="Ayarlar"><i class="fa-solid fa-gear"></i></button>
                     </div>
-                    <div class="portfolio-summary-compact">
-                        <div class="label">PORTFÖY</div>
-                        <div class="val-group">
-                            <span class="value">${PORTFOLIO_STATS.total.toLocaleString()} ₳</span>
-                            <span class="change positive">+${PORTFOLIO_STATS.change}%</span>
-                        </div>
                     </div>
-                </div>
             </header>
 
             <!-- Main Layout with Views -->
@@ -251,7 +231,19 @@ function renderFullExchangeView() {
                                 <div class="chart-header">
                                     <div class="chart-symbol">
                                         <div class="symbol-box">
-                                            <span class="symbol">NOMOS 100</span>
+                                            <select class="chart-symbol-select" style="background: transparent; color: white; border: none; font-size: 1.2rem; font-weight: bold; cursor: pointer; outline: none; margin-right: 8px;">
+                                                <optgroup label="Ülkeler">
+                                                    <option value="TR">Türkiye Endeksi</option>
+                                                    <option value="USA">ABD Endeksi</option>
+                                                    <option value="GER">Almanya Endeksi</option>
+                                                    <option value="CHN">Çin Endeksi</option>
+                                                </optgroup>
+                                                <optgroup label="Makro Endeksler">
+                                                    <option value="GLO">Küresel Büyüme Endeksi</option>
+                                                    <option value="DEV">Gelişen Piyasalar</option>
+                                                    <option value="ENE">Enerji Piyasası</option>
+                                                </optgroup>
+                                            </select>
                                             <span class="market">INDEX</span>
                                         </div>
                                         <div class="price-box">
@@ -308,7 +300,7 @@ function renderFullExchangeView() {
                                             <div class="internal-section">
                                                 <h4><i class="fa-solid fa-newspaper"></i> HABERLER</h4>
                                                 <div class="stock-news-item mini">
-                                                    <div class="news-title">NOMOS 100 Endeksi pozitif seyrediyor.</div>
+                                                    <div class="news-title">Küresel Büyüme Endeksi Endeksi pozitif seyrediyor.</div>
                                                     <span class="time">2sa</span>
                                                 </div>
                                                 <div class="stock-news-item mini">
@@ -317,10 +309,10 @@ function renderFullExchangeView() {
                                                 </div>
                                             </div>
                                             <div class="internal-section">
-                                                <h4><i class="fa-solid fa-pie-chart"></i> FONLAR (BYF)</h4>
+                                                <h4><i class="fa-solid fa-chart-simple"></i> EMTİA PİYASASI</h4>
                                                 <div class="funds-mini-row">
-                                                    <div class="f-mini-tag">Büyüme %12</div>
-                                                    <div class="f-mini-tag">Tekno %8</div>
+                                                    <div class="f-mini-tag">Altın +1.2%</div>
+                                                    <div class="f-mini-tag">Petrol -1.5%</div>
                                                 </div>
                                             </div>
                                         </div>
@@ -346,23 +338,7 @@ function renderFullExchangeView() {
                                     </div>
                                 </div>
 
-                                <div class="chart-trading-bar">
-                                     <div class="sentiment-indicator" title="Piyasa Duyarlılığı">
-                                         <div class="sentiment-bar-fill"></div>
-                                         <span class="sentiment-label shadow-text">BOĞA %65</span>
-                                     </div>
-                                     <div class="quick-trade-buttons">
-                                         <button class="q-trade-btn buy" onclick="alert('Alım emri: 12,458')">
-                                             <span class="action-label">AL</span>
-                                             <span class="action-price">12,458</span>
-                                         </button>
-                                         <button class="q-trade-btn sell" onclick="alert('Satım emri: 12,457')">
-                                             <span class="action-label">SAT</span>
-                                             <span class="action-price">12,457</span>
-                                         </button>
-                                     </div>
-                                 </div>
-                                 <div class="chart-bottom-info">
+                                <div class="chart-bottom-info">
                                      <div class="chart-stats-mini">
                                          <div class="mini-stat"><span>YÜK:</span> <span class="v text-green">12,520</span></div>
                                          <div class="mini-stat"><span>DÜŞ:</span> <span class="v text-red">12,195</span></div>
@@ -376,20 +352,20 @@ function renderFullExchangeView() {
                                 <div class="sidebar-section">
                                     <h4><i class="fa-solid fa-list-ul"></i> İzleme Listesi</h4>
                                     <div class="watch-list" id="tv-watch-list">
-                                        <div class="watch-item">
-                                            <span class="w-symbol">TKS</span>
-                                            <span class="w-price">1,250</span>
-                                            <span class="w-change positive">+3.5%</span>
+<div class="watch-item">
+                                            <span class="w-symbol">TR</span>
+                                            <span class="w-price">8,945</span>
+                                            <span class="w-change positive">+1.24%</span>
                                         </div>
                                         <div class="watch-item">
-                                            <span class="w-symbol">TKN</span>
-                                            <span class="w-price">2,450</span>
-                                            <span class="w-change positive">+5.8%</span>
+                                            <span class="w-symbol">USA</span>
+                                            <span class="w-price">34,567</span>
+                                            <span class="w-change positive">+0.45%</span>
                                         </div>
                                         <div class="watch-item">
-                                            <span class="w-symbol">ENP</span>
-                                            <span class="w-price">1,780</span>
-                                            <span class="w-change negative">-0.4%</span>
+                                            <span class="w-symbol">XAU</span>
+                                            <span class="w-price">2,350</span>
+                                            <span class="w-change positive">+1.2%</span>
                                         </div>
                                     </div>
                                 </div>
@@ -417,18 +393,18 @@ function renderFullExchangeView() {
                     <div class="exchange-view-panel" id="view-funds">
                         <section class="funds-section">
                             <div class="section-header">
-                                <h2>Yatırım Fonları</h2>
+                                <h2>Emtia Grafikleri</h2>
                                 <div class="section-controls">
                                     <div class="filter-tabs">
                                         <button class="filter-tab active" data-filter="all">Tümü</button>
-                                        <button class="filter-tab" data-filter="low">Düşük Risk</button>
-                                        <button class="filter-tab" data-filter="medium">Orta Risk</button>
-                                        <button class="filter-tab" data-filter="high">Yüksek Risk</button>
+                                        <button class="filter-tab" data-filter="precious">Değerli Maden</button>
+                                        <button class="filter-tab" data-filter="energy">Enerji</button>
+                                        <button class="filter-tab" data-filter="industrial">Endüstriyel</button>
                                     </div>
                                 </div>
                             </div>
                             <div class="funds-grid">
-                                ${STOCK_DATA.funds.map(fund => renderFundCard(fund)).join('')}
+                                ${STOCK_DATA.commodities.map(fund => renderFundCard(fund)).join('')}
                             </div>
                         </section>
                     </div>
@@ -1201,7 +1177,7 @@ function setupFundEvents() {
         if (card) {
             const actionBtn = e.target.closest('[data-action]');
             const fundId = card.dataset.fundId;
-            const fund = STOCK_DATA.funds.find(f => f.id === fundId);
+            const fund = STOCK_DATA.commodities.find(f => f.id === fundId);
 
             if (fund) {
                 if (actionBtn) {
@@ -1237,7 +1213,7 @@ function handleFundClick(e) {
     if (!card) return;
 
     const fundId = card.dataset.fundId;
-    const fund = STOCK_DATA.funds.find(f => f.id === fundId);
+    const fund = STOCK_DATA.commodities.find(f => f.id === fundId);
 
     if (!fund) return;
 
@@ -1258,7 +1234,7 @@ function applyFundFilter(filter) {
     const cards = document.querySelectorAll('.fund-card');
     cards.forEach(card => {
         const fundId = card.dataset.fundId;
-        const fund = STOCK_DATA.funds.find(f => f.id === fundId);
+        const fund = STOCK_DATA.commodities.find(f => f.id === fundId);
         if (filter === 'all' || fund.risk === filter) {
             card.style.display = 'flex';
         } else {
@@ -1620,7 +1596,7 @@ function addAlertToList(price) {
     const alertHtml = `
         <div class="alert-item" id="${id}">
             <div class="alert-info">
-                <span class="alert-symbol">NOMOS 100</span>
+                <span class="alert-symbol">Küresel Büyüme Endeksi</span>
                 <span class="alert-price">${price.toLocaleString()}</span>
             </div>
             <button class="btn-clear-alert" onclick="this.closest('.alert-item').remove()">
@@ -1866,7 +1842,7 @@ function renderMainChart() {
             const bullish = c.close >= c.open;
             tooltip.innerHTML = `
                 <div class="tt-header ${bullish ? 'bullish' : 'bearish'}">
-                    <span class="tt-symbol">NOMOS 100</span>
+                    <span class="tt-symbol">Küresel Büyüme Endeksi</span>
                     <span class="tt-change ${bullish ? 'positive' : 'negative'}">
                         ${bullish ? '+' : ''}${((c.close - c.open) / c.open * 100).toFixed(2)}%
                     </span>
@@ -1977,7 +1953,7 @@ function renderRecentInvestments() {
     const investments = [
         { type: 'buy', asset: 'TKN', amount: 500, price: 142.50, time: '2 dk önce', profit: null },
         { type: 'sell', asset: 'ENP', amount: 200, price: 89.20, time: '15 dk önce', profit: 1250 },
-        { type: 'buy', asset: 'NOMOS 100 Fonu', amount: 1, price: 5000, time: '1 saat önce', profit: null },
+        { type: 'buy', asset: 'Küresel Büyüme Endeksi Fonu', amount: 1, price: 5000, time: '1 saat önce', profit: null },
         { type: 'dividend', asset: 'MNC', amount: null, price: 450, time: '3 saat önce', profit: 450 }
     ];
 
@@ -2334,11 +2310,11 @@ export function getStockData() {
 }
 
 export function getStockById(stockId) {
-    return STOCK_DATA.companies.find(s => s.id === stockId);
+    return STOCK_DATA.countries.find(s => s.id === stockId);
 }
 
 export function getFundById(fundId) {
-    return STOCK_DATA.funds.find(f => f.id === fundId);
+    return STOCK_DATA.commodities.find(f => f.id === fundId);
 }
 
 // === DÜNYA HİSELERİ ===
