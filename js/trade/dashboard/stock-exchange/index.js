@@ -26,12 +26,11 @@ export const STOCK_DATA = {
         { id: 'logistics_express', name: 'Express Lojistik', ticker: 'EXL', sector: 'logistics', price: 980, change: 4.2, volume: 98000, marketCap: 9800000 },
         { id: 'agro_harvest', name: 'Agro Hasat', ticker: 'AGH', sector: 'agriculture', price: 650, change: -2.5, volume: 65000, marketCap: 6500000 }
     ],
-    commodities: [
-        { id: 'gold', name: 'Altın', ticker: 'XAU', type: 'precious', price: 2350.50, change: 1.2, risk: 'low', distribution: {'Fiziki': 80, 'Kağıt': 20} },
-        { id: 'silver', name: 'Gümüş', ticker: 'XAG', type: 'precious', price: 28.40, change: 0.8, risk: 'medium', distribution: {'Fiziki': 60, 'Kağıt': 40} },
-        { id: 'oil', name: 'Ham Petrol', ticker: 'OIL', type: 'energy', price: 82.30, change: -1.5, risk: 'high', distribution: {'Varil': 90, 'Diğer': 10} },
-        { id: 'gas', name: 'Doğalgaz', ticker: 'NG', type: 'energy', price: 2.80, change: 3.4, risk: 'high', distribution: {'Boru Hat.': 70, 'LNG': 30} },
-        { id: 'copper', name: 'Bakır', ticker: 'COP', type: 'industrial', price: 4.10, change: 0.5, risk: 'medium', distribution: {'Külçe': 50, 'Diğer': 50} }
+    funds: [
+        { id: 'tech_fund', name: 'Teknoloji Odaklı BYF', ticker: 'TEK', type: 'growth', price: 1450, aum: 150000000, change: 2.4, risk: 'high' },
+        { id: 'dividend_fund', name: 'Temettü 25 BYF', ticker: 'TEM', type: 'dividend', price: 850, aum: 450000000, change: 0.8, risk: 'low' },
+        { id: 'global_fund', name: 'Küresel Karma Fon', ticker: 'GLB', type: 'mixed', price: 2100, aum: 320000000, change: 1.2, risk: 'medium' },
+        { id: 'sustainability', name: 'Sürdürülebilirlik BYF', ticker: 'SRD', type: 'growth', price: 1100, aum: 85000000, change: 1.8, risk: 'medium' }
     ],
     indices: [
         { name: 'Küresel Büyüme Endeksi', value: 1045.32, change: 0.84 },
@@ -98,8 +97,8 @@ function renderExchangeWidget() {
                     Borsa
                 </button>
                 <button class="btn-exchange" data-action="view-funds">
-                    <i class="fa-solid fa-gem"></i>
-                    Emtialar
+                    <i class="fa-solid fa-coins"></i>
+                    Fonlar
                 </button>
                 <button class="btn-exchange" data-action="view-world-stocks">
                     <i class="fa-solid fa-globe"></i>
@@ -135,8 +134,8 @@ function renderFullExchangeView() {
                             <span>Grafik</span>
                         </button>
                         <button class="exchange-nav-btn" data-view="funds">
-                            <i class="fa-solid fa-gem"></i>
-                            <span>Emtia Grafikleri</span>
+                            <i class="fa-solid fa-coins"></i>
+                            <span>Yatırım Fonları</span>
                         </button>
                         <button class="exchange-nav-btn" data-view="world-stocks">
                             <i class="fa-solid fa-globe"></i>
@@ -309,10 +308,10 @@ function renderFullExchangeView() {
                                                 </div>
                                             </div>
                                             <div class="internal-section">
-                                                <h4><i class="fa-solid fa-chart-simple"></i> EMTİA PİYASASI</h4>
+                                                <h4><i class="fa-solid fa-pie-chart"></i> FONLAR (BYF)</h4>
                                                 <div class="funds-mini-row">
-                                                    <div class="f-mini-tag">Altın +1.2%</div>
-                                                    <div class="f-mini-tag">Petrol -1.5%</div>
+                                                    <div class="f-mini-tag">Büyüme %12</div>
+                                                    <div class="f-mini-tag">Tekno %8</div>
                                                 </div>
                                             </div>
                                         </div>
@@ -362,11 +361,7 @@ function renderFullExchangeView() {
                                             <span class="w-price">34,567</span>
                                             <span class="w-change positive">+0.45%</span>
                                         </div>
-                                        <div class="watch-item">
-                                            <span class="w-symbol">XAU</span>
-                                            <span class="w-price">2,350</span>
-                                            <span class="w-change positive">+1.2%</span>
-                                        </div>
+                                        
                                     </div>
                                 </div>
                                 <div class="sidebar-section">
@@ -393,18 +388,18 @@ function renderFullExchangeView() {
                     <div class="exchange-view-panel" id="view-funds">
                         <section class="funds-section">
                             <div class="section-header">
-                                <h2>Emtia Grafikleri</h2>
+                                <h2>Yatırım Fonları</h2>
                                 <div class="section-controls">
                                     <div class="filter-tabs">
                                         <button class="filter-tab active" data-filter="all">Tümü</button>
-                                        <button class="filter-tab" data-filter="precious">Değerli Maden</button>
-                                        <button class="filter-tab" data-filter="energy">Enerji</button>
-                                        <button class="filter-tab" data-filter="industrial">Endüstriyel</button>
+                                        <button class="filter-tab" data-filter="low">Düşük Risk</button>
+                                        <button class="filter-tab" data-filter="medium">Orta Risk</button>
+                                        <button class="filter-tab" data-filter="high">Yüksek Risk</button>
                                     </div>
                                 </div>
                             </div>
                             <div class="funds-grid">
-                                ${STOCK_DATA.commodities.map(fund => renderFundCard(fund)).join('')}
+                                ${STOCK_DATA.funds.map(fund => renderFundCard(fund)).join('')}
                             </div>
                         </section>
                     </div>
@@ -1177,7 +1172,7 @@ function setupFundEvents() {
         if (card) {
             const actionBtn = e.target.closest('[data-action]');
             const fundId = card.dataset.fundId;
-            const fund = STOCK_DATA.commodities.find(f => f.id === fundId);
+            const fund = STOCK_DATA.funds.find(f => f.id === fundId);
 
             if (fund) {
                 if (actionBtn) {
@@ -1213,7 +1208,7 @@ function handleFundClick(e) {
     if (!card) return;
 
     const fundId = card.dataset.fundId;
-    const fund = STOCK_DATA.commodities.find(f => f.id === fundId);
+    const fund = STOCK_DATA.funds.find(f => f.id === fundId);
 
     if (!fund) return;
 
@@ -1234,7 +1229,7 @@ function applyFundFilter(filter) {
     const cards = document.querySelectorAll('.fund-card');
     cards.forEach(card => {
         const fundId = card.dataset.fundId;
-        const fund = STOCK_DATA.commodities.find(f => f.id === fundId);
+        const fund = STOCK_DATA.funds.find(f => f.id === fundId);
         if (filter === 'all' || fund.risk === filter) {
             card.style.display = 'flex';
         } else {
@@ -2314,7 +2309,7 @@ export function getStockById(stockId) {
 }
 
 export function getFundById(fundId) {
-    return STOCK_DATA.commodities.find(f => f.id === fundId);
+    return STOCK_DATA.funds.find(f => f.id === fundId);
 }
 
 // === DÜNYA HİSELERİ ===
