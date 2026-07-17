@@ -5,63 +5,51 @@
 /* === HAMBURGER BUTTON === */
 .hamburger-btn {
     position: relative;
-    width: 40px;
-    height: 40px;
-    background: rgba(255, 255, 255, 0.04);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 10px;
+    width: 42px;
+    height: 32px;
+    background: rgba(0, 0, 0, 0.25);
+    border: 1px solid var(--border, rgba(255,255,255,0.1));
+    border-radius: 6px;
     cursor: pointer;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 5px;
+    gap: 4px;
     padding: 0;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
     flex-shrink: 0;
-    overflow: hidden;
-}
-
-.hamburger-btn::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(135deg, rgba(59, 130, 246, 0), rgba(139, 92, 246, 0));
-    border-radius: 10px;
-    transition: background 0.3s ease;
 }
 
 .hamburger-btn:hover {
+    background: rgba(0, 0, 0, 0.35);
     border-color: rgba(255, 255, 255, 0.15);
-    background: rgba(255, 255, 255, 0.07);
-    transform: scale(1.05);
-}
-
-.hamburger-btn:hover::before {
-    background: linear-gradient(135deg, rgba(59, 130, 246, 0.08), rgba(139, 92, 246, 0.05));
 }
 
 .hamburger-btn.active {
-    background: linear-gradient(135deg, rgba(59, 130, 246, 0.15), rgba(139, 92, 246, 0.1));
-    border-color: rgba(59, 130, 246, 0.3);
-    box-shadow: 0 0 20px rgba(59, 130, 246, 0.2);
+    background: rgba(59, 130, 246, 0.12);
+    border-color: rgba(59, 130, 246, 0.35);
+    box-shadow: 0 0 12px rgba(59, 130, 246, 0.15);
 }
 
 .ham-line {
     display: block;
-    width: 18px;
-    height: 2px;
-    background: rgba(255, 255, 255, 0.6);
+    width: 16px;
+    height: 1.5px;
+    background: rgba(255, 255, 255, 0.55);
     border-radius: 2px;
-    transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     transform-origin: center;
-    position: relative;
+}
+
+.hamburger-btn:hover .ham-line {
+    background: rgba(255, 255, 255, 0.8);
 }
 
 .hamburger-btn.active .ham-line:nth-child(1) {
-    transform: translateY(7px) rotate(45deg);
+    transform: translateY(5.5px) rotate(45deg);
     background: #60a5fa;
-    width: 20px;
+    width: 16px;
 }
 
 .hamburger-btn.active .ham-line:nth-child(2) {
@@ -70,9 +58,9 @@
 }
 
 .hamburger-btn.active .ham-line:nth-child(3) {
-    transform: translateY(-7px) rotate(-45deg);
+    transform: translateY(-5.5px) rotate(-45deg);
     background: #60a5fa;
-    width: 20px;
+    width: 16px;
 }
 
 /* === OVERLAY === */
