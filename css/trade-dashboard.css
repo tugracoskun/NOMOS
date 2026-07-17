@@ -5333,8 +5333,10 @@
 /* === COMPACT OVERVIEW V2 === */
 .overview-compact-v2 {
     display: grid;
-    grid-template-columns: 1fr 0.9fr 1.4fr;
-    gap: 12px;
+    grid-template-columns: minmax(320px, 1fr) minmax(340px, 1fr);
+    max-width: 900px;
+    margin: 0 auto;
+    gap: 24px;
     height: calc(100vh - 180px);
     min-height: 520px;
 }
@@ -10562,8 +10564,10 @@
    OVERVIEW V2 - PREMIUM KOMPAKT LAYOUT
    ======================================== */
 .overview-compact-v2 {
-    grid-template-columns: 260px 1fr 265px;
-    gap: 12px;
+    grid-template-columns: minmax(320px, 1fr) minmax(340px, 1fr);
+    max-width: 900px;
+    margin: 0 auto;
+    gap: 24px;
     height: 100%;
 }
 

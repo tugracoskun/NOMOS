@@ -163,49 +163,6 @@ function renderOverviewTab() {
                 </div>
             </div>
 
-            <!-- Orta Sütun: Ticaret Türleri + Portföy -->
-            <div class="overview-column col-center">
-                <!-- Ticaret Türleri İkili Widget -->
-                <div class="widget-card trade-types-widget" style="flex-shrink:0;">
-                    <div class="trade-types-header">
-                        <h3><i class="fa-solid fa-arrow-right-arrow-left"></i> Ticaret</h3>
-                    </div>
-                    <div class="trade-types-grid">
-                        <div class="trade-type-card" data-trade-type="commodity">
-                            <div class="trade-type-icon" style="background:rgba(251,191,36,0.12); color:#fbbf24;"><i class="fa-solid fa-scale-balanced"></i></div>
-                            <div class="trade-type-info">
-                                <span class="trade-type-name">Emtia</span>
-                                <span class="trade-type-desc">4 aktif işlem</span>
-                            </div>
-                            <i class="fa-solid fa-chevron-right trade-type-arrow"></i>
-                        </div>
-                        <div class="trade-type-card" data-trade-type="exchange">
-                            <div class="trade-type-icon" style="background:rgba(59,130,246,0.12); color:#60a5fa;"><i class="fa-solid fa-chart-line"></i></div>
-                            <div class="trade-type-info">
-                                <span class="trade-type-name">Borsa</span>
-                                <span class="trade-type-desc">NOMOS 100 +1.24%</span>
-                            </div>
-                            <i class="fa-solid fa-chevron-right trade-type-arrow"></i>
-                        </div>
-                        <div class="trade-type-card" data-trade-type="company">
-                            <div class="trade-type-icon" style="background:rgba(34,197,94,0.12); color:#4ade80;"><i class="fa-solid fa-building"></i></div>
-                            <div class="trade-type-info">
-                                <span class="trade-type-name">Şirket</span>
-                                <span class="trade-type-desc">Yönetim paneli</span>
-                            </div>
-                            <i class="fa-solid fa-chevron-right trade-type-arrow"></i>
-                        </div>
-                        <div class="trade-type-card" data-trade-type="logistics">
-                            <div class="trade-type-icon" style="background:rgba(6,182,212,0.12); color:#22d3ee;"><i class="fa-solid fa-truck-fast"></i></div>
-                            <div class="trade-type-info">
-                                <span class="trade-type-name">Lojistik</span>
-                                <span class="trade-type-desc">3 aktif kargo</span>
-                            </div>
-                            <i class="fa-solid fa-chevron-right trade-type-arrow"></i>
-                        </div>
-                    </div>
-                </div>
-            </div>
 
             <!-- Sağ Sütun: Şirket + Borsa -->
             <div class="overview-column col-right">
