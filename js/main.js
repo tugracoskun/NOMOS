@@ -4,12 +4,14 @@
 import { navigateTo, handleInitialLoad } from './router.js';
 import { loadState, startIncomeTicker, toggleGoldDropdown } from './data/state.js';
 import { initSettingsPanel } from './settings.js';
+import { initSidebarMenu } from './sidebar-menu.js';
 
 document.addEventListener('DOMContentLoaded', () => {
     console.log("NOMOS System Initialized.");
     loadState();
     startIncomeTicker();
     initSettingsPanel();
+    initSidebarMenu();
     
     // Altın paneli fonksiyonunu global yap (onclick için)
     window.toggleGoldDropdown = toggleGoldDropdown;

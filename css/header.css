@@ -661,24 +661,6 @@
     letter-spacing: 0.5px;
 }
 
-.settings-btn {
-    background: transparent;
-    border: 1px solid var(--border);
-    color: var(--text-dim);
-    padding: 6px 12px;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: 0.2s;
-    font-size: 0.8rem;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-}
-
-.settings-btn:hover {
-    background-color: var(--bg-card);
-    color: var(--text-light);
-}
 
 /* Navigasyon Linkleri - Premium Enhanced */
 .header-bottom {
