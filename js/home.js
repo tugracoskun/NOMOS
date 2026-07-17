@@ -110,7 +110,7 @@ export function renderHome(container) {
                 </div>
 
                 <!-- Meclis Dağılımı (en altta) -->
-                <div class="home-widget parliament-widget">
+                <div class="home-widget parliament-widget" data-page="parliament" style="cursor: pointer;" title="Meclis'e Git">
                     <div class="widget-header">
                         <h3><i class="fa-solid fa-landmark"></i> Meclis Dağılımı</h3>
                     </div>
