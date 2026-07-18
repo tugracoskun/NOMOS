@@ -3,29 +3,21 @@
    ========================================= */
 .home-layout-grid {
     display: grid;
-    /* Sol (270px) | Orta (Esnek) | Sağ (270px) */
-    /* Yanları biraz kıstık ki ortadaki Chat'e yer kalsın ama 1250px'e sığsın */
+    /* Sol (260px) | Orta (Esnek - Chat daralır) | Sağ (265px) */
     grid-template-columns: 260px 1fr 265px;
     gap: 16px;
-    /* Diğer sayfalarla aynı boşluk */
 
-    /* KRİTİK AYAR 1: GENİŞLİK SINIRI */
-    max-width: 1250px;
-    /* Partiler ve Meclis sayfasıyla birebir aynı */
+    /* Navigasyonun sol-sağ kenar hizasıyla eşleşir */
+    max-width: 980px;
     margin: 0 auto;
-    /* Ortala */
 
-    padding: 20px;
+    padding: 16px 0;
 
-    /* KRİTİK AYAR 2: ALT SINIR */
     height: calc(100vh - 130px);
-    /* Dikey alanı daha agresif doldur */
-    /* Header + Footer/Padding telafisi */
     min-height: 500px;
 
     overflow: hidden;
     align-items: stretch;
-    /* İçerideki sütunları boydan boya uzat */
     animation: fadeIn 0.4s ease;
 }
 
