@@ -30,13 +30,20 @@ export function initMap(containerId) {
         
         <div id="map-loader" class="map-loader-overlay">
             <div class="loader-content">
-                <div class="ring-outer"></div>
-                <div class="ring-middle"></div>
-                <div class="ring-inner"></div>
+                <div class="radar-container">
+                    <div class="radar-grid"></div>
+                    <div class="radar-beam"></div>
+                    <div class="radar-dot dot-1"></div>
+                    <div class="radar-dot dot-2"></div>
+                    <div class="radar-dot dot-3"></div>
+                </div>
             </div>
             <div class="loader-text-group">
-                <div class="loading-title">UYDU BAĞLANTISI</div>
-                <div class="loading-subtitle">Veriler İşleniyor...</div>
+                <div class="loading-title">NOMOS KOMUTA MERKEZİ</div>
+                <div class="loading-subtitle" id="dynamic-loader-text">Uydu Bağlantısı Kuruluyor...</div>
+                <div class="loading-progress-track">
+                    <div class="loading-progress-fill"></div>
+                </div>
             </div>
         </div>
 
@@ -203,57 +210,78 @@ export function initMap(containerId) {
 
     // 3. YÜKLEME VE BEKLEME MANTIĞI
 
+    // Dinamik Yükleme Metinleri Animasyonu
+    const loaderMsgs = [
+        "Küresel Sınırlar Çiziliyor...",
+        "Ekonomik Veriler İndiriliyor...",
+        "Askeri Tesisler Taranıyor...",
+        "Nüfus Yoğunluğu Hesaplanıyor...",
+        "Bölgesel Diplomasi Yükleniyor..."
+    ];
+    let msgIndex = 0;
+    const msgInterval = setInterval(() => {
+        const msgEl = document.getElementById('dynamic-loader-text');
+        if (msgEl) {
+            msgEl.innerText = loaderMsgs[msgIndex];
+            msgIndex = (msgIndex + 1) % loaderMsgs.length;
+        }
+    }, 600);
+
     // A: Veri Yükleme İşlemi
-    const dataLoading = loadLayers(mapInstance);
+    loadLayers(mapInstance).then((isCached) => {
+        
+        const finalizeLoader = () => {
+            clearInterval(msgInterval);
+            const loader = document.getElementById('map-loader');
 
-    // B: Minimum Bekleme Süresi (2 Saniye) - Tasarım görünsün ve render otursun diye
-    const minWait = new Promise(resolve => setTimeout(resolve, 2000));
+            // Router Loading Bar'ı bitir
+            import('../router.js').then(module => {
+                if (module.finishLoading) module.finishLoading();
+            });
 
-    // İkisi de bitince loader'ı kaldır
-    Promise.all([dataLoading, minWait]).then(() => {
-        const loader = document.getElementById('map-loader');
+            if (loader) {
+                // Yazıyı değiştir (Son dokunuş)
+                loader.querySelector('.loading-title').innerText = "BAĞLANTI KURULDU";
+                loader.querySelector('.loading-title').style.color = "#4ade80"; // Yeşil
+                
+                const subtitle = loader.querySelector('.loading-subtitle');
+                if(subtitle) subtitle.innerText = "Harita Aktif";
 
-        // Router Loading Bar'ı bitir
-        import('../router.js').then(module => {
-            if (module.finishLoading) module.finishLoading();
-        });
+                // Progress bar'ı fulleyelim
+                const fill = loader.querySelector('.loading-progress-fill');
+                if(fill) {
+                    fill.style.transition = "width 0.2s ease-out";
+                    fill.style.width = "100%";
+                }
 
-        if (loader) {
-            // Yazıyı değiştir (Son dokunuş)
-            loader.querySelector('.loading-title').innerText = "BAĞLANTI KURULDU";
-            loader.querySelector('.loading-title').style.color = "#4ade80"; // Yeşil
-            loader.querySelector('.loading-subtitle').innerText = "Harita Hazır";
-
-            // Kısa bir süre sonra yok et
-            setTimeout(() => {
-                loader.classList.add('map-loader-hidden');
-                setTimeout(() => loader.remove(), 800); // CSS transition süresi kadar bekle
-
-                // Harita Modları paneli event'lerini başlat
-                initModePanelEvents();
-
-                // Dünya İstatistikleri paneli event'lerini başlat
-                initWorldStatsPanel();
-
-                // Uçak tracking sistemini başlat
-                initFlightTracking(mapInstance);
-
-                // Gemi tracking sistemini başlat
-                initShipTracking(mapInstance);
-
-                // Deniz rotalarını başlat
-                initSeaRoutes(mapInstance);
-
-                // Havalimanlarını başlat
+                // Kısa bir süre sonra yok et
                 setTimeout(() => {
-                    import('./flights.js').then(module => {
-                        initAirports(mapInstance, module.getActiveFlights());
-                    });
+                    loader.classList.add('map-loader-hidden');
+                    setTimeout(() => loader.remove(), 600); // CSS transition süresi kadar bekle
 
-                    // Limanları başlat
-                    initPorts(mapInstance, getActiveShips);
-                }, 1000);
-            }, 500);
+                    // Sistemleri başlat
+                    initModePanelEvents();
+                    initWorldStatsPanel();
+                    initFlightTracking(mapInstance);
+                    initShipTracking(mapInstance);
+                    initSeaRoutes(mapInstance);
+
+                    setTimeout(() => {
+                        import('./flights.js').then(module => {
+                            initAirports(mapInstance, module.getActiveFlights());
+                        });
+                        initPorts(mapInstance, getActiveShips);
+                    }, 800);
+                }, 300);
+            }
+        };
+
+        if (isCached) {
+            // Veri zaten elimizde, beklemeden anında yükle!
+            finalizeLoader();
+        } else {
+            // İlk açılışta animasyonu ve bar'ın doluşunu görmek için biraz bekle
+            setTimeout(finalizeLoader, 1800);
         }
     });
 }

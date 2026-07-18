@@ -11,6 +11,10 @@ let provinceLayer = null;
 let borderLayer = null;
 let mapRef = null; // Harita referansı
 
+// GLOBAL CACHE DEĞİŞKENLERİ
+let cachedRegions = null;
+let cachedTargetCountries = null;
+
 // --- MOD DEĞİŞİKLİĞİ DİNLEYİCİSİ ---
 window.addEventListener('mapModeChanged', (e) => {
     console.log(`Layers: Mod değişti -> ${e.detail.mode}`);
@@ -158,25 +162,40 @@ export async function loadLayers(mapInstance) {
     setupLabelPane(mapInstance);
 
     const loaderText = document.querySelector('.loading-subtitle');
-    if (loaderText) loaderText.innerText = "Dünya Haritası Oluşturuluyor...";
+    if (loaderText && !cachedRegions) loaderText.innerText = "Dünya Haritası Oluşturuluyor...";
+
+    let isCached = false;
 
     try {
-        const res = await fetch(dataUrls.world);
-        if (!res.ok) throw new Error("Dünya haritası yüklenemedi");
+        let targetCountries = cachedTargetCountries;
+        let allGeneratedRegions = cachedRegions;
 
-        const worldData = await res.json();
-        const allGeneratedRegions = [];
-        let globalRegionCounter = 0;
+        if (targetCountries && allGeneratedRegions) {
+            console.log("Map: Önbellekteki veriler kullanılıyor (Hızlı Yükleme).");
+            isCached = true;
+        } else {
+            console.log("Map: Yeni veri indiriliyor ve hesaplanıyor...");
+            const res = await fetch(dataUrls.world);
+            if (!res.ok) throw new Error("Dünya haritası yüklenemedi");
 
-        console.log("Map: Tüm dünya işleniyor...");
+            const worldData = await res.json();
+            allGeneratedRegions = [];
+            let globalRegionCounter = 0;
 
-        const targetCountries = worldData.features.filter(f => f.properties.ISO_A3 !== 'ATA');
+            console.log("Map: Tüm dünya işleniyor...");
 
-        targetCountries.forEach(country => {
-            const regions = generateVoronoiRegions(country, 5, globalRegionCounter);
-            globalRegionCounter += regions.length;
-            allGeneratedRegions.push(...regions);
-        });
+            targetCountries = worldData.features.filter(f => f.properties.ISO_A3 !== 'ATA');
+
+            targetCountries.forEach(country => {
+                const regions = generateVoronoiRegions(country, 5, globalRegionCounter);
+                globalRegionCounter += regions.length;
+                allGeneratedRegions.push(...regions);
+            });
+
+            // Cache'e kaydet
+            cachedRegions = allGeneratedRegions;
+            cachedTargetCountries = targetCountries;
+        }
 
         if (provinceLayer) mapInstance.removeLayer(provinceLayer);
         if (borderLayer) mapInstance.removeLayer(borderLayer);
@@ -198,11 +217,11 @@ export async function loadLayers(mapInstance) {
         }).addTo(mapInstance);
 
         // C. Etiketler
-        if (loaderText) loaderText.innerText = "Etiketler Ekleniyor...";
+        if (loaderText && !isCached) loaderText.innerText = "Etiketler Ekleniyor...";
         createCountryLabels(targetCountries, mapInstance);
 
         // D. Şehir Marker'ları
-        if (loaderText) loaderText.innerText = "Şehirler Yerleştiriliyor...";
+        if (loaderText && !isCached) loaderText.innerText = "Şehirler Yerleştiriliyor...";
         setupCityPane(mapInstance);
         createCityMarkers(allGeneratedRegions, mapInstance);
 
@@ -216,9 +235,13 @@ export async function loadLayers(mapInstance) {
         updateCityMarkersVisibility(mapInstance.getZoom());
 
         console.log(`Map: ${allGeneratedRegions.length} bölge oluşturuldu.`);
+        
+        // Önbellek durumunu döndür
+        return isCached;
 
     } catch (e) {
         console.error("Harita Oluşturma Hatası:", e);
+        return false;
     }
 }
 

@@ -1,17 +1,17 @@
 #game-map {
     width: 100%;
     height: 100%;
-    /* YENİ DENİZ RENGİ */
+    /* YENÄ° DENÄ°Z RENGÄ° */
     background-color: #51699C;
     z-index: 1;
 }
 
-/* Leaflet Varsayılan Arka Planı */
+/* Leaflet VarsayÄ±lan Arka PlanÄ± */
 .leaflet-container {
     background: #51699C !important;
 }
 
-/* ... (Diğer stiller aynı kalsın: leaflet-bar, popup vb.) ... */
+/* ... (DiÄŸer stiller aynÄ± kalsÄ±n: leaflet-bar, popup vb.) ... */
 .leaflet-bar a {
     background-color: var(--bg-card) !important;
     color: var(--text-light) !important;
@@ -43,7 +43,7 @@
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    transition: opacity 0.8s ease-in-out;
+    transition: opacity 0.6s ease-in-out;
 
     /* Tekno-Grid Arka Plan */
     background-image:
@@ -66,124 +66,124 @@
     animation: scan 3s linear infinite;
 }
 
-/* Merkezdeki Daireler */
+/* Merkezdeki Radar Konteyneri */
 .loader-content {
     position: relative;
-    width: 120px;
-    height: 120px;
+    width: 140px;
+    height: 140px;
     display: flex;
     justify-content: center;
     align-items: center;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(15,23,42,0.8) 0%, rgba(5,10,20,0.9) 100%);
+    box-shadow: 0 0 30px rgba(59, 130, 246, 0.2), inset 0 0 20px rgba(59,130,246,0.3);
+    border: 2px solid rgba(59, 130, 246, 0.4);
 }
 
-/* Dış Halka */
-.ring-outer {
+/* Radar İç Izgara (Hedef Çaprazı) */
+.radar-grid {
     position: absolute;
     width: 100%;
     height: 100%;
-    border: 2px dashed rgba(59, 130, 246, 0.3);
     border-radius: 50%;
-    animation: spin-slow 10s linear infinite;
+    background: 
+        linear-gradient(90deg, transparent 49%, rgba(59,130,246,0.5) 50%, transparent 51%),
+        linear-gradient(0deg, transparent 49%, rgba(59,130,246,0.5) 50%, transparent 51%),
+        radial-gradient(circle, transparent 65%, rgba(59,130,246,0.3) 66%, transparent 68%),
+        radial-gradient(circle, transparent 35%, rgba(59,130,246,0.3) 36%, transparent 38%);
 }
 
-/* Orta Halka (Kesik) */
-.ring-middle {
+/* Dönen Radar Işını */
+.radar-beam {
     position: absolute;
-    width: 80%;
-    height: 80%;
-    border: 2px solid transparent;
-    border-top: 2px solid #3b82f6;
-    border-bottom: 2px solid #3b82f6;
-    border-radius: 50%;
-    animation: spin 2s linear infinite;
-    box-shadow: 0 0 20px rgba(59, 130, 246, 0.2);
-}
-
-/* İç Radar */
-.ring-inner {
-    position: absolute;
+    top: 50%;
+    left: 50%;
     width: 50%;
     height: 50%;
-    background: rgba(59, 130, 246, 0.1);
-    border-radius: 50%;
-    animation: pulse 1.5s infinite alternate;
+    background: conic-gradient(from 0deg, rgba(59, 130, 246, 0.8), transparent 60deg);
+    transform-origin: top left;
+    border-radius: 100% 0 0 0;
+    animation: spin 2s linear infinite;
 }
 
-/* Yazı Grubu */
+/* Radar Noktaları (Uçaklar/Birlikler) */
+.radar-dot {
+    position: absolute;
+    width: 6px;
+    height: 6px;
+    background: #4ade80;
+    border-radius: 50%;
+    box-shadow: 0 0 8px #4ade80;
+    opacity: 0;
+    animation: ping 2s ease-out infinite;
+}
+
+.dot-1 { top: 30%; left: 60%; animation-delay: 0.5s; }
+.dot-2 { top: 70%; left: 30%; animation-delay: 1.2s; }
+.dot-3 { top: 40%; left: 20%; animation-delay: 1.8s; }
+
+/* Yazı Grubu ve Progress Bar */
 .loader-text-group {
-    margin-top: 30px;
+    margin-top: 40px;
     text-align: center;
     z-index: 2;
+    width: 300px;
 }
 
 .loading-title {
     font-family: 'Courier New', monospace;
     color: #fff;
-    font-size: 1.2rem;
-    font-weight: 700;
-    letter-spacing: 2px;
-    text-shadow: 0 0 10px rgba(59, 130, 246, 0.8);
+    font-size: 1.3rem;
+    font-weight: 800;
+    letter-spacing: 3px;
+    text-shadow: 0 0 12px rgba(59, 130, 246, 0.9);
 }
 
 .loading-subtitle {
     font-family: 'Inter', sans-serif;
     color: #94a3b8;
-    font-size: 0.8rem;
-    margin-top: 5px;
+    font-size: 0.85rem;
+    margin-top: 8px;
     text-transform: uppercase;
+    min-height: 18px; /* Sabit yükseklik */
+}
+
+/* Progress Track */
+.loading-progress-track {
+    width: 100%;
+    height: 4px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 2px;
+    margin-top: 15px;
+    overflow: hidden;
+    position: relative;
+}
+
+.loading-progress-fill {
+    width: 5%; /* Başlangıç */
+    height: 100%;
+    background: #3b82f6;
+    box-shadow: 0 0 10px #3b82f6;
+    border-radius: 2px;
+    transition: width 1.8s ease-in-out;
 }
 
 /* Animasyonlar */
 @keyframes scan {
-    0% {
-        top: -10%;
-        opacity: 0;
-    }
-
-    10% {
-        opacity: 1;
-    }
-
-    90% {
-        opacity: 1;
-    }
-
-    100% {
-        top: 110%;
-        opacity: 0;
-    }
+    0% { top: -10%; opacity: 0; }
+    10% { opacity: 1; }
+    90% { opacity: 1; }
+    100% { top: 110%; opacity: 0; }
 }
 
 @keyframes spin {
-    0% {
-        transform: rotate(0deg);
-    }
-
-    100% {
-        transform: rotate(360deg);
-    }
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
 }
 
-@keyframes spin-slow {
-    0% {
-        transform: rotate(0deg);
-    }
-
-    100% {
-        transform: rotate(-360deg);
-    }
-}
-
-@keyframes pulse {
-    0% {
-        transform: scale(0.8);
-        opacity: 0.5;
-    }
-
-    100% {
-        transform: scale(1);
-        opacity: 1;
-    }
+@keyframes ping {
+    0% { transform: scale(1); opacity: 1; }
+    100% { transform: scale(3); opacity: 0; }
 }
 
 .map-loader-hidden {
@@ -191,9 +191,9 @@
     pointer-events: none;
 }
 
-/* --- HARİTA ETİKETLERİ (Age of History 3 Tarzı) --- */
+/* --- HARÄ°TA ETÄ°KETLERÄ° (Age of History 3 TarzÄ±) --- */
 
-/* Ülke İsimleri - Kompakt ve Temiz */
+/* Ãœlke Ä°simleri - Kompakt ve Temiz */
 .country-label {
     pointer-events: none !important;
     transition: opacity 0.3s ease;
@@ -215,21 +215,21 @@
     transform: translate(-50%, -50%);
 }
 
-/* --- ŞEHİR MARKER'LARI --- */
+/* --- ÅEHÄ°R MARKER'LARI --- */
 
-/* Şehir Marker Container */
+/* Åehir Marker Container */
 .city-marker {
     pointer-events: auto !important;
     cursor: pointer;
     transition: opacity 0.3s ease;
 }
 
-/* Şehir Noktası */
+/* Åehir NoktasÄ± */
 .city-dot {
     width: 8px;
     height: 8px;
     background: #fbbf24;
-    /* Altın sarısı */
+    /* AltÄ±n sarÄ±sÄ± */
     border: 2px solid #ffffff;
     border-radius: 50%;
     box-shadow:
@@ -246,7 +246,7 @@
         0 0 20px rgba(245, 158, 11, 0.6);
 }
 
-/* Şehir Tooltip */
+/* Åehir Tooltip */
 .city-tooltip {
     background: rgba(0, 0, 0, 0.85) !important;
     border: 1px solid #fbbf24 !important;
@@ -263,7 +263,7 @@
     border-top-color: #fbbf24 !important;
 }
 
-/* Şehir İsmi Label */
+/* Åehir Ä°smi Label */
 .city-name-label {
     position: absolute;
     top: 50%;
@@ -272,7 +272,7 @@
     /* Tam merkeze hizala */
     font-family: 'Inter', sans-serif;
     font-size: 10px;
-    /* Biraz büyüttüm */
+    /* Biraz bÃ¼yÃ¼ttÃ¼m */
     font-weight: 700;
     color: #fbbf24;
     text-align: center;
@@ -287,12 +287,12 @@
     /* Hafif transparan */
 }
 
-/* Şehir üzerine gelince (Polygon hover) label parlasın */
-/* Bunu yapmak için JS tarafında class eklemek gerekebilir veya CSS sibling selector zordur. */
-/* Şimdilik sabit kalsın. */
+/* Åehir Ã¼zerine gelince (Polygon hover) label parlasÄ±n */
+/* Bunu yapmak iÃ§in JS tarafÄ±nda class eklemek gerekebilir veya CSS sibling selector zordur. */
+/* Åimdilik sabit kalsÄ±n. */
 
 
-/* --- ŞEHİR DETAY PANELİ --- */
+/* --- ÅEHÄ°R DETAY PANELÄ° --- */
 
 #city-detail-panel {
     position: fixed;
@@ -412,7 +412,7 @@
     margin-bottom: 2px;
 }
 
-/* Kaynak Kartı Özel Stil */
+/* Kaynak KartÄ± Ã–zel Stil */
 .resource-stat {
     background: linear-gradient(135deg, rgba(251, 191, 36, 0.1), rgba(245, 158, 11, 0.05));
     border-color: rgba(251, 191, 36, 0.3);
@@ -427,7 +427,7 @@
     color: #fbbf24;
 }
 
-/* Altyapı Kartı */
+/* AltyapÄ± KartÄ± */
 .infra-stat {
     background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(37, 99, 235, 0.05));
     border-color: rgba(59, 130, 246, 0.3);
@@ -442,7 +442,7 @@
     color: #60a5fa;
 }
 
-/* Vergi Verimliliği Kartı */
+/* Vergi VerimliliÄŸi KartÄ± */
 .tax-stat {
     background: linear-gradient(135deg, rgba(34, 197, 94, 0.1), rgba(22, 163, 74, 0.05));
     border-color: rgba(34, 197, 94, 0.3);
@@ -457,7 +457,7 @@
     color: #4ade80;
 }
 
-/* Eyalet Değeri Kartı */
+/* Eyalet DeÄŸeri KartÄ± */
 .value-stat {
     background: linear-gradient(135deg, rgba(168, 85, 247, 0.1), rgba(139, 92, 246, 0.05));
     border-color: rgba(168, 85, 247, 0.3);
@@ -472,7 +472,7 @@
     color: #c084fc;
 }
 
-/* Bina Kartı */
+/* Bina KartÄ± */
 .building-stat {
     background: linear-gradient(135deg, rgba(236, 72, 153, 0.1), rgba(219, 39, 119, 0.05));
     border-color: rgba(236, 72, 153, 0.3);
@@ -534,14 +534,14 @@
     }
 }
 
-/* --- HARİTA MODLARI - KOMPAKT SLİDER --- */
+/* --- HARÄ°TA MODLARI - KOMPAKT SLÄ°DER --- */
 .map-modes-panel {
     position: absolute;
     top: 50%;
     right: 0;
     transform: translateY(-50%);
     width: 220px;
-    /* Toplam genişlik (ikonlar + içerik) */
+    /* Toplam geniÅŸlik (ikonlar + iÃ§erik) */
     background: linear-gradient(135deg, rgba(15, 23, 42, 0.98), rgba(30, 41, 59, 0.98));
     border: 1px solid rgba(255, 255, 255, 0.12);
     border-right: none;
@@ -553,15 +553,15 @@
     overflow: visible;
     display: flex;
     flex-direction: row-reverse;
-    /* İkonlar sağda, içerik solda */
+    /* Ä°konlar saÄŸda, iÃ§erik solda */
 }
 
-/* Kapalı durum - sola kayarak gizle (sadece ikonlar görünür) */
+/* KapalÄ± durum - sola kayarak gizle (sadece ikonlar gÃ¶rÃ¼nÃ¼r) */
 .map-modes-panel.collapsed {
     transform: translateY(-50%) translateX(calc(100% - 44px));
 }
 
-/* İkon Şeridi (Her zaman sağda) */
+/* Ä°kon Åeridi (Her zaman saÄŸda) */
 .modes-icon-strip {
     display: flex;
     flex-direction: column;
@@ -599,7 +599,7 @@
     color: #60a5fa;
 }
 
-/* Genişletme Butonu - Ortada, hover'da görünür */
+/* GeniÅŸletme Butonu - Ortada, hover'da gÃ¶rÃ¼nÃ¼r */
 .expand-btn {
     position: absolute;
     left: 50%;
@@ -621,7 +621,7 @@
     z-index: 10;
 }
 
-/* Icon strip hover'da butonu göster */
+/* Icon strip hover'da butonu gÃ¶ster */
 .modes-icon-strip:hover .expand-btn {
     opacity: 1;
 }
@@ -633,7 +633,7 @@
     box-shadow: 0 0 12px rgba(59, 130, 246, 0.5);
 }
 
-/* Header (gizlendi, artık gereksiz) */
+/* Header (gizlendi, artÄ±k gereksiz) */
 .modes-header {
     display: none;
 }
@@ -643,7 +643,7 @@
     display: none;
 }
 
-/* Pull-tab (görünür) */
+/* Pull-tab (gÃ¶rÃ¼nÃ¼r) */
 .modes-pull-tab {
     position: absolute;
     left: -24px;
@@ -686,7 +686,7 @@
     transform: rotate(180deg);
 }
 
-/* Inline Header (açık durumda) */
+/* Inline Header (aÃ§Ä±k durumda) */
 .modes-header-inline {
     display: flex;
     justify-content: space-between;
@@ -721,17 +721,17 @@
     color: #60a5fa;
 }
 
-/* İçerik Alanı (Solda) */
+/* Ä°Ã§erik AlanÄ± (Solda) */
 .modes-content {
     flex: 1;
     padding: 12px;
     overflow: hidden;
 }
 
-/* Expand/collapse için width animation yerine translateX kullanıldı, 
-   bu yüzden display:none gerekmiyor */
+/* Expand/collapse iÃ§in width animation yerine translateX kullanÄ±ldÄ±, 
+   bu yÃ¼zden display:none gerekmiyor */
 
-/* Mod Butonları - 2x4 Grid */
+/* Mod ButonlarÄ± - 2x4 Grid */
 .mode-buttons {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
@@ -868,7 +868,7 @@
    FLIGHT TRACKING SYSTEM - Flightradar24 Style
    ===================================================== */
 
-/* Uçak Marker - Daha büyük ve animasyonlu */
+/* UÃ§ak Marker - Daha bÃ¼yÃ¼k ve animasyonlu */
 .flight-marker {
     cursor: pointer;
     transition: all 0.3s ease;
@@ -945,7 +945,7 @@
     color: white;
 }
 
-/* Uçuş Detay Paneli */
+/* UÃ§uÅŸ Detay Paneli */
 .flight-panel {
     position: fixed;
     top: 50%;
@@ -1025,7 +1025,7 @@
     gap: 20px;
 }
 
-/* Rota Gösterimi */
+/* Rota GÃ¶sterimi */
 .flight-route {
     display: flex;
     align-items: center;
@@ -1071,7 +1071,7 @@
     box-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
 }
 
-/* İstatistikler */
+/* Ä°statistikler */
 .flight-stats {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
@@ -1188,7 +1188,7 @@
         grid-template-columns: 1fr;
     }
 }
-/* VIP U�ak Bilgileri */
+/* VIP Uçak Bilgileri */
 .vip-info {
     background: rgba(251, 191, 36, 0.05);
     border: 1px solid rgba(251, 191, 36, 0.2);
@@ -1387,7 +1387,7 @@
     padding: 16px;
 }
 
-/* �statistikler */
+/* İstatistikler */
 .airport-stats {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
@@ -1571,7 +1571,7 @@
     font-size: 0.85rem;
 }
 
-/* Basit ok i�areti - test i�in */
+/* Basit ok işareti - test için */
 .flight-arrow {
     font-size: 24px;
     font-weight: bold;
@@ -1584,7 +1584,7 @@
     height: 100%;
 }
 
-/* SVG U�ak �konu */
+/* SVG Uçak İkonu */
 .flight-plane-icon {
     width: 100%;
     height: 100%;
@@ -1804,7 +1804,7 @@
     100% { filter: drop-shadow(0 0 2px rgba(255,255,255,0.2)); }
 }
 
-/* GEM� S�STEM� - Age of History 3 Tarz� */
+/* GEMİ SİSTEMİ - Age of History 3 Tarzı */
 .ship-marker {
     cursor: pointer;
     transition: transform 0.2s ease;
@@ -1905,7 +1905,7 @@
     font-weight: 500;
 }
 
-/* GEM� DETAY PANEL� */
+/* GEMİ DETAY PANELİ */
 .ship-panel {
     position: fixed;
     top: 50%;
@@ -2045,7 +2045,7 @@
     color: #3b82f6;
 }
 
-/* L�MAN S�STEM� */
+/* LİMAN SİSTEMİ */
 .port-marker {
     cursor: pointer;
 }
@@ -2271,7 +2271,7 @@
     font-size: 0.85rem;
 }
 
-/* DEN�Z ROTALARI */
+/* DENİZ ROTALARI */
 .sea-route-line {
     pointer-events: none;
 }
@@ -2316,7 +2316,7 @@
     font-size: 0.9rem;
 }
 
-/* ROTA ET�KETLER� - ��ZG�YE PARALEL VE S�L�K */
+/* ROTA ETİKETLERİ - ÇİZGİYE PARALEL VE SİLİK */
 .route-label-text {
     background: transparent;
     color: rgba(255, 255, 255, 0.2);
@@ -2343,7 +2343,7 @@
     transition: all 0.2s ease;
 }
 
-/* ROTA S�STEM� - M�N�MAL VE AKICI */
+/* ROTA SİSTEMİ - MİNİMAL VE AKICI */
 .sea-route-line {
     cursor: pointer;
     stroke-linecap: round;
@@ -2374,7 +2374,7 @@
     border-radius: 3px;
 }
 
-/* ROTA �S�MLER� - �IK VE MODERN */
+/* ROTA İSİMLERİ - ŞIK VE MODERN */
 .route-label-text {
     font-family: 'Inter', -apple-system, sans-serif !important;
     font-size: 10px !important;
@@ -2400,7 +2400,7 @@
         0 0 20px var(--route-color, #0ea5e9) !important;
 }
 
-/* ROTA �S�MLER� - S�METR�K VE SADE */
+/* ROTA İSİMLERİ - SİMETRİK VE SADE */
 .route-label {
     pointer-events: none !important;
 }
