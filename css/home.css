@@ -480,7 +480,7 @@
 }
 
 /* =========================================
-   ORTA SÜTUN: CHAT (BEYAZ ALAN)
+   ORTA SÜTUN: KONUM KARTI + CHAT
    ========================================= */
 .home-col-center {
     display: flex;
@@ -489,6 +489,161 @@
     min-height: 0;
     min-width: 0;
     align-self: stretch;
+    gap: 12px;
+}
+
+/* === KONUM KARTI (2 satırlı) === */
+.location-card {
+    flex-shrink: 0;
+    overflow: hidden !important;
+    background: linear-gradient(135deg, rgba(30,41,59,0.9) 0%, rgba(15,23,42,0.95) 100%) !important;
+    border-color: rgba(59,130,246,0.15) !important;
+    position: relative;
+}
+
+.location-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, #3b82f6, #8b5cf6, #06b6d4);
+    border-radius: 8px 8px 0 0;
+}
+
+/* Üst satır: bayrak + ülke adı + şehir */
+.location-top-row {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 16px 18px 14px;
+}
+
+.location-flag-area {
+    position: relative;
+    flex-shrink: 0;
+}
+
+.location-flag-big {
+    width: 56px;
+    height: auto;
+    border-radius: 6px;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.55);
+    display: block;
+}
+
+.location-status-dot {
+    position: absolute;
+    bottom: -3px;
+    right: -3px;
+    width: 10px;
+    height: 10px;
+    background: #22c55e;
+    border-radius: 50%;
+    border: 2px solid #0c1828;
+    box-shadow: 0 0 6px rgba(34,197,94,0.6);
+    animation: pulseGreen 2s ease-in-out infinite;
+}
+
+@keyframes pulseGreen {
+    0%, 100% { box-shadow: 0 0 6px rgba(34,197,94,0.6); }
+    50%       { box-shadow: 0 0 14px rgba(34,197,94,0.9); }
+}
+
+.location-main-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.location-country-name {
+    font-size: 1.15rem;
+    font-weight: 800;
+    color: #f1f5f9;
+    line-height: 1.2;
+    letter-spacing: -0.3px;
+}
+
+.location-city {
+    font-size: 0.72rem;
+    color: #64748b;
+    margin-top: 5px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    flex-wrap: wrap;
+}
+
+.location-city i {
+    color: #3b82f6;
+    font-size: 0.6rem;
+}
+
+.location-zone {
+    font-weight: 600;
+    font-size: 0.65rem;
+    padding: 1px 7px;
+    border-radius: 4px;
+}
+
+.location-zone.peace {
+    background: rgba(34,197,94,0.12);
+    color: #4ade80;
+    border: 1px solid rgba(34,197,94,0.2);
+}
+
+.location-zone.war {
+    background: rgba(239,68,68,0.12);
+    color: #f87171;
+    border: 1px solid rgba(239,68,68,0.2);
+}
+
+/* Alt satır: istatistikler — tam genişlik */
+.location-stats-row {
+    display: flex;
+    align-items: stretch;
+    border-top: 1px solid rgba(255,255,255,0.05);
+    background: rgba(0,0,0,0.15);
+}
+
+.location-stat {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 12px 8px;
+    gap: 4px;
+}
+
+.location-stat-val {
+    font-size: 1.0rem;
+    font-weight: 800;
+    color: #f1f5f9;
+    font-variant-numeric: tabular-nums;
+    line-height: 1;
+}
+
+.location-stat-lbl {
+    font-size: 0.6rem;
+    color: #475569;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    font-weight: 600;
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    gap: 3px;
+}
+
+.location-stat-lbl i {
+    font-size: 0.55rem;
+    color: #3b82f6;
+}
+
+.location-stat-divider {
+    width: 1px;
+    background: rgba(255,255,255,0.05);
+    flex-shrink: 0;
+    align-self: stretch;
 }
 
 .chat-container {
@@ -496,8 +651,7 @@
     border: 1px solid var(--border);
     border-radius: 12px;
     flex: 1;
-    /* TÜM ALANI DOLDUR */
-    height: 100%;
+    min-height: 0;
     display: flex;
     flex-direction: column;
     overflow: hidden;

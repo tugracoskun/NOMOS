@@ -95,19 +95,7 @@ export function renderHome(container) {
                     </div>
                 </div>
 
-                <!-- Konum -->
-                <div class="home-widget region-widget">
-                    <div class="widget-header">
-                        <h3><i class="fa-solid fa-map-pin"></i> Konum</h3>
-                    </div>
-                    <div class="region-info">
-                        <img src="https://flagcdn.com/w80/tr.png" class="region-flag">
-                        <div>
-                            <strong>Ankara, Türkiye</strong>
-                            <small>Barış Bölgesi</small>
-                        </div>
-                    </div>
-                </div>
+
 
                 <!-- Meclis Dağılımı (en altta) -->
                 <div class="home-widget parliament-widget" data-page="parliament" style="cursor: pointer;" title="Meclis'e Git">
@@ -121,8 +109,56 @@ export function renderHome(container) {
 
             </div>
 
-            <!-- 2. ORTA SÜTUN (Chat) -->
+            <!-- 2. ORTA SÜTUN (Konum Kartı + Chat) -->
             <div class="home-col-center">
+
+                <!-- Üst: Konum & Ülke Bilgisi -->
+                <div class="home-widget location-card">
+                    <!-- Üst Satır: Bayrak + İsim + Durum -->
+                    <div class="location-top-row">
+                        <div class="location-flag-area">
+                            <img src="https://flagcdn.com/w80/tr.png" alt="Türkiye" class="location-flag-big">
+                            <div class="location-status-dot"></div>
+                        </div>
+                        <div class="location-main-info">
+                            <div class="location-country-name">Türkiye</div>
+                            <div class="location-city">
+                                <i class="fa-solid fa-map-pin"></i> Ankara
+                                &middot;
+                                <span class="location-zone peace">Barış Bölgesi</span>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Alt Satır: İstatistikler -->
+                    <div class="location-stats-row">
+                        <div class="location-stat">
+                            <span class="location-stat-val">84.7M</span>
+                            <span class="location-stat-lbl"><i class="fa-solid fa-users"></i> Nüfus</span>
+                        </div>
+                        <div class="location-stat-divider"></div>
+                        <div class="location-stat">
+                            <span class="location-stat-val">780K</span>
+                            <span class="location-stat-lbl"><i class="fa-solid fa-mountain-city"></i> km²</span>
+                        </div>
+                        <div class="location-stat-divider"></div>
+                        <div class="location-stat">
+                            <span class="location-stat-val">%62</span>
+                            <span class="location-stat-lbl"><i class="fa-solid fa-person-booth"></i> Destek</span>
+                        </div>
+                        <div class="location-stat-divider"></div>
+                        <div class="location-stat">
+                            <span class="location-stat-val">B+</span>
+                            <span class="location-stat-lbl"><i class="fa-solid fa-chart-simple"></i> Kredi</span>
+                        </div>
+                        <div class="location-stat-divider"></div>
+                        <div class="location-stat">
+                            <span class="location-stat-val">4,820</span>
+                            <span class="location-stat-lbl"><i class="fa-solid fa-star"></i> Puan</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Alt: Chat -->
                 <div class="chat-container">
                     <div class="chat-header-tabs">
                         <button class="chat-tab ${currentChannel === 'global' ? 'active' : ''}" data-channel="global">

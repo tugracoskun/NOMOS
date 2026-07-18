@@ -219,7 +219,7 @@ function buildSidebarHTML() {
                 </div>
 
                 <div class="sidebar-menu-item" data-page="wars">
-                    <div class="sidebar-menu-icon icon-red"><i class="fa-solid fa-rocket"></i></div>
+                    <div class="sidebar-menu-icon icon-red"><i class="fa-solid fa-jet-fighter"></i></div>
                     <div class="sidebar-menu-text">
                         <span class="sidebar-menu-title">Savaşlar</span>
                         <span class="sidebar-menu-desc">Aktif çatışmalar ve diplomasi</span>
@@ -247,7 +247,7 @@ function buildSidebarHTML() {
                 </div>
 
                 <div class="sidebar-menu-item" data-page="hangar">
-                    <div class="sidebar-menu-icon icon-orange"><i class="fa-solid fa-jet-fighter"></i></div>
+                    <div class="sidebar-menu-icon icon-orange"><i class="fa-solid fa-warehouse"></i></div>
                     <div class="sidebar-menu-text">
                         <span class="sidebar-menu-title">Hangar</span>
                         <span class="sidebar-menu-desc">Askeri araçlar ve ekipman</span>
