@@ -56,16 +56,12 @@
                 </div>
             </div>
 
-
             <!-- Enerji, Arama ve Ayarlar -->
             <div class="status-section">
-                <!-- Global Arama -->
-                <div class="header-search-compact">
-                    <div class="search-wrapper-mini">
-                        <i class="fa-solid fa-magnifying-glass"></i>
-                        <input type="text" placeholder="Ara..." id="global-search-input-compact">
-                        <div class="search-shortcut">/</div>
-                    </div>
+                <!-- Mesajlar İkonu -->
+                <div class="header-messages-icon" data-page="messages" style="cursor: pointer; display: flex; align-items: center; justify-content: center; width: 32px; height: 32px; background: rgba(0,0,0,0.25); border: 1px solid var(--border); border-radius: 6px; transition: all 0.3s; position: relative;" title="Mesajlar">
+                    <i class="fa-solid fa-envelope" style="color: var(--text-light); font-size: 0.9rem;"></i>
+                    <span class="msg-badge" style="position: absolute; top: -4px; right: -4px; background: #ef4444; color: white; font-size: 0.55rem; font-weight: bold; padding: 2px 4px; border-radius: 6px; box-shadow: 0 0 5px rgba(239,68,68,0.5); display: none;">0</span>
                 </div>
 
                 <div class="resource-group gold-display" onclick="toggleGoldDropdown(event)" style="cursor: pointer;">
@@ -90,7 +86,6 @@
             <a href="#" data-page="parties"><i class="fa-solid fa-flag"></i> Partiler</a>
             <a href="#" data-page="trade"><i class="fa-solid fa-chart-line"></i> Ticaret</a>
             <a href="#" data-page="hangar"><i class="fa-solid fa-warehouse"></i> Hangar</a>
-            <a href="#" data-page="messages"><i class="fa-solid fa-envelope"></i> Mesajlar</a>
             <a href="#" data-page="social"><i class="fa-brands fa-twitter"></i> Sosyal Medya</a>
         </nav>
 
