@@ -27,6 +27,7 @@ export function loadState() {
         const parsed = JSON.parse(saved);
         Object.assign(gameState, parsed);
     }
+    return gameState;
 }
 
 // Son para hareketleri log'u (max 30)
