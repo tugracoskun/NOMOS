@@ -163,6 +163,17 @@ window.addEventListener('popstate', (event) => {
     handleInitialLoad();
 });
 
+// hashchange: window.location.hash = '...' ile yapılan yönlendirmeleri yakalar
+window.addEventListener('hashchange', (event) => {
+    handleInitialLoad();
+});
+
+// nomos:navigate: Circular dependency olmadan sayfa modüllerinden gelen yönlendirmeler
+window.addEventListener('nomos:navigate', (event) => {
+    const { page, view = null, id = null } = event.detail;
+    navigateTo(page, view, id);
+});
+
 // Sayfa ilk açıldığında veya F5 atıldığında URL'i analiz et
 export function handleInitialLoad() {
     const hash = window.location.hash.substring(1); // # işaretini at

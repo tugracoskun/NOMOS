@@ -7,7 +7,7 @@
     left: 24px;
     width: 320px;
     z-index: 1000;
-    pointer-events: auto;
+    pointer-events: none; /* INVISIBLE SHIELD FIX */
 
     background: rgba(15, 23, 42, 0.95);
     border: 1px solid rgba(255, 255, 255, 0.1);
@@ -30,6 +30,7 @@
 .nation-overlay.active {
     opacity: 1;
     transform: translateX(0) scale(1);
+    pointer-events: auto; /* INVISIBLE SHIELD FIX */
 }
 
 /* Close Butonu */

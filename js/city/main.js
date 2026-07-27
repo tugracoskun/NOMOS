@@ -10,142 +10,75 @@ let currentCityId = null;
 export function renderCityPage(container, cityId) {
     currentCityId = cityId || 'demo';
 
-    // İlk açılışta container'ı gizle (CSS yüklenene kadar)
-    container.style.opacity = '0';
-    container.style.transition = 'opacity 0.2s ease';
+    // Şehir Verisini Yükle
+    let cityData = loadCityData(currentCityId);
 
-    // CSS'leri yükle ve yüklendikten sonra render et
-    loadStyles(() => {
-        // Şehir Verisini Yükle
-        let cityData = loadCityData(currentCityId);
+    // Altyapı ve İstatistikleri Hesapla
+    const stats = generateCityStats(cityData);
+    const buildings = cityData.buildings || [];
 
-        // Altyapı ve İstatistikleri Hesapla
-        const stats = generateCityStats(cityData);
-        const buildings = cityData.buildings || [];
+    // Ülke ve İttifak Verisi
+    const nation = getNationData(cityData.country);
+    const alliancesHtml = (nation.alliances || []).map(a =>
+        `<span class="tag-v2"><i class="fa-solid ${a.icon || 'fa-shield-halved'}"></i> ${a.name}</span>`
+    ).join('');
 
-        // Ülke ve İttifak Verisi
-        const nation = getNationData(cityData.country);
-        const alliancesHtml = (nation.alliances || []).map(a =>
-            `<span class="tag-v2"><i class="fa-solid ${a.icon || 'fa-shield-halved'}"></i> ${a.name}</span>`
-        ).join('');
+    // Kıyı Şehri mi kontrol et
+    const isCoastal = isCoastalRegion(cityData.regionId);
 
-        // Kıyı Şehri mi kontrol et
-        const isCoastal = isCoastalRegion(cityData.regionId);
-
-        // HTML Birleştirme (Templates.js'den gelen parçalarla)
-        container.innerHTML = `
-            <div class="city-page">
-                <header class="city-header">
-                    <div class="city-header-left">
-                        <button class="back-btn" onclick="window.location.hash='map'">
-                            <i class="fa-solid fa-arrow-left"></i>
-                        </button>
-                        <div class="city-title">
-                            <h1>${cityData.name}</h1>
-                            <div class="city-tags">
-                                <span class="city-country-badge city-country-link" 
-                                      data-page="country" 
-                                      data-view="${nation.name.replace(/"/g, '&quot;').replace(/'/g, '&#39;')}" 
-                                      title="${nation.name} profilini görüntüle">
-                                    <i class="fa-solid fa-location-dot"></i> ${nation.name}
-                                    <i class="fa-solid fa-arrow-up-right-from-square" style="font-size:0.6rem; opacity:0.6; margin-left:4px;"></i>
-                                </span>
-                                ${isCoastal ? '<span class="coastal-tag"><i class="fa-solid fa-anchor"></i> Kıyı Şehri</span>' : ''}
-                            </div>
+    // HTML Birleştirme
+    container.innerHTML = `
+        <div class="city-page">
+            <header class="city-header">
+                <div class="city-header-left">
+                    <button class="back-btn" data-page="map">
+                        <i class="fa-solid fa-arrow-left"></i>
+                    </button>
+                    <div class="city-title">
+                        <h1>${cityData.name}</h1>
+                        <div class="city-tags">
+                            <span class="city-country-badge" data-page="country" data-view="${nation.name}"
+                                  title="${nation.name} profiline git">
+                                <i class="fa-solid fa-location-dot"></i> ${nation.name}
+                            </span>
+                            ${isCoastal ? '<span class="coastal-tag"><i class="fa-solid fa-anchor"></i> Kıyı Şehri</span>' : ''}
                         </div>
                     </div>
-                    <div class="city-header-right">
-                        <div class="city-value-badge-wrapper">
-                            <div class="city-value-badge">
-                                <i class="fa-solid fa-star"></i>
-                                <span>Eyalet Değeri: ${stats.cityValue.stars}/10</span>
-                                <i class="fa-solid fa-circle-info info-icon"></i>
-                            </div>
-                            <div class="rank-tooltip">
-                                <h4>Değerlendirme Puanı (${stats.cityValue.score}/100)</h4>
-                                <ul>
-                                    ${Object.entries(stats.cityValue.details || {}).map(([key, val]) => `
-                                        <li>
-                                            <span>${key}</span>
-                                            <span class="score">+${val}</span>
-                                        </li>
-                                    `).join('')}
-                                </ul>
-                            </div>
+                </div>
+                <div class="city-header-right">
+                    <div class="city-value-badge-wrapper">
+                        <div class="city-value-badge">
+                            <i class="fa-solid fa-star"></i>
+                            <span>Eyalet Değeri: ${stats.cityValue.stars}/10</span>
+                            <i class="fa-solid fa-circle-info info-icon"></i>
+                        </div>
+                        <div class="rank-tooltip">
+                            <h4>Değerlendirme Puanı (${stats.cityValue.score}/100)</h4>
+                            <ul>
+                                ${Object.entries(stats.cityValue.details || {}).map(([key, val]) => `
+                                    <li>
+                                        <span>${key}</span>
+                                        <span class="score">+${val}</span>
+                                    </li>
+                                `).join('')}
+                            </ul>
                         </div>
                     </div>
-                </header>
+                </div>
+            </header>
 
+            <div class="city-dashboard-wrapper">
                 <main class="city-dashboard">
                     ${generateSidebarHTML(cityData, nation, stats, alliancesHtml)}
                     ${generateMainContentHTML(buildings)}
                 </main>
             </div>
-        `;
+        </div>
+    `;
 
-        // Event Listener'ları Kur
-        setupTabs(buildings);
-        setupUpgradeButton(currentCityId);
-
-        // Ülke linkine doğrudan click handler bağla
-        const countryLink = container.querySelector('.city-country-link');
-        if (countryLink) {
-            countryLink.addEventListener('click', (e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                const countryName = countryLink.getAttribute('data-view');
-                if (countryName) {
-                    window.location.hash = `country/${encodeURIComponent(countryName)}`;
-                }
-            });
-        }
-
-        // Render tamamlandı, container'ı göster
-        requestAnimationFrame(() => {
-            container.style.opacity = '1';
-        });
-    });
-}
-
-// ------ YARDIMCI FONKSİYONLAR & EVENTLER ------
-
-function loadStyles(callback) {
-    const cssFiles = [
-        { id: 'city-page-style', href: 'css/city.css' },
-        { id: 'nation-panel-style', href: 'css/nation-panel.css' }
-    ];
-
-    // Yüklenmemiş CSS'leri bul
-    const toLoad = cssFiles.filter(css => !document.getElementById(css.id));
-
-    if (toLoad.length === 0) {
-        // Tüm CSS'ler zaten yüklü
-        callback();
-        return;
-    }
-
-    let loadedCount = 0;
-
-    toLoad.forEach(css => {
-        const link = document.createElement('link');
-        link.id = css.id;
-        link.rel = 'stylesheet';
-        link.href = css.href;
-        link.onload = () => {
-            loadedCount++;
-            if (loadedCount === toLoad.length) {
-                callback();
-            }
-        };
-        // Hata durumunda da devam et
-        link.onerror = () => {
-            loadedCount++;
-            if (loadedCount === toLoad.length) {
-                callback();
-            }
-        };
-        document.head.appendChild(link);
-    });
+    // Tab ve upgrade butonları
+    setupTabs(buildings);
+    setupUpgradeButton(currentCityId);
 }
 
 function loadCityData(cityId) {
