@@ -7955,6 +7955,7 @@
     width: 100%;
     height: 6px;
     -webkit-appearance: none;
+    appearance: none;
     background: linear-gradient(to right, #ef4444, #fbbf24, #22c55e);
     border-radius: 3px;
     margin: 10px 0;
