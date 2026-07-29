@@ -281,7 +281,7 @@ export function initMap(containerId) {
             finalizeLoader();
         } else {
             // İlk açılışta animasyonu ve bar'ın doluşunu görmek için biraz bekle
-            setTimeout(finalizeLoader, 1800);
+            setTimeout(finalizeLoader, 300);
         }
     });
 }
