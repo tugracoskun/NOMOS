@@ -10,6 +10,7 @@ import { renderCountryPage } from './country/main.js';
 import { renderTradePage } from './trade/main.js';
 import { renderMessagesPage } from './messages/main.js';
 import { renderHangarPage } from './hangar/main.js';
+import { renderWarsPage } from './wars/main.js';
 
 const appContainer = document.getElementById('app-container');
 
@@ -125,6 +126,11 @@ export function loadPage(pageName, subView = null, id = null) {
 
             case 'hangar':
                 renderHangarPage(appContainer);
+                finishLoading();
+                break;
+
+            case 'wars':
+                renderWarsPage(appContainer);
                 finishLoading();
                 break;
 

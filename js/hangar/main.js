@@ -17,7 +17,7 @@ import { gameState, updateGold } from '../data/state.js';
 //   requiredLevel: Satın alabilmek için gereken minimum oyuncu seviyesi
 //   desc: Birim açıklaması
 
-const unitDatabase = {
+export const unitDatabase = {
     // ======================== KARA KUVVETLERİ ========================
     land: [
         {
@@ -242,7 +242,7 @@ const civilDatabase = [
 // ===================================================================
 // OYUNCU ENVANTERİ (Dinamik)
 // ===================================================================
-let inventory = {
+export let inventory = {
     military: {
         militia: 0, inf: 12000, spec_ops: 0, apc: 220, ifv: 0, art: 180, mlrs: 0,
         tank_light: 0, tank: 340, tank_heavy: 0, sam: 0,
