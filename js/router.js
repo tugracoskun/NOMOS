@@ -130,7 +130,7 @@ export function loadPage(pageName, subView = null, id = null) {
                 break;
 
             case 'wars':
-                renderWarsPage(appContainer);
+                renderWarsPage(appContainer, subView, id);
                 finishLoading();
                 break;
 

@@ -1,5 +1,6 @@
 import { buildingTypes, infrastructureLevels, getNextLevelPreview } from '../data/city-stats.js';
 import { loadState } from '../data/state.js';
+import { getWarsForCity } from '../data/wars.js';
 
 const buildingCategories = {
     economic: ['municipality', 'courthouse', 'taxOffice', 'taxCollection'],
@@ -8,8 +9,34 @@ const buildingCategories = {
 };
 
 export function generateSidebarHTML(cityData, nation, stats, alliancesHtml) {
+    const activeWars = getWarsForCity(cityData);
+    
+    let activeWarsHtml = '';
+    if (activeWars.length > 0) {
+        activeWarsHtml = `
+            <section class="sidebar-section highlight-card" style="margin-bottom: 16px; border-color: rgba(239, 68, 68, 0.5); background: rgba(239, 68, 68, 0.05);">
+                <div class="resource-header" style="color: #ef4444;">
+                    <i class="fa-solid fa-fire"></i>
+                    <span>Aktif Savaşlar (${activeWars.length})</span>
+                </div>
+                <div class="resource-body" style="flex-direction: column; gap: 8px;">
+                    ${activeWars.map(w => `
+                        <div class="active-war-item" data-page="wars" data-view="detail" data-id="${w.id}" style="cursor: pointer; background: rgba(0,0,0,0.5); padding: 8px; border-radius: 6px; border: 1px solid rgba(239, 68, 68, 0.2); transition: all 0.2s; display: flex; justify-content: space-between; align-items: center;" onmouseover="this.style.background='rgba(239, 68, 68, 0.15)'" onmouseout="this.style.background='rgba(0,0,0,0.5)'">
+                            <div style="display: flex; flex-direction: column; gap: 2px;">
+                                <span style="font-size: 0.75rem; color: #ef4444; font-weight: bold;">${w.type}</span>
+                                <span style="font-size: 0.85rem; color: var(--text-light);">${w.sideA.name} vs ${w.sideB.name}</span>
+                            </div>
+                            <i class="fa-solid fa-chevron-right" style="color: rgba(255,255,255,0.3); font-size: 0.8rem;"></i>
+                        </div>
+                    `).join('')}
+                </div>
+            </section>
+        `;
+    }
+
     return `
         <aside class="city-sidebar">
+            ${activeWarsHtml}
             <!-- FAZ 4: KAYNAK GELİRİ KARTI -->
             ${cityData.resource ? `
             <div class="sidebar-section highlight-card">

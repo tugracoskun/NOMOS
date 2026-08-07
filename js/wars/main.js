@@ -1,84 +1,11 @@
 // WARS (SAVAŞLAR) MODÜLÜ - KOMPAKT & ÇOK OYUNCULU HASAR SİSTEMİ
 import { gameState } from '../data/state.js';
 import { inventory, unitDatabase } from '../hangar/main.js';
+import { activeWars, warHistory, getWarLocationName, syncWarsWithMap } from '../data/wars.js';
 
 // ===================================================================
 // SAHTE VERİ (MOCK DATA)
 // ===================================================================
-const activeWars = [
-    { 
-        id: 'w1', 
-        type: 'Vekalet Savaşı',
-        sideA: { name: 'Türkiye', code: 'tr' }, 
-        sideB: { name: 'Yunanistan', code: 'gr' }, 
-        location: 'Ege Denizi', 
-        casusBelli: 'Kıta Sahanlığı İhlali', 
-        damageA: 1540000, 
-        damageB: 920000, 
-        casualtiesA: 8500, 
-        casualtiesB: 14200, 
-        duration: '14 Gün',
-        playerSupportedSide: null,
-        contributorsA: [
-            {name: 'Nomos_King', damage: 850000}, 
-            {name: 'Korkusuz34', damage: 450000}, 
-            {name: 'General_X', damage: 240000}
-        ],
-        contributorsB: [
-            {name: 'Spartan99', damage: 600000}, 
-            {name: 'Athena_TR', damage: 320000}
-        ]
-    },
-    { 
-        id: 'w2', 
-        type: 'Fetih Harekâtı',
-        sideA: { name: 'Rusya', code: 'ru' }, 
-        sideB: { name: 'Ukrayna', code: 'ua' }, 
-        location: 'Donbas', 
-        casusBelli: 'Toprak Bütünlüğü', 
-        damageA: 4250000, 
-        damageB: 3890000, 
-        casualtiesA: 125000, 
-        casualtiesB: 142500, 
-        duration: '18 Ay',
-        playerSupportedSide: null,
-        contributorsA: [{name: 'BearClaw', damage: 2100000}, {name: 'Ivan_K', damage: 1500000}],
-        contributorsB: [{name: 'GhostOfK', damage: 1800000}, {name: 'Liberty1', damage: 1200000}, {name: 'NATO_Sup', damage: 890000}]
-    },
-    { 
-        id: 'w3', 
-        type: 'Askeri Darbe',
-        sideA: { name: 'Hükümet Güçleri', code: 'cf' }, 
-        sideB: { name: 'İsyancılar', code: 'cd' }, 
-        location: 'Başkent', 
-        casusBelli: 'Yönetimi Devirme', 
-        damageA: 250000, 
-        damageB: 450000, 
-        casualtiesA: 2100, 
-        casualtiesB: 1800, 
-        duration: '5 Gün',
-        playerSupportedSide: null,
-        contributorsA: [{name: 'Loyalist', damage: 150000}],
-        contributorsB: [{name: 'ShadowOps', damage: 280000}, {name: 'Merc_1', damage: 170000}]
-    }
-];
-
-const warHistory = [
-    { 
-        id: 'wh1', 
-        type: 'Vekalet Savaşı',
-        sideA: { name: 'Azerbaycan', code: 'az' },
-        sideB: { name: 'Ermenistan', code: 'am' },
-        location: 'Karabağ',
-        date: '1 Yıl Önce', 
-        winner: 'A', 
-        damageA: 5500000,
-        damageB: 1200000,
-        casualtiesA: 2900, 
-        casualtiesB: 7800 
-    }
-];
-
 const neighbors = [
     { id: 'gr', name: 'Yunanistan', code: 'gr', strength: 'Güçlü', relations: -65, alliance: 'NATO' },
     { id: 'sy', name: 'Suriye', code: 'sy', strength: 'Çok Zayıf', relations: -90, alliance: 'Yok' },
@@ -101,10 +28,14 @@ function getFlagUrl(code) {
 // ===================================================================
 // ANA RENDER FONKSİYONU
 // ===================================================================
-export function renderWarsPage(container) {
+export function renderWarsPage(container, view = null, warId = null) {
     if (!container) return;
+    syncWarsWithMap(); // Her sayfa açıldığında savaş konumlarını güncel harita verisine senkronize et
     activeTab = 'overview';
     selectedWar = null;
+    if (view === 'detail' && warId) {
+        selectedWar = activeWars.find(w => w.id === warId) ? warId : null;
+    }
     isDeploying = false;
     isLeaderboardOpen = false;
 
@@ -281,7 +212,7 @@ function renderOverviewTab() {
                     
                     <div class="wr-info">
                         <div class="wr-type">${war.type}</div>
-                        <div class="wr-loc"><i class="fa-solid fa-location-dot"></i> ${war.location}</div>
+                        <div class="wr-loc"><i class="fa-solid fa-location-dot"></i> ${getWarLocationName(war)}</div>
                     </div>
 
                     <div class="wr-actions"><i class="fa-solid fa-chevron-right"></i></div>
@@ -306,7 +237,9 @@ function renderOverviewTab() {
         <div class="war-card">
             <div class="wc-top">
                 <div class="wc-type-badge">${war.type}</div>
-                <div class="wc-loc"><i class="fa-solid fa-crosshairs"></i> ${war.location} | <i class="fa-regular fa-clock"></i> ${war.duration}</div>
+                <div class="wc-loc" data-page="city" data-view="${war.locationRegionId}" style="cursor: pointer; color: var(--accent-primary); transition: color 0.2s;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='var(--accent-primary)'">
+                    <i class="fa-solid fa-crosshairs"></i> ${getWarLocationName(war)} <span style="color: var(--text-dim);">| <i class="fa-regular fa-clock"></i> ${war.duration}</span>
+                </div>
             </div>
 
             <div class="vs-container-compact">

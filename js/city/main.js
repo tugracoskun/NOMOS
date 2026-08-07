@@ -3,11 +3,14 @@ import { addBuildingToCity, upgradeCityInfrastructure } from '../data/state.js';
 import { getNationData } from '../data/nations.js';
 import { generateSidebarHTML, generateMainContentHTML, generateBuildingCards } from './templates.js';
 import { isCoastalRegion } from '../data/coastal-regions.js';
+import { getCityDataByRegion } from '../map/cities.js';
+import { syncWarsWithMap } from '../data/wars.js';
 
 let currentCityId = null;
 
 // Sayfa render (Ana Controller)
 export function renderCityPage(container, cityId) {
+    syncWarsWithMap(); // Şehir sayfasına girerken savaşların bölgelerini haritayla senkronize et
     currentCityId = cityId || 'demo';
 
     // Şehir Verisini Yükle
@@ -82,6 +85,11 @@ export function renderCityPage(container, cityId) {
 }
 
 function loadCityData(cityId) {
+    if (cityId && cityId !== 'demo') {
+        const dynamicCity = getCityDataByRegion(cityId);
+        if (dynamicCity) return dynamicCity;
+    }
+    
     try {
         const savedCity = localStorage.getItem('nomos_current_city');
         if (savedCity) return JSON.parse(savedCity);
